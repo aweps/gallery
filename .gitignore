@@ -22,6 +22,15 @@
 # is commented out by default.
 #.vscode/
 
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Created by https://www.toptal.com/developers/gitignore/api/flutter
+# Edit at https://www.toptal.com/developers/gitignore?templates=flutter
+
+### Flutter ###
 # Flutter/Dart/Pub related
 **/doc/api/
 .dart_tool/
@@ -31,7 +40,9 @@
 .pub-cache/
 .pub/
 /build/
-test_goldens/failures/
+golden_test/failures/
+build/
+lib/generated_plugin_registrant.dart
 
 # Android related
 **/android/**/gradle-wrapper.jar
@@ -39,6 +50,7 @@ test_goldens/failures/
 **/android/captures/
 **/android/gradlew
 **/android/gradlew.bat
+**/android/key.properties
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 
@@ -77,5 +89,16 @@ test_goldens/failures/
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
-**/google-services.json
-**/GoogleService-Info.plist
+
+android/google-play-service-account.json
+**/flutter*.log
+**/android/.idea/
+**/fastlane/report.xml
+**/Runner.ipa
+**/Runner.app.dSYM*
+**/ios/Flutter/DartDefines.xcconfig
+
+_ops/.env.temp
+_ops/.secrets.local
+_ops/.secrets.dev
+_ops/.secrets.prod

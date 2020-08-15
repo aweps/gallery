@@ -1,0 +1,33 @@
+name: Publish IOS app
+
+on:
+  push:
+    branches: [ ios ]
+
+jobs:
+
+  build_ios:
+    if: |
+      !contains(github.event.head_commit.message, 'ci skip')
+      && !contains(github.event.pull_request.title, 'ci skip')
+    runs-on: macos-latest
+    steps:
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: build
+      run: bash _ops/build.ios.sh
+
+    - name: publish
+      timeout-minutes: 30
+      run: bash _ops/publish.ios.sh
+      env:
+        PA_TOKEN: ${{ secrets.PA_TOKEN }}
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        FASTLANE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+        FASTLANE_SESSION: ${{ secrets.APPLE_SESSION }}
+        FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        DART_DEFINES: ${{ secrets.DART_DEFINES }}
+
