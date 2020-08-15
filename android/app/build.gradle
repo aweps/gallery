@@ -37,7 +37,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "io.flutter.demo.gallery"
+        applicationId "com.webkrux.demo.gallery"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode flutterVersionCode.toInteger()

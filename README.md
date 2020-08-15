@@ -41,7 +41,7 @@ This includes:
 - Linux
 - Windows
 
-An APK, macOS, Linux, and Windows builds are available for [download](https://github.com/flutter/gallery/releases). You can find it on the web at [gallery.flutter.dev](https://gallery.flutter.dev/) and on the [Google Play Store](https://play.google.com/store/apps/details?id=io.flutter.demo.gallery).
+An APK, macOS, Linux, and Windows builds are available for [download](https://github.com/flutter/gallery/releases). You can find it on the web at [gallery.flutter.dev](https://gallery.flutter.dev/) and on the [Google Play Store](https://play.google.com/store/apps/details?id=com.webkrux.demo.gallery).
 
 You can build from source yourself for any of these platforms, though, please note desktop support must [be enabled](
 https://github.com/flutter/flutter/wiki/Desktop-shells#tooling). For
