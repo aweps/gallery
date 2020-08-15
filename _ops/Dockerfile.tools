@@ -1,0 +1,20 @@
+FROM cirrusci/flutter:1.17.2-web as builder
+
+USER root
+
+RUN apt-get update && \
+    apt-get install -y gpg-agent && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Google Chrome
+RUN DEBIAN_FRONTEND=noninteractive \
+ && echo 'deb http://dl.google.com/linux/chrome/deb stable main' >> /etc/apt/sources.list.d/google-chrome.list \
+ && curl -fL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+ && apt-get update \
+ && apt-get install --no-install-recommends -y -q google-chrome-stable \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+# Upgrade to support web
+RUN flutter channel beta && flutter upgrade
+RUN flutter config --enable-web && flutter doctor
