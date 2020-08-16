@@ -8,4 +8,4 @@ dartanalyzer ./ --fatal-infos --fatal-warnings
 
 flutter analyze
 flutter test
-flutter pub run grinder verify-code-segments
+#flutter pub run grinder verify-code-segments
