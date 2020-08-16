@@ -16,5 +16,5 @@ RUN DEBIAN_FRONTEND=noninteractive \
  && rm -rf /var/lib/apt/lists/*
 
 # Upgrade to support web
-RUN flutter channel beta && flutter upgrade
+RUN flutter channel master && flutter upgrade
 RUN flutter config --enable-web && flutter doctor

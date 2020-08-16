@@ -2,8 +2,7 @@ name: Flutter Gallery Golden Tests
 on:
   push:
     branches:
-      - master
-  pull_request:
+      - upstream
 jobs:
   golden-test:
     name: Golden tests

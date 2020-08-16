@@ -2,8 +2,7 @@ name: Flutter Gallery Integration Tests
 on:
   push:
     branches:
-      - master
-  pull_request:
+      - upstream
 jobs:
   integration-test:
     name: Integration tests

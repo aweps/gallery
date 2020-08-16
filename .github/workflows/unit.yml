@@ -1,9 +1,8 @@
 name: Flutter Gallery Unit Tests
-on: 
+on:
   push:
     branches:
-      - master
-  pull_request:
+      - upstream
 jobs:
   test:
     name: Test on ${{ matrix.os }}
