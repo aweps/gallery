@@ -66,7 +66,8 @@ platform :ios do
 
 	# Commit the version bump
 	commit_version_bump(
-		force: true
+		force: true,
+		xcodeproj: "Runner.xcodeproj"
 	)
 
 	# Add a git tag for this build. This will automatically
