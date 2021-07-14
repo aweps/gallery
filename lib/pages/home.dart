@@ -7,25 +7,24 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/semantics.dart';
-
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 import 'package:gallery/constants.dart';
 import 'package:gallery/data/demos.dart';
 import 'package:gallery/data/gallery_options.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
 import 'package:gallery/layout/adaptive.dart';
 import 'package:gallery/layout/image_placeholder.dart';
 import 'package:gallery/pages/category_list_item.dart';
 import 'package:gallery/pages/settings.dart';
 import 'package:gallery/pages/splash.dart';
-import 'package:gallery/studies/crane/app.dart';
 import 'package:gallery/studies/crane/colors.dart';
-import 'package:gallery/studies/fortnightly/app.dart';
-import 'package:gallery/studies/rally/app.dart';
+import 'package:gallery/studies/crane/routes.dart' as crane_routes;
+import 'package:gallery/studies/fortnightly/routes.dart' as fortnightly_routes;
 import 'package:gallery/studies/rally/colors.dart';
-import 'package:gallery/studies/shrine/app.dart';
+import 'package:gallery/studies/rally/routes.dart' as rally_routes;
+import 'package:gallery/studies/reply/routes.dart' as reply_routes;
 import 'package:gallery/studies/shrine/colors.dart';
-import 'package:gallery/studies/starter/app.dart';
+import 'package:gallery/studies/shrine/routes.dart' as shrine_routes;
+import 'package:gallery/studies/starter/routes.dart' as starter_app_routes;
 
 const _horizontalPadding = 32.0;
 const _carouselItemMargin = 8.0;
@@ -36,6 +35,8 @@ const _desktopCardsPerPage = 4;
 class ToggleSplashNotification extends Notification {}
 
 class HomePage extends StatelessWidget {
+  const HomePage({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     var carouselHeight = _carouselHeight(.7, context);
@@ -43,6 +44,21 @@ class HomePage extends StatelessWidget {
     final localizations = GalleryLocalizations.of(context);
     final studyDemos = studies(localizations);
     final carouselCards = <Widget>[
+      _CarouselCard(
+        demo: studyDemos['reply'],
+        asset: const AssetImage(
+          'assets/studies/reply_card.png',
+          package: 'flutter_gallery_assets',
+        ),
+        assetColor: const Color(0xFF344955),
+        assetDark: const AssetImage(
+          'assets/studies/reply_card_dark.png',
+          package: 'flutter_gallery_assets',
+        ),
+        assetDarkColor: const Color(0xFF1D2327),
+        textColor: Colors.white,
+        studyRoute: reply_routes.homeRoute,
+      ),
       _CarouselCard(
         demo: studyDemos['shrine'],
         asset: const AssetImage(
@@ -56,7 +72,7 @@ class HomePage extends StatelessWidget {
         ),
         assetDarkColor: const Color(0xFF543B3C),
         textColor: shrineBrown900,
-        studyRoute: ShrineApp.loginRoute,
+        studyRoute: shrine_routes.loginRoute,
       ),
       _CarouselCard(
         demo: studyDemos['rally'],
@@ -71,7 +87,7 @@ class HomePage extends StatelessWidget {
           package: 'flutter_gallery_assets',
         ),
         assetDarkColor: const Color(0xFF253538),
-        studyRoute: RallyApp.loginRoute,
+        studyRoute: rally_routes.loginRoute,
       ),
       _CarouselCard(
         demo: studyDemos['crane'],
@@ -86,7 +102,7 @@ class HomePage extends StatelessWidget {
         ),
         assetDarkColor: const Color(0xFF591946),
         textColor: cranePurple700,
-        studyRoute: CraneApp.defaultRoute,
+        studyRoute: crane_routes.defaultRoute,
       ),
       _CarouselCard(
         demo: studyDemos['fortnightly'],
@@ -100,7 +116,7 @@ class HomePage extends StatelessWidget {
           package: 'flutter_gallery_assets',
         ),
         assetDarkColor: const Color(0xFF1F1F1F),
-        studyRoute: FortnightlyApp.defaultRoute,
+        studyRoute: fortnightly_routes.defaultRoute,
       ),
       _CarouselCard(
         demo: studyDemos['starterApp'],
@@ -115,7 +131,7 @@ class HomePage extends StatelessWidget {
         ),
         assetDarkColor: const Color(0xFF3F3D45),
         textColor: Colors.black,
-        studyRoute: StarterApp.defaultRoute,
+        studyRoute: starter_app_routes.defaultRoute,
       ),
     ];
 
@@ -161,7 +177,7 @@ class HomePage extends StatelessWidget {
               ),
               child: _GalleryHeader(),
             ),
-            Container(
+            SizedBox(
               height: carouselHeight,
               child: _DesktopCarousel(children: carouselCards),
             ),
@@ -209,7 +225,7 @@ class HomePage extends StatelessWidget {
                     child: Wrap(
                       crossAxisAlignment: WrapCrossAlignment.center,
                       alignment: WrapAlignment.end,
-                      children: [
+                      children: const [
                         SettingsAbout(),
                         SettingsFeedback(),
                         SettingsAttribution(),
@@ -225,6 +241,7 @@ class HomePage extends StatelessWidget {
     } else {
       return Scaffold(
         body: _AnimatedHomePage(
+          restorationId: 'animated_page',
           isSplashPageAnimationFinished:
               SplashPageAnimation.of(context).isFinished,
           carouselCards: carouselCards,
@@ -266,7 +283,7 @@ class _CategoriesHeader extends StatelessWidget {
 }
 
 class Header extends StatelessWidget {
-  const Header({this.color, this.text});
+  const Header({Key key, this.color, this.text}) : super(key: key);
 
   final Color color;
   final String text;
@@ -293,10 +310,12 @@ class Header extends StatelessWidget {
 class _AnimatedHomePage extends StatefulWidget {
   const _AnimatedHomePage({
     Key key,
+    @required this.restorationId,
     @required this.carouselCards,
     @required this.isSplashPageAnimationFinished,
   }) : super(key: key);
 
+  final String restorationId;
   final List<Widget> carouselCards;
   final bool isSplashPageAnimationFinished;
 
@@ -305,9 +324,22 @@ class _AnimatedHomePage extends StatefulWidget {
 }
 
 class _AnimatedHomePageState extends State<_AnimatedHomePage>
-    with SingleTickerProviderStateMixin {
+    with RestorationMixin, SingleTickerProviderStateMixin {
   AnimationController _animationController;
   Timer _launchTimer;
+  final RestorableBool _isMaterialListExpanded = RestorableBool(false);
+  final RestorableBool _isCupertinoListExpanded = RestorableBool(false);
+  final RestorableBool _isOtherListExpanded = RestorableBool(false);
+
+  @override
+  String get restorationId => widget.restorationId;
+
+  @override
+  void restoreState(RestorationBucket oldBucket, bool initialRestore) {
+    registerForRestoration(_isMaterialListExpanded, 'material_list');
+    registerForRestoration(_isCupertinoListExpanded, 'cupertino_list');
+    registerForRestoration(_isOtherListExpanded, 'other_list');
+  }
 
   @override
   void initState() {
@@ -340,6 +372,9 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
     _animationController.dispose();
     _launchTimer?.cancel();
     _launchTimer = null;
+    _isMaterialListExpanded.dispose();
+    _isCupertinoListExpanded.dispose();
+    _isOtherListExpanded.dispose();
     super.dispose();
   }
 
@@ -352,6 +387,7 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
         ListView(
           // Makes integration tests possible.
           key: const ValueKey('HomeListView'),
+          restorationId: 'home_list_view',
           children: [
             const SizedBox(height: 8),
             Container(
@@ -360,8 +396,9 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
               child: _GalleryHeader(),
             ),
             _Carousel(
-              children: widget.carouselCards,
               animationController: _animationController,
+              restorationId: 'home_carousel',
+              children: widget.carouselCards,
             ),
             Container(
               margin:
@@ -372,40 +409,51 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
               startDelayFraction: 0.00,
               controller: _animationController,
               child: CategoryListItem(
-                key: const PageStorageKey<GalleryDemoCategory>(
-                  GalleryDemoCategory.material,
-                ),
-                category: GalleryDemoCategory.material,
-                imageString: 'assets/icons/material/material.png',
-                demos: materialDemos(localizations),
-                initiallyExpanded: isTestMode,
-              ),
+                  key: const PageStorageKey<GalleryDemoCategory>(
+                    GalleryDemoCategory.material,
+                  ),
+                  restorationId: 'home_material_category_list',
+                  category: GalleryDemoCategory.material,
+                  imageString: 'assets/icons/material/material.png',
+                  demos: materialDemos(localizations),
+                  initiallyExpanded:
+                      _isMaterialListExpanded.value || isTestMode,
+                  onTap: (shouldOpenList) {
+                    _isMaterialListExpanded.value = shouldOpenList;
+                  }),
             ),
             _AnimatedCategoryItem(
               startDelayFraction: 0.05,
               controller: _animationController,
               child: CategoryListItem(
-                key: const PageStorageKey<GalleryDemoCategory>(
-                  GalleryDemoCategory.cupertino,
-                ),
-                category: GalleryDemoCategory.cupertino,
-                imageString: 'assets/icons/cupertino/cupertino.png',
-                demos: cupertinoDemos(localizations),
-                initiallyExpanded: isTestMode,
-              ),
+                  key: const PageStorageKey<GalleryDemoCategory>(
+                    GalleryDemoCategory.cupertino,
+                  ),
+                  restorationId: 'home_cupertino_category_list',
+                  category: GalleryDemoCategory.cupertino,
+                  imageString: 'assets/icons/cupertino/cupertino.png',
+                  demos: cupertinoDemos(localizations),
+                  initiallyExpanded:
+                      _isCupertinoListExpanded.value || isTestMode,
+                  onTap: (shouldOpenList) {
+                    _isCupertinoListExpanded.value = shouldOpenList;
+                  }),
             ),
             _AnimatedCategoryItem(
               startDelayFraction: 0.10,
               controller: _animationController,
               child: CategoryListItem(
-                key: const PageStorageKey<GalleryDemoCategory>(
-                  GalleryDemoCategory.other,
-                ),
-                category: GalleryDemoCategory.other,
-                imageString: 'assets/icons/reference/reference.png',
-                demos: otherDemos(localizations),
-                initiallyExpanded: isTestMode,
-              ),
+                  key: const PageStorageKey<GalleryDemoCategory>(
+                    GalleryDemoCategory.other,
+                  ),
+                  restorationId: 'home_other_category_list',
+                  category: GalleryDemoCategory.other,
+                  imageString: 'assets/icons/reference/reference.png',
+                  demos: otherDemos(localizations),
+                  initiallyExpanded: _isOtherListExpanded.value || isTestMode,
+                  onTap: (shouldOpenList) {
+                    _isOtherListExpanded.value = shouldOpenList;
+                  }),
             ),
           ],
         ),
@@ -414,7 +462,7 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
           child: GestureDetector(
             onVerticalDragEnd: (details) {
               if (details.velocity.pixelsPerSecond.dy > 200) {
-                ToggleSplashNotification()..dispatch(context);
+                ToggleSplashNotification().dispatch(context);
               }
             },
             child: SafeArea(
@@ -615,7 +663,7 @@ class _AnimatedCarousel extends StatelessWidget {
                 child: child,
               );
             },
-            child: Container(
+            child: SizedBox(
               height: _carouselHeight(.4, context),
               width: constraints.maxWidth,
               child: child,
@@ -672,21 +720,32 @@ class _AnimatedCarouselCard extends StatelessWidget {
 class _Carousel extends StatefulWidget {
   const _Carousel({
     Key key,
-    this.children,
     this.animationController,
+    this.restorationId,
+    this.children,
   }) : super(key: key);
 
-  final List<Widget> children;
   final AnimationController animationController;
+  final String restorationId;
+  final List<Widget> children;
 
   @override
   _CarouselState createState() => _CarouselState();
 }
 
 class _CarouselState extends State<_Carousel>
-    with SingleTickerProviderStateMixin {
+    with RestorationMixin, SingleTickerProviderStateMixin {
   PageController _controller;
-  int _currentPage = 0;
+
+  final RestorableInt _currentPage = RestorableInt(0);
+
+  @override
+  String get restorationId => widget.restorationId;
+
+  @override
+  void restoreState(RestorationBucket oldBucket, bool initialRestore) {
+    registerForRestoration(_currentPage, 'carousel_page');
+  }
 
   @override
   void didChangeDependencies() {
@@ -695,9 +754,9 @@ class _CarouselState extends State<_Carousel>
       // The viewPortFraction is calculated as the width of the device minus the
       // padding.
       final width = MediaQuery.of(context).size.width;
-      final padding = (_horizontalPadding * 2) - (_carouselItemMargin * 2);
+      const padding = (_horizontalPadding * 2) - (_carouselItemMargin * 2);
       _controller = PageController(
-        initialPage: _currentPage,
+        initialPage: _currentPage.value,
         viewportFraction: (width - padding) / width,
       );
     }
@@ -706,6 +765,7 @@ class _CarouselState extends State<_Carousel>
   @override
   void dispose() {
     _controller.dispose();
+    _currentPage.dispose();
     super.dispose();
   }
 
@@ -718,7 +778,7 @@ class _CarouselState extends State<_Carousel>
           value = _controller.page - index;
         } else {
           // If haveDimensions is false, use _currentPage to calculate value.
-          value = (_currentPage - index).toDouble();
+          value = (_currentPage.value - index).toDouble();
         }
         // We want the peeking cards to be 160 in height and 0.38 helps
         // achieve that.
@@ -739,8 +799,8 @@ class _CarouselState extends State<_Carousel>
     // We only want the second card to be animated.
     if (index == 1) {
       return _AnimatedCarouselCard(
-        child: carouselCard,
         controller: widget.animationController,
+        child: carouselCard,
       );
     } else {
       return carouselCard;
@@ -750,12 +810,13 @@ class _CarouselState extends State<_Carousel>
   @override
   Widget build(BuildContext context) {
     return _AnimatedCarousel(
+      controller: widget.animationController,
       child: PageView.builder(
         // Makes integration tests possible.
         key: const ValueKey('studyDemoList'),
         onPageChanged: (value) {
           setState(() {
-            _currentPage = value;
+            _currentPage.value = value;
           });
         },
         controller: _controller,
@@ -763,7 +824,6 @@ class _CarouselState extends State<_Carousel>
         itemBuilder: (context, index) => builder(index),
         allowImplicitScrolling: true,
       ),
-      controller: widget.animationController,
     );
   }
 }
@@ -932,8 +992,8 @@ class _DesktopPageButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final buttonSize = 58.0;
-    final padding = _horizontalDesktopPadding - buttonSize / 2;
+    const buttonSize = 58.0;
+    const padding = _horizontalDesktopPadding - buttonSize / 2;
     return ExcludeSemantics(
       child: Align(
         alignment: isEnd
@@ -1008,7 +1068,7 @@ class _CarouselCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () {
-            Navigator.of(context).pushNamed(studyRoute);
+            Navigator.of(context).restorablePushNamed(studyRoute);
           },
           child: Stack(
             fit: StackFit.expand,
@@ -1016,12 +1076,12 @@ class _CarouselCard extends StatelessWidget {
               if (asset != null)
                 FadeInImagePlaceholder(
                   image: asset,
+                  placeholder: Container(
+                    color: assetColor,
+                  ),
                   child: Ink.image(
                     image: asset,
                     fit: BoxFit.cover,
-                  ),
-                  placeholder: Container(
-                    color: assetColor,
                   ),
                 ),
               Padding(
@@ -1065,9 +1125,13 @@ class StudyWrapper extends StatefulWidget {
   const StudyWrapper({
     Key key,
     this.study,
+    this.alignment = AlignmentDirectional.bottomStart,
+    this.hasBottomNavBar = false,
   }) : super(key: key);
 
   final Widget study;
+  final bool hasBottomNavBar;
+  final AlignmentDirectional alignment;
 
   @override
   _StudyWrapperState createState() => _StudyWrapperState();
@@ -1083,31 +1147,42 @@ class _StudyWrapperState extends State<StudyWrapper> {
         children: [
           Semantics(
             sortKey: const OrdinalSortKey(1),
-            child: widget.study,
+            child: RestorationScope(
+              restorationId: 'study_wrapper',
+              child: widget.study,
+            ),
           ),
-          Align(
-            alignment: AlignmentDirectional.bottomStart,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Semantics(
-                sortKey: const OrdinalSortKey(0),
-                label: GalleryLocalizations.of(context).backToGallery,
-                button: true,
-                enabled: true,
-                excludeSemantics: true,
-                child: FloatingActionButton.extended(
-                  key: const ValueKey('Back'),
-                  onPressed: () {
-                    Navigator.of(context)
-                        .popUntil((route) => route.settings.name == '/');
-                  },
-                  icon: IconTheme(
-                    data: IconThemeData(color: colorScheme.onPrimary),
-                    child: const BackButtonIcon(),
-                  ),
-                  label: Text(
-                    MaterialLocalizations.of(context).backButtonTooltip,
-                    style: textTheme.button.apply(color: colorScheme.onPrimary),
+          SafeArea(
+            child: Align(
+              alignment: widget.alignment,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: widget.hasBottomNavBar
+                        ? kBottomNavigationBarHeight + 16.0
+                        : 16.0),
+                child: Semantics(
+                  sortKey: const OrdinalSortKey(0),
+                  label: GalleryLocalizations.of(context).backToGallery,
+                  button: true,
+                  enabled: true,
+                  excludeSemantics: true,
+                  child: FloatingActionButton.extended(
+                    heroTag: _BackButtonHeroTag(),
+                    key: const ValueKey('Back'),
+                    onPressed: () {
+                      Navigator.of(context)
+                          .popUntil((route) => route.settings.name == '/');
+                    },
+                    icon: IconTheme(
+                      data: IconThemeData(color: colorScheme.onPrimary),
+                      child: const BackButtonIcon(),
+                    ),
+                    label: Text(
+                      MaterialLocalizations.of(context).backButtonTooltip,
+                      style:
+                          textTheme.button.apply(color: colorScheme.onPrimary),
+                    ),
                   ),
                 ),
               ),
@@ -1118,3 +1193,5 @@ class _StudyWrapperState extends State<StudyWrapper> {
     );
   }
 }
+
+class _BackButtonHeroTag {}

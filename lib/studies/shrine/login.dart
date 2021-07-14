@@ -5,13 +5,13 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 import 'package:gallery/data/gallery_options.dart';
 import 'package:gallery/layout/adaptive.dart';
 import 'package:gallery/layout/image_placeholder.dart';
 import 'package:gallery/layout/letter_spacing.dart';
 import 'package:gallery/layout/text_scale.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
 import 'package:gallery/studies/shrine/app.dart';
 import 'package:gallery/studies/shrine/colors.dart';
 import 'package:gallery/studies/shrine/theme.dart';
@@ -26,7 +26,7 @@ double desktopLoginScreenMainAreaWidth({BuildContext context}) {
 }
 
 class LoginPage extends StatelessWidget {
-  const LoginPage();
+  const LoginPage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class LoginPage extends StatelessWidget {
               builder: (context, constraints) => Scaffold(
                 body: SafeArea(
                   child: Center(
-                    child: Container(
+                    child: SizedBox(
                       width: desktopLoginScreenMainAreaWidth(context: context),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -62,6 +62,7 @@ class LoginPage extends StatelessWidget {
               appBar: AppBar(backgroundColor: Colors.white),
               body: SafeArea(
                 child: ListView(
+                  restorationId: 'login_list_view',
                   physics: const ClampingScrollPhysics(),
                   padding: const EdgeInsets.symmetric(
                     horizontal: _horizontalPadding,
@@ -90,9 +91,9 @@ class _ShrineLogo extends StatelessWidget {
     return ExcludeSemantics(
       child: Column(
         children: [
-          FadeInImagePlaceholder(
-            image: const AssetImage('packages/shrine_images/diamond.png'),
-            placeholder: Container(
+          const FadeInImagePlaceholder(
+            image: AssetImage('packages/shrine_images/diamond.png'),
+            placeholder: SizedBox(
               width: 34,
               height: 34,
             ),
@@ -115,20 +116,16 @@ class _UsernameTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final _usernameController = TextEditingController();
-
     return PrimaryColorOverride(
       color: shrineBrown900,
-      child: Container(
-        child: TextField(
-          controller: _usernameController,
-          cursorColor: colorScheme.onSurface,
-          decoration: InputDecoration(
-            labelText:
-                GalleryLocalizations.of(context).shrineLoginUsernameLabel,
-            labelStyle: TextStyle(
-                letterSpacing: letterSpacingOrNone(mediumLetterSpacing)),
-          ),
+      child: TextField(
+        textInputAction: TextInputAction.next,
+        restorationId: 'username_text_field',
+        cursorColor: colorScheme.onSurface,
+        decoration: InputDecoration(
+          labelText: GalleryLocalizations.of(context).shrineLoginUsernameLabel,
+          labelStyle: TextStyle(
+              letterSpacing: letterSpacingOrNone(mediumLetterSpacing)),
         ),
       ),
     );
@@ -142,21 +139,16 @@ class _PasswordTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final _passwordController = TextEditingController();
-
     return PrimaryColorOverride(
       color: shrineBrown900,
-      child: Container(
-        child: TextField(
-          controller: _passwordController,
-          cursorColor: colorScheme.onSurface,
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText:
-                GalleryLocalizations.of(context).shrineLoginPasswordLabel,
-            labelStyle: TextStyle(
-                letterSpacing: letterSpacingOrNone(mediumLetterSpacing)),
-          ),
+      child: TextField(
+        restorationId: 'password_text_field',
+        cursorColor: colorScheme.onSurface,
+        obscureText: true,
+        decoration: InputDecoration(
+          labelText: GalleryLocalizations.of(context).shrineLoginPasswordLabel,
+          labelStyle: TextStyle(
+              letterSpacing: letterSpacingOrNone(mediumLetterSpacing)),
         ),
       ),
     );
@@ -176,50 +168,54 @@ class _CancelAndNextButtons extends StatelessWidget {
         ? const EdgeInsets.symmetric(horizontal: 24, vertical: 16)
         : EdgeInsets.zero;
 
-    return Wrap(
-      children: [
-        ButtonBar(
-          buttonPadding: isDesktop ? EdgeInsets.zero : null,
-          children: [
-            FlatButton(
-              child: Padding(
-                padding: buttonTextPadding,
-                child: Text(
-                  GalleryLocalizations.of(context).shrineCancelButtonCaption,
-                  style: TextStyle(color: colorScheme.onSurface),
-                ),
-              ),
+    return Padding(
+      padding: isDesktop ? EdgeInsets.zero : const EdgeInsets.all(8),
+      child: OverflowBar(
+        spacing: isDesktop ? 0 : 8,
+        alignment: MainAxisAlignment.end,
+        children: [
+          TextButton(
+            style: TextButton.styleFrom(
               shape: const BeveledRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(7)),
               ),
-              onPressed: () {
-                // The login screen is immediately displayed on top of
-                // the Shrine home screen using onGenerateRoute and so
-                // rootNavigator must be set to true in order to get out
-                // of Shrine completely.
-                Navigator.of(context, rootNavigator: true).pop();
-              },
             ),
-            RaisedButton(
-              child: Padding(
-                padding: buttonTextPadding,
-                child: Text(
-                  GalleryLocalizations.of(context).shrineNextButtonCaption,
-                  style: TextStyle(
-                      letterSpacing: letterSpacingOrNone(largeLetterSpacing)),
-                ),
+            onPressed: () {
+              // The login screen is immediately displayed on top of
+              // the Shrine home screen using onGenerateRoute and so
+              // rootNavigator must be set to true in order to get out
+              // of Shrine completely.
+              Navigator.of(context, rootNavigator: true).pop();
+            },
+            child: Padding(
+              padding: buttonTextPadding,
+              child: Text(
+                GalleryLocalizations.of(context).shrineCancelButtonCaption,
+                style: TextStyle(color: colorScheme.onSurface),
               ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
               elevation: 8,
               shape: const BeveledRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(7)),
               ),
-              onPressed: () {
-                Navigator.of(context).pushNamed(ShrineApp.homeRoute);
-              },
             ),
-          ],
-        ),
-      ],
+            onPressed: () {
+              Navigator.of(context).restorablePushNamed(ShrineApp.homeRoute);
+            },
+            child: Padding(
+              padding: buttonTextPadding,
+              child: Text(
+                GalleryLocalizations.of(context).shrineNextButtonCaption,
+                style: TextStyle(
+                    letterSpacing: letterSpacingOrNone(largeLetterSpacing)),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -234,8 +230,8 @@ class PrimaryColorOverride extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      child: child,
       data: Theme.of(context).copyWith(primaryColor: color),
+      child: child,
     );
   }
 }

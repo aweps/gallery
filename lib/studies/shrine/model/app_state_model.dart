@@ -2,10 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:scoped_model/scoped_model.dart';
-
 import 'package:gallery/studies/shrine/model/product.dart';
 import 'package:gallery/studies/shrine/model/products_repository.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 double _salesTaxRate = 0.06;
 double _shippingCostPerItem = 7;
@@ -67,6 +66,20 @@ class AppStateModel extends Model {
       _productsInCart[productId] = 1;
     } else {
       _productsInCart[productId]++;
+    }
+
+    notifyListeners();
+  }
+
+  // Adds products to the cart by a certain amount.
+  // quantity must be non-null positive value.
+  void addMultipleProductsToCart(int productId, int quantity) {
+    assert(quantity > 0);
+    assert(quantity != null);
+    if (!_productsInCart.containsKey(productId)) {
+      _productsInCart[productId] = quantity;
+    } else {
+      _productsInCart[productId] += quantity;
     }
 
     notifyListeners();

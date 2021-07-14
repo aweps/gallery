@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 import 'package:gallery/studies/rally/charts/pie_chart.dart';
 import 'package:gallery/studies/rally/data.dart';
 import 'package:gallery/studies/rally/finance.dart';
@@ -12,6 +12,8 @@ import 'package:gallery/studies/rally/tabs/sidebar.dart';
 
 /// A page that shows a summary of accounts.
 class AccountsView extends StatelessWidget {
+  const AccountsView({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final items = DummyDataService.getAccountDataList(context);
@@ -19,6 +21,7 @@ class AccountsView extends StatelessWidget {
     final balanceTotal = sumAccountDataPrimaryAmount(items);
 
     return TabWithSidebar(
+      restorationId: 'accounts_view',
       mainView: FinancialEntityView(
         heroLabel: GalleryLocalizations.of(context).rallyAccountTotal,
         heroAmount: balanceTotal,

@@ -2,26 +2,27 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:animations/animations.dart';
-
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 import 'package:gallery/data/gallery_options.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
 import 'package:gallery/layout/letter_spacing.dart';
 import 'package:gallery/studies/rally/colors.dart';
 import 'package:gallery/studies/rally/home.dart';
 import 'package:gallery/studies/rally/login.dart';
+import 'package:gallery/studies/rally/routes.dart' as routes;
+import 'package:google_fonts/google_fonts.dart';
 
 /// The RallyApp is a MaterialApp with a theme and 2 routes.
 ///
 /// The home route is the main page with tabs for sub pages.
 /// The login route is the initial route.
 class RallyApp extends StatelessWidget {
-  const RallyApp();
+  const RallyApp({Key key}) : super(key: key);
 
-  static const String loginRoute = '/rally/login';
-  static const String homeRoute = '/rally';
+  static const String loginRoute = routes.loginRoute;
+  static const String homeRoute = routes.homeRoute;
 
   final sharedZAxisTransitionBuilder = const SharedAxisPageTransitionsBuilder(
     fillColor: RallyColors.primaryBackground,
@@ -31,6 +32,7 @@ class RallyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      restorationScopeId: 'rally_app',
       title: 'Rally',
       debugShowCheckedModeBanner: false,
       theme: _buildRallyTheme().copyWith(
@@ -56,7 +58,10 @@ class RallyApp extends StatelessWidget {
   ThemeData _buildRallyTheme() {
     final base = ThemeData.dark();
     return ThemeData(
-      appBarTheme: const AppBarTheme(brightness: Brightness.dark, elevation: 0),
+      appBarTheme: const AppBarTheme(
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        elevation: 0,
+      ),
       scaffoldBackgroundColor: RallyColors.primaryBackground,
       primaryColor: RallyColors.primaryBackground,
       focusColor: RallyColors.focusColor,
@@ -70,6 +75,7 @@ class RallyApp extends StatelessWidget {
         fillColor: RallyColors.inputBackground,
         focusedBorder: InputBorder.none,
       ),
+      visualDensity: VisualDensity.standard,
     );
   }
 

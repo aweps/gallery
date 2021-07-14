@@ -1,7 +1,7 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 // BEGIN sharedYAxisTransitionDemo
 
@@ -100,6 +100,17 @@ class _SharedYAxisTransitionDemoState extends State<SharedYAxisTransitionDemo>
                       Radius.circular(4),
                     ),
                   ),
+                  onTap: () {
+                    if (!_isAlphabetical) {
+                      _controller.reset();
+                      _controller.animateTo(0.5);
+                    } else {
+                      _controller.animateTo(1);
+                    }
+                    setState(() {
+                      _isAlphabetical = !_isAlphabetical;
+                    });
+                  },
                   child: Row(
                     children: [
                       Text(_isAlphabetical
@@ -112,36 +123,23 @@ class _SharedYAxisTransitionDemoState extends State<SharedYAxisTransitionDemo>
                       ),
                     ],
                   ),
-                  onTap: () {
-                    if (!_isAlphabetical) {
-                      _controller.reset();
-                      _controller.animateTo(0.5);
-                    } else {
-                      _controller.animateTo(1);
-                    }
-                    setState(() {
-                      _isAlphabetical = !_isAlphabetical;
-                    });
-                  },
                 ),
               ),
             ],
           ),
           const SizedBox(height: 10),
           Expanded(
-            child: Container(
-              child: PageTransitionSwitcher(
-                reverse: _isAlphabetical,
-                transitionBuilder: (child, animation, secondaryAnimation) {
-                  return SharedAxisTransition(
-                    child: child,
-                    animation: animation,
-                    secondaryAnimation: secondaryAnimation,
-                    transitionType: SharedAxisTransitionType.vertical,
-                  );
-                },
-                child: _isAlphabetical ? _alphabeticalList : _recentList,
-              ),
+            child: PageTransitionSwitcher(
+              reverse: _isAlphabetical,
+              transitionBuilder: (child, animation, secondaryAnimation) {
+                return SharedAxisTransition(
+                  animation: animation,
+                  secondaryAnimation: secondaryAnimation,
+                  transitionType: SharedAxisTransitionType.vertical,
+                  child: child,
+                );
+              },
+              child: _isAlphabetical ? _alphabeticalList : _recentList,
             ),
           ),
         ],

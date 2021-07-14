@@ -2,13 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
+
 import 'package:gallery/data/gallery_options.dart';
-
 import 'package:gallery/studies/crane/model/formatters.dart';
-
-import '../../../l10n/gallery_localizations.dart';
 
 abstract class Destination {
   const Destination({

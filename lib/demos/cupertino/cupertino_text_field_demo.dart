@@ -3,12 +3,12 @@
 // found in the LICENSE file.
 
 import 'package:flutter/cupertino.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 // BEGIN cupertinoTextFieldDemo
 
 class CupertinoTextFieldDemo extends StatelessWidget {
-  const CupertinoTextFieldDemo();
+  const CupertinoTextFieldDemo({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +20,14 @@ class CupertinoTextFieldDemo extends StatelessWidget {
       ),
       child: SafeArea(
         child: ListView(
+          restorationId: 'text_field_demo_list_view',
           padding: const EdgeInsets.all(16),
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: CupertinoTextField(
+                textInputAction: TextInputAction.next,
+                restorationId: 'email_address_text_field',
                 placeholder: localizations.demoTextFieldEmail,
                 keyboardType: TextInputType.emailAddress,
                 clearButtonMode: OverlayVisibilityMode.editing,
@@ -34,6 +37,8 @@ class CupertinoTextFieldDemo extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: CupertinoTextField(
+                textInputAction: TextInputAction.next,
+                restorationId: 'login_password_text_field',
                 placeholder: localizations.rallyLoginPassword,
                 clearButtonMode: OverlayVisibilityMode.editing,
                 obscureText: true,
@@ -41,6 +46,8 @@ class CupertinoTextFieldDemo extends StatelessWidget {
               ),
             ),
             CupertinoTextField(
+              textInputAction: TextInputAction.done,
+              restorationId: 'pin_number_text_field',
               prefix: const Icon(
                 CupertinoIcons.padlock_solid,
                 size: 28,

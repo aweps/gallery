@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
-
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 import 'package:gallery/data/gallery_options.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
 import 'package:gallery/layout/adaptive.dart';
 import 'package:gallery/layout/text_scale.dart';
 import 'package:gallery/studies/shrine/app.dart';
@@ -15,6 +13,7 @@ import 'package:gallery/studies/shrine/model/app_state_model.dart';
 import 'package:gallery/studies/shrine/model/product.dart';
 import 'package:gallery/studies/shrine/page_status.dart';
 import 'package:gallery/studies/shrine/triangle_category_indicator.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 double desktopCategoryMenuPageWidth({
   BuildContext context,
@@ -134,7 +133,8 @@ class CategoryMenuPage extends StatelessWidget {
                     enabled: true,
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.of(context).pushNamed(ShrineApp.loginRoute);
+                        Navigator.of(context)
+                            .restorablePushNamed(ShrineApp.loginRoute);
                       },
                       child: _buttonText(
                         GalleryLocalizations.of(context)
@@ -183,7 +183,8 @@ class CategoryMenuPage extends StatelessWidget {
                           if (onCategoryTap != null) {
                             onCategoryTap();
                           }
-                          Navigator.of(context).pushNamed(ShrineApp.loginRoute);
+                          Navigator.of(context)
+                              .restorablePushNamed(ShrineApp.loginRoute);
                         },
                         child: _buttonText(
                           GalleryLocalizations.of(context)

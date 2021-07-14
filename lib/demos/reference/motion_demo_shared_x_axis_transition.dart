@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 // BEGIN sharedXAxisTransitionDemo
 
 class SharedXAxisTransitionDemo extends StatefulWidget {
-  const SharedXAxisTransitionDemo();
+  const SharedXAxisTransitionDemo({Key key}) : super(key: key);
   @override
   _SharedXAxisTransitionDemoState createState() =>
       _SharedXAxisTransitionDemoState();
@@ -58,25 +58,25 @@ class _SharedXAxisTransitionDemoState extends State<SharedXAxisTransitionDemo> {
                   secondaryAnimation,
                 ) {
                   return SharedAxisTransition(
-                    child: child,
                     animation: animation,
                     secondaryAnimation: secondaryAnimation,
                     transitionType: SharedAxisTransitionType.horizontal,
+                    child: child,
                   );
                 },
                 child: _isLoggedIn ? const _CoursePage() : const _SignInPage(),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  FlatButton(
+                  TextButton(
                     onPressed: _isLoggedIn ? _toggleLoginStatus : null,
                     child: Text(localizations.demoSharedXAxisBackButtonText),
                   ),
-                  RaisedButton(
+                  ElevatedButton(
                     onPressed: _isLoggedIn ? null : _toggleLoginStatus,
                     child: Text(localizations.demoSharedXAxisNextButtonText),
                   ),
@@ -175,7 +175,7 @@ class _SignInPage extends StatelessWidget {
         final maxHeight = constraints.maxHeight;
         final spacing = SizedBox(height: maxHeight / 25);
 
-        return Column(
+        return ListView(
           children: [
             SizedBox(height: maxHeight / 10),
             Image.asset(
@@ -222,7 +222,7 @@ class _SignInPage extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsetsDirectional.only(start: 10),
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: () {},
                     child: Text(
                       localizations.demoSharedXAxisForgotEmailButtonText,
@@ -231,7 +231,7 @@ class _SignInPage extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsetsDirectional.only(start: 10),
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: () {},
                     child: Text(
                       localizations.demoSharedXAxisCreateAccountButtonText,

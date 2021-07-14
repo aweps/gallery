@@ -5,8 +5,8 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 import 'package:gallery/data/gallery_options.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
 
 // Common constants between SlowMotionSetting and SettingsListItem.
 final settingItemBorderRadius = BorderRadius.circular(10);
@@ -20,6 +20,8 @@ class DisplayOption {
 }
 
 class SlowMotionSetting extends StatelessWidget {
+  const SlowMotionSetting({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -74,7 +76,7 @@ class SlowMotionSetting extends StatelessWidget {
 }
 
 class SettingsListItem<T> extends StatefulWidget {
-  SettingsListItem({
+  const SettingsListItem({
     Key key,
     @required this.optionsMap,
     @required this.title,

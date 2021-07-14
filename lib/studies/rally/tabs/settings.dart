@@ -5,11 +5,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:gallery/layout/adaptive.dart';
-import 'package:gallery/studies/rally/app.dart';
 import 'package:gallery/studies/rally/colors.dart';
 import 'package:gallery/studies/rally/data.dart';
+import 'package:gallery/studies/rally/routes.dart' as rally_route;
 
 class SettingsView extends StatefulWidget {
+  const SettingsView({Key key}) : super(key: key);
+
   @override
   _SettingsViewState createState() => _SettingsViewState();
 }
@@ -21,6 +23,7 @@ class _SettingsViewState extends State<SettingsView> {
       child: Container(
         padding: EdgeInsets.only(top: isDisplayDesktop(context) ? 24 : 0),
         child: ListView(
+          restorationId: 'settings_list_view',
           shrinkWrap: true,
           children: [
             for (String title
@@ -45,16 +48,19 @@ class _SettingsItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
-      textColor: Colors.white,
-      child: Container(
-        alignment: AlignmentDirectional.centerStart,
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
-        child: Text(title),
+    return TextButton(
+      style: TextButton.styleFrom(
+        primary: Colors.white,
+        padding: EdgeInsets.zero,
       ),
       onPressed: () {
-        Navigator.of(context).pushNamed(RallyApp.loginRoute);
+        Navigator.of(context).restorablePushNamed(rally_route.loginRoute);
       },
+      child: Container(
+        alignment: AlignmentDirectional.centerStart,
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 28),
+        child: Text(title),
+      ),
     );
   }
 }

@@ -10,11 +10,11 @@ import 'package:gallery/data/gallery_options.dart';
 import 'package:gallery/layout/text_scale.dart';
 import 'package:gallery/studies/shrine/category_menu_page.dart';
 import 'package:gallery/studies/shrine/model/product.dart';
-import 'package:gallery/studies/shrine/supplemental/balanced_layout.dart';
 import 'package:gallery/studies/shrine/page_status.dart';
+import 'package:gallery/studies/shrine/supplemental/balanced_layout.dart';
 import 'package:gallery/studies/shrine/supplemental/desktop_product_columns.dart';
-import 'package:gallery/studies/shrine/supplemental/product_columns.dart';
 import 'package:gallery/studies/shrine/supplemental/product_card.dart';
+import 'package:gallery/studies/shrine/supplemental/product_columns.dart';
 
 const _topPadding = 34.0;
 const _bottomPadding = 44.0;
@@ -26,7 +26,7 @@ class MobileAsymmetricView extends StatelessWidget {
 
   final List<Product> products;
 
-  List<Container> _buildColumns(
+  List<SizedBox> _buildColumns(
     BuildContext context,
     BoxConstraints constraints,
   ) {
@@ -65,7 +65,7 @@ class MobileAsymmetricView extends StatelessWidget {
       // helpers for creating the index of the product list that will correspond
       // to the index of the list of columns.
 
-      return List<Container>.generate(_listItemCount(products.length), (index) {
+      return List<SizedBox>.generate(_listItemCount(products.length), (index) {
         var width = _cardToScreenWidthRatio * MediaQuery.of(context).size.width;
         Widget column;
         if (index % 2 == 0) {
@@ -85,7 +85,7 @@ class MobileAsymmetricView extends StatelessWidget {
             reverse: true,
           );
         }
-        return Container(
+        return SizedBox(
           width: width,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -98,7 +98,7 @@ class MobileAsymmetricView extends StatelessWidget {
 
       return [
         for (final product in products)
-          Container(
+          SizedBox(
             width: _cardToScreenWidthRatio * MediaQuery.of(context).size.width,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -142,6 +142,7 @@ class MobileAsymmetricView extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, constraints) {
               return ListView(
+                restorationId: 'product_page_list_view',
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsetsDirectional.fromSTEB(
                   0,
@@ -149,8 +150,8 @@ class MobileAsymmetricView extends StatelessWidget {
                   16,
                   _bottomPadding,
                 ),
-                children: _buildColumns(context, constraints),
                 physics: const AlwaysScrollableScrollPhysics(),
+                children: _buildColumns(context, constraints),
               );
             },
           ),
@@ -220,12 +221,13 @@ class DesktopAsymmetricView extends StatelessWidget {
 }
 
 class DesktopColumns extends StatelessWidget {
-  DesktopColumns({
+  const DesktopColumns({
+    Key key,
     @required this.columnCount,
     @required this.products,
     @required this.largeImageWidth,
     @required this.smallImageWidth,
-  });
+  }) : super(key: key);
 
   final int columnCount;
   final List<Product> products;
@@ -263,6 +265,7 @@ class DesktopColumns extends StatelessWidget {
 
     return ListView(
       scrollDirection: Axis.vertical,
+      physics: const AlwaysScrollableScrollPhysics(),
       children: [
         Container(height: 60),
         Row(
@@ -284,7 +287,6 @@ class DesktopColumns extends StatelessWidget {
         ),
         Container(height: 60),
       ],
-      physics: const AlwaysScrollableScrollPhysics(),
     );
   }
 }

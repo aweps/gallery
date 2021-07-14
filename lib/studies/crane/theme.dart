@@ -3,10 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-
 import 'package:gallery/layout/letter_spacing.dart';
 import 'package:gallery/studies/crane/colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 final ThemeData craneTheme = _buildCraneTheme();
 
@@ -22,22 +21,18 @@ ThemeData _buildCraneTheme() {
       primary: cranePurple800,
       secondary: craneRed700,
     ),
-    accentColor: cranePurple700,
     primaryColor: cranePurple800,
-    buttonColor: craneRed700,
     hintColor: craneWhite60,
     indicatorColor: cranePrimaryWhite,
     scaffoldBackgroundColor: cranePrimaryWhite,
     cardColor: cranePrimaryWhite,
-    textSelectionColor: cranePurple700,
     errorColor: craneErrorOrange,
     highlightColor: Colors.transparent,
-    buttonTheme: const ButtonThemeData(
-      textTheme: ButtonTextTheme.accent,
-    ),
     textTheme: _buildCraneTextTheme(base.textTheme),
+    textSelectionTheme: const TextSelectionThemeData(
+      selectionColor: cranePurple700,
+    ),
     primaryTextTheme: _buildCraneTextTheme(base.primaryTextTheme),
-    accentTextTheme: _buildCraneTextTheme(base.accentTextTheme),
     iconTheme: _customIconTheme(base.iconTheme, craneWhite60),
     primaryIconTheme: _customIconTheme(base.iconTheme, cranePrimaryWhite),
   );

@@ -4,10 +4,9 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import 'package:gallery/l10n/gallery_localizations.dart';
 
 void showAboutDialog({
   @required BuildContext context,
@@ -34,8 +33,8 @@ class _AboutDialog extends StatelessWidget {
     final bodyTextStyle =
         textTheme.bodyText1.apply(color: colorScheme.onPrimary);
 
-    final name = 'Flutter Gallery'; // Don't need to localize.
-    final legalese = '© 2019 The Flutter team'; // Don't need to localize.
+    const name = 'Flutter Gallery'; // Don't need to localize.
+    const legalese = '© 2021 The Flutter team'; // Don't need to localize.
     final repoText = GalleryLocalizations.of(context).githubRepo(name);
     final seeSource =
         GalleryLocalizations.of(context).aboutDialogDescription(repoText);
@@ -56,7 +55,7 @@ class _AboutDialog extends StatelessWidget {
             FutureBuilder(
               future: getVersionNumber(),
               builder: (context, snapshot) => Text(
-                snapshot.hasData ? '$name ${snapshot.data}' : '$name',
+                snapshot.hasData ? '$name ${snapshot.data}' : name,
                 style: textTheme.headline4.apply(color: colorScheme.onPrimary),
               ),
             ),
@@ -75,7 +74,7 @@ class _AboutDialog extends StatelessWidget {
                     text: repoText,
                     recognizer: TapGestureRecognizer()
                       ..onTap = () async {
-                        final url = 'https://github.com/flutter/gallery/';
+                        const url = 'https://github.com/flutter/gallery/';
                         if (await canLaunch(url)) {
                           await launch(
                             url,
@@ -100,11 +99,7 @@ class _AboutDialog extends StatelessWidget {
         ),
       ),
       actions: [
-        FlatButton(
-          textColor: colorScheme.primary,
-          child: Text(
-            MaterialLocalizations.of(context).viewLicensesButtonLabel,
-          ),
+        TextButton(
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute<void>(
               builder: (context) => Theme(
@@ -112,22 +107,24 @@ class _AboutDialog extends StatelessWidget {
                   textTheme: Typography.material2018(
                     platform: Theme.of(context).platform,
                   ).black,
-                  scaffoldBackgroundColor: Colors.white,
+                  cardColor: Colors.white,
                 ),
-                child: LicensePage(
+                child: const LicensePage(
                   applicationName: name,
                   applicationLegalese: legalese,
                 ),
               ),
             ));
           },
+          child: Text(
+            MaterialLocalizations.of(context).viewLicensesButtonLabel,
+          ),
         ),
-        FlatButton(
-          textColor: colorScheme.primary,
-          child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+        TextButton(
           onPressed: () {
             Navigator.pop(context);
           },
+          child: Text(MaterialLocalizations.of(context).closeButtonLabel),
         ),
       ],
     );

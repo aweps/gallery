@@ -2,15 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 const String _kGalleryAssetsPackage = 'flutter_gallery_assets';
 
 // BEGIN cardsDemo
 
-enum CardDemoType {
+enum CardType {
   standard,
   tappable,
   selectable,
@@ -24,7 +23,7 @@ class TravelDestination {
     @required this.description,
     @required this.city,
     @required this.location,
-    this.type = CardDemoType.standard,
+    this.cardType = CardType.standard,
   })  : assert(assetName != null),
         assert(assetPackage != null),
         assert(title != null),
@@ -38,7 +37,7 @@ class TravelDestination {
   final String description;
   final String city;
   final String location;
-  final CardDemoType type;
+  final CardType cardType;
 }
 
 List<TravelDestination> destinations(BuildContext context) => [
@@ -63,7 +62,7 @@ List<TravelDestination> destinations(BuildContext context) => [
         city: GalleryLocalizations.of(context).cardsDemoTravelDestinationCity2,
         location: GalleryLocalizations.of(context)
             .cardsDemoTravelDestinationLocation2,
-        type: CardDemoType.tappable,
+        cardType: CardType.tappable,
       ),
       TravelDestination(
         assetName: 'places/india_tanjore_thanjavur_temple.png',
@@ -75,7 +74,7 @@ List<TravelDestination> destinations(BuildContext context) => [
         city: GalleryLocalizations.of(context).cardsDemoTravelDestinationCity1,
         location: GalleryLocalizations.of(context)
             .cardsDemoTravelDestinationLocation1,
-        type: CardDemoType.selectable,
+        cardType: CardType.selectable,
       ),
     ];
 
@@ -85,7 +84,7 @@ class TravelDestinationItem extends StatelessWidget {
         super(key: key);
 
   // This height will allow for all the Card's content to fit comfortably within the card.
-  static const height = 338.0;
+  static const height = 360.0;
   final TravelDestination destination;
   final ShapeBorder shape;
 
@@ -146,9 +145,7 @@ class TappableTravelDestinationItem extends StatelessWidget {
                 clipBehavior: Clip.antiAlias,
                 shape: shape,
                 child: InkWell(
-                  onTap: () {
-                    print('Card was tapped');
-                  },
+                  onTap: () {},
                   // Generally, material cards use onSurface with 12% opacity for the pressed state.
                   splashColor:
                       Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
@@ -165,25 +162,23 @@ class TappableTravelDestinationItem extends StatelessWidget {
   }
 }
 
-class SelectableTravelDestinationItem extends StatefulWidget {
-  const SelectableTravelDestinationItem(
-      {Key key, @required this.destination, this.shape})
-      : assert(destination != null),
+class SelectableTravelDestinationItem extends StatelessWidget {
+  const SelectableTravelDestinationItem({
+    Key key,
+    @required this.destination,
+    @required this.isSelected,
+    @required this.onSelected,
+    this.shape,
+  })  : assert(destination != null),
         super(key: key);
 
   final TravelDestination destination;
   final ShapeBorder shape;
+  final bool isSelected;
+  final VoidCallback onSelected;
 
-  @override
-  _SelectableTravelDestinationItemState createState() =>
-      _SelectableTravelDestinationItemState();
-}
-
-class _SelectableTravelDestinationItemState
-    extends State<SelectableTravelDestinationItem> {
   // This height will allow for all the Card's content to fit comfortably within the card.
   static const height = 298.0;
-  var _isSelected = false;
 
   @override
   Widget build(BuildContext context) {
@@ -203,13 +198,10 @@ class _SelectableTravelDestinationItemState
               child: Card(
                 // This ensures that the Card's children (including the ink splash) are clipped correctly.
                 clipBehavior: Clip.antiAlias,
-                shape: widget.shape,
+                shape: shape,
                 child: InkWell(
                   onLongPress: () {
-                    print('Selectable card state changed');
-                    setState(() {
-                      _isSelected = !_isSelected;
-                    });
+                    onSelected();
                   },
                   // Generally, material cards use onSurface with 12% opacity for the pressed state.
                   splashColor: colorScheme.onSurface.withOpacity(0.12),
@@ -218,20 +210,20 @@ class _SelectableTravelDestinationItemState
                   child: Stack(
                     children: [
                       Container(
-                        color: _isSelected
+                        color: isSelected
                             // Generally, material cards use primary with 8% opacity for the selected state.
                             // See: https://material.io/design/interaction/states.html#anatomy
                             ? colorScheme.primary.withOpacity(0.08)
                             : Colors.transparent,
                       ),
-                      TravelDestinationContent(destination: widget.destination),
+                      TravelDestinationContent(destination: destination),
                       Align(
                         alignment: Alignment.topRight,
                         child: Padding(
                           padding: const EdgeInsets.all(8),
                           child: Icon(
                             Icons.check_circle,
-                            color: _isSelected
+                            color: isSelected
                                 ? colorScheme.primary
                                 : Colors.transparent,
                           ),
@@ -344,30 +336,28 @@ class TravelDestinationContent extends StatelessWidget {
             ),
           ),
         ),
-        if (destination.type == CardDemoType.standard)
+        if (destination.cardType == CardType.standard)
           // share, explore buttons
-          ButtonBar(
-            alignment: MainAxisAlignment.start,
-            children: [
-              FlatButton(
-                child: Text(GalleryLocalizations.of(context).demoMenuShare,
-                    semanticsLabel: GalleryLocalizations.of(context)
-                        .cardsDemoShareSemantics(destination.title)),
-                textColor: Colors.amber.shade500,
-                onPressed: () {
-                  print('pressed');
-                },
-              ),
-              FlatButton(
-                child: Text(GalleryLocalizations.of(context).cardsDemoExplore,
-                    semanticsLabel: GalleryLocalizations.of(context)
-                        .cardsDemoExploreSemantics(destination.title)),
-                textColor: Colors.amber.shade500,
-                onPressed: () {
-                  print('pressed');
-                },
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: OverflowBar(
+              alignment: MainAxisAlignment.start,
+              spacing: 8,
+              children: [
+                TextButton(
+                  onPressed: () {},
+                  child: Text(GalleryLocalizations.of(context).demoMenuShare,
+                      semanticsLabel: GalleryLocalizations.of(context)
+                          .cardsDemoShareSemantics(destination.title)),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: Text(GalleryLocalizations.of(context).cardsDemoExplore,
+                      semanticsLabel: GalleryLocalizations.of(context)
+                          .cardsDemoExploreSemantics(destination.title)),
+                ),
+              ],
+            ),
           ),
       ],
     );
@@ -375,13 +365,29 @@ class TravelDestinationContent extends StatelessWidget {
 }
 
 class CardsDemo extends StatefulWidget {
-  const CardsDemo();
+  const CardsDemo({Key key}) : super(key: key);
 
   @override
   _CardsDemoState createState() => _CardsDemoState();
 }
 
-class _CardsDemoState extends State<CardsDemo> {
+class _CardsDemoState extends State<CardsDemo> with RestorationMixin {
+  final RestorableBool _isSelected = RestorableBool(false);
+
+  @override
+  String get restorationId => 'cards_demo';
+
+  @override
+  void restoreState(RestorationBucket oldBucket, bool initialRestore) {
+    registerForRestoration(_isSelected, 'is_selected');
+  }
+
+  @override
+  void dispose() {
+    _isSelected.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -391,18 +397,26 @@ class _CardsDemoState extends State<CardsDemo> {
       ),
       body: Scrollbar(
         child: ListView(
+          restorationId: 'cards_demo_list_view',
           padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
           children: [
             for (final destination in destinations(context))
               Container(
                 margin: const EdgeInsets.only(bottom: 8),
-                child: (destination.type == CardDemoType.standard)
+                child: (destination.cardType == CardType.standard)
                     ? TravelDestinationItem(destination: destination)
-                    : destination.type == CardDemoType.tappable
+                    : destination.cardType == CardType.tappable
                         ? TappableTravelDestinationItem(
                             destination: destination)
                         : SelectableTravelDestinationItem(
-                            destination: destination),
+                            destination: destination,
+                            isSelected: _isSelected.value,
+                            onSelected: () {
+                              setState(() {
+                                _isSelected.value = !_isSelected.value;
+                              });
+                            },
+                          ),
               ),
           ],
         ),

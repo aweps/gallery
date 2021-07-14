@@ -10,13 +10,14 @@ import 'package:flutter/services.dart';
 /// Wrap your widget as [child] of a [HighlightFocus] widget.
 class HighlightFocus extends StatefulWidget {
   const HighlightFocus({
+    Key key,
     @required this.onPressed,
     @required this.child,
     this.highlightColor,
     this.borderColor,
     this.hasFocus = true,
     this.debugLabel,
-  });
+  }) : super(key: key);
 
   /// [onPressed] is called when you press space, enter, or numpad-enter
   /// when the widget is focused.
@@ -82,9 +83,9 @@ class _HighlightFocusState extends State<HighlightFocus> {
                 event.logicalKey == LogicalKeyboardKey.enter ||
                 event.logicalKey == LogicalKeyboardKey.numpadEnter)) {
           widget.onPressed();
-          return true;
+          return KeyEventResult.handled;
         } else {
-          return false;
+          return KeyEventResult.ignored;
         }
       },
       child: Container(

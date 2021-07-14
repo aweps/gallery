@@ -3,21 +3,21 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gallery/data/gallery_options.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
 import 'package:gallery/pages/backdrop.dart';
 
 void main() {
   testWidgets('Home page hides settings semantics when closed', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: const [GalleryLocalizations.delegate],
+      const MaterialApp(
+        localizationsDelegates: [GalleryLocalizations.delegate],
         home: ModelBinding(
-          initialModel: const GalleryOptions(
+          initialModel: GalleryOptions(
             textScaleFactor: 1.0,
           ),
-          child: const Backdrop(
+          child: Backdrop(
             settingsPage: Text('Front'),
             homePage: Text('Back'),
           ),

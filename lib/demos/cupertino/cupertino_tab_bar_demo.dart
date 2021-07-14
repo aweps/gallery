@@ -4,7 +4,7 @@
 
 import 'package:flutter/cupertino.dart';
 
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 // BEGIN cupertinoNavigationDemo
 
@@ -16,7 +16,7 @@ class _TabInfo {
 }
 
 class CupertinoTabBarDemo extends StatelessWidget {
-  const CupertinoTabBarDemo();
+  const CupertinoTabBarDemo({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,18 +38,19 @@ class CupertinoTabBarDemo extends StatelessWidget {
     return DefaultTextStyle(
       style: CupertinoTheme.of(context).textTheme.textStyle,
       child: CupertinoTabScaffold(
+        restorationId: 'cupertino_tab_scaffold',
         tabBar: CupertinoTabBar(
           items: [
             for (final tabInfo in _tabInfo)
               BottomNavigationBarItem(
-                // ignore: deprecated_member_use
-                title: Text(tabInfo.title),
+                label: tabInfo.title,
                 icon: Icon(tabInfo.icon),
               ),
           ],
         ),
         tabBuilder: (context, index) {
           return CupertinoTabView(
+            restorationScopeId: 'cupertino_tab_view_$index',
             builder: (context) => _CupertinoDemoTab(
               title: _tabInfo[index].title,
               icon: _tabInfo[index].icon,

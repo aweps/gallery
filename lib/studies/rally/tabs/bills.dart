@@ -4,7 +4,7 @@
 
 import 'package:flutter/widgets.dart';
 
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 import 'package:gallery/studies/rally/charts/pie_chart.dart';
 import 'package:gallery/studies/rally/data.dart';
 import 'package:gallery/studies/rally/finance.dart';
@@ -12,6 +12,8 @@ import 'package:gallery/studies/rally/tabs/sidebar.dart';
 
 /// A page that shows a summary of bills.
 class BillsView extends StatefulWidget {
+  const BillsView({Key key}) : super(key: key);
+
   @override
   _BillsViewState createState() => _BillsViewState();
 }
@@ -30,6 +32,7 @@ class _BillsViewState extends State<BillsView>
     );
 
     return TabWithSidebar(
+      restorationId: 'bills_view',
       mainView: FinancialEntityView(
         heroLabel: GalleryLocalizations.of(context).rallyBillsDue,
         heroAmount: dueTotal,

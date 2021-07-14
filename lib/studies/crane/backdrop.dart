@@ -2,25 +2,20 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-
+import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:meta/meta.dart';
-
 import 'package:gallery/data/gallery_options.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
 import 'package:gallery/layout/adaptive.dart';
 import 'package:gallery/layout/image_placeholder.dart';
-import 'package:gallery/studies/crane/border_tab_indicator.dart';
 import 'package:gallery/studies/crane/backlayer.dart';
+import 'package:gallery/studies/crane/border_tab_indicator.dart';
 import 'package:gallery/studies/crane/colors.dart';
-import 'package:gallery/studies/crane/model/data.dart';
-import 'package:gallery/studies/crane/model/destination.dart';
 import 'package:gallery/studies/crane/header_form.dart';
 import 'package:gallery/studies/crane/item_cards.dart';
+import 'package:gallery/studies/crane/model/data.dart';
+import 'package:gallery/studies/crane/model/destination.dart';
 
 class _FrontLayer extends StatefulWidget {
   const _FrontLayer({
@@ -28,11 +23,13 @@ class _FrontLayer extends StatefulWidget {
     this.title,
     this.index,
     this.mobileTopOffset,
+    this.restorationId,
   }) : super(key: key);
 
   final String title;
   final int index;
   final double mobileTopOffset;
+  final String restorationId;
 
   @override
   _FrontLayerState createState() => _FrontLayerState();
@@ -75,7 +72,11 @@ class _FrontLayerState extends State<_FrontLayer> {
     final isDesktop = isDisplayDesktop(context);
     final isSmallDesktop = isDisplaySmallDesktop(context);
 
-    final crossAxisCount = isSmallDesktop ? 2 : isDesktop ? 4 : 1;
+    final crossAxisCount = isSmallDesktop
+        ? 2
+        : isDesktop
+            ? 4
+            : 1;
 
     return FocusTraversalGroup(
       policy: ReadingOrderTraversalPolicy(),
@@ -96,6 +97,7 @@ class _FrontLayerState extends State<_FrontLayer> {
           ),
           child: StaggeredGridView.countBuilder(
             key: ValueKey('CraneListView-${widget.index}'),
+            restorationId: widget.restorationId,
             crossAxisCount: crossAxisCount,
             crossAxisSpacing: 16.0,
             padding: isDesktop
@@ -135,6 +137,7 @@ class Backdrop extends StatefulWidget {
   final Widget backTitle;
 
   const Backdrop({
+    Key key,
     @required this.frontLayer,
     @required this.backLayerItems,
     @required this.frontTitle,
@@ -142,13 +145,16 @@ class Backdrop extends StatefulWidget {
   })  : assert(frontLayer != null),
         assert(backLayerItems != null),
         assert(frontTitle != null),
-        assert(backTitle != null);
+        assert(backTitle != null),
+        super(key: key);
 
   @override
   _BackdropState createState() => _BackdropState();
 }
 
-class _BackdropState extends State<Backdrop> with TickerProviderStateMixin {
+class _BackdropState extends State<Backdrop>
+    with TickerProviderStateMixin, RestorationMixin {
+  final RestorableInt tabIndex = RestorableInt(0);
   TabController _tabController;
   Animation<Offset> _flyLayerHorizontalOffset;
   Animation<Offset> _sleepLayerHorizontalOffset;
@@ -159,9 +165,25 @@ class _BackdropState extends State<Backdrop> with TickerProviderStateMixin {
   static const _sleepLayerTopOffset = 60.0;
 
   @override
+  String get restorationId => 'tab_non_scrollable_demo';
+
+  @override
+  void restoreState(RestorationBucket oldBucket, bool initialRestore) {
+    registerForRestoration(tabIndex, 'tab_index');
+    _tabController.index = tabIndex.value;
+  }
+
+  @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      // When the tab controller's value is updated, make sure to update the
+      // tab index value, which is state restorable.
+      setState(() {
+        tabIndex.value = _tabController.index;
+      });
+    });
 
     // Offsets to create a horizontal gap between front layers.
     _flyLayerHorizontalOffset = _tabController.animation.drive(
@@ -177,6 +199,7 @@ class _BackdropState extends State<Backdrop> with TickerProviderStateMixin {
   @override
   void dispose() {
     _tabController.dispose();
+    tabIndex.dispose();
     super.dispose();
   }
 
@@ -200,7 +223,7 @@ class _BackdropState extends State<Backdrop> with TickerProviderStateMixin {
             backgroundColor: cranePurple800,
             appBar: AppBar(
               automaticallyImplyLeading: false,
-              brightness: Brightness.dark,
+              systemOverlayStyle: SystemUiOverlayStyle.light,
               elevation: 0,
               titleSpacing: 0,
               flexibleSpace: CraneAppBar(
@@ -244,6 +267,7 @@ class _BackdropState extends State<Backdrop> with TickerProviderStateMixin {
                                   .craneFlySubhead,
                               index: 0,
                               mobileTopOffset: _sleepLayerTopOffset,
+                              restorationId: 'fly-subhead',
                             ),
                           ),
                           SlideTransition(
@@ -253,6 +277,7 @@ class _BackdropState extends State<Backdrop> with TickerProviderStateMixin {
                                   .craneSleepSubhead,
                               index: 1,
                               mobileTopOffset: 0,
+                              restorationId: 'sleep-subhead',
                             ),
                           ),
                           SlideTransition(
@@ -262,6 +287,7 @@ class _BackdropState extends State<Backdrop> with TickerProviderStateMixin {
                                   .craneEatSubhead,
                               index: 2,
                               mobileTopOffset: _sleepLayerTopOffset,
+                              restorationId: 'eat-subhead',
                             ),
                           ),
                         ],

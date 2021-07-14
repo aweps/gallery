@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 // BEGIN fadeThroughTransitionDemo
 
 class FadeThroughTransitionDemo extends StatefulWidget {
-  const FadeThroughTransitionDemo();
+  const FadeThroughTransitionDemo({Key key}) : super(key: key);
 
   @override
   _FadeThroughTransitionDemoState createState() =>
@@ -69,18 +69,15 @@ class _FadeThroughTransitionDemoState extends State<FadeThroughTransitionDemo> {
         items: [
           BottomNavigationBarItem(
             icon: const Icon(Icons.photo_library),
-            // ignore: deprecated_member_use
-            title: Text(localizations.demoFadeThroughAlbumsDestination),
+            label: localizations.demoFadeThroughAlbumsDestination,
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.photo),
-            // ignore: deprecated_member_use
-            title: Text(localizations.demoFadeThroughPhotosDestination),
+            label: localizations.demoFadeThroughPhotosDestination,
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.search),
-            // ignore: deprecated_member_use
-            title: Text(localizations.demoFadeThroughSearchDestination),
+            label: localizations.demoFadeThroughSearchDestination,
           ),
         ],
       ),

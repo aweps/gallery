@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 // BEGIN fadeScaleTransitionDemo
 
 class FadeScaleTransitionDemo extends StatefulWidget {
-  const FadeScaleTransitionDemo();
+  const FadeScaleTransitionDemo({Key key}) : super(key: key);
 
   @override
   _FadeScaleTransitionDemoState createState() =>
@@ -94,8 +94,8 @@ class _FadeScaleTransitionDemoState extends State<FadeScaleTransitionDemo>
         child: Visibility(
           visible: _controller.status != AnimationStatus.dismissed,
           child: FloatingActionButton(
-            child: const Icon(Icons.add),
             onPressed: () {},
+            child: const Icon(Icons.add),
           ),
         ),
       ),
@@ -108,7 +108,7 @@ class _FadeScaleTransitionDemoState extends State<FadeScaleTransitionDemo>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                RaisedButton(
+                ElevatedButton(
                   onPressed: () {
                     showModal<void>(
                         context: context,
@@ -117,7 +117,7 @@ class _FadeScaleTransitionDemoState extends State<FadeScaleTransitionDemo>
                   child: Text(localizations.demoFadeScaleShowAlertDialogButton),
                 ),
                 const SizedBox(width: 10),
-                RaisedButton(
+                ElevatedButton(
                   onPressed: () {
                     if (_isAnimationRunningForwardsOrComplete) {
                       _controller.reverse();
@@ -148,13 +148,13 @@ class _ExampleAlertDialog extends StatelessWidget {
     return AlertDialog(
       content: Text(localizations.demoFadeScaleAlertDialogHeader),
       actions: [
-        FlatButton(
+        TextButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
           child: Text(localizations.demoFadeScaleAlertDialogCancelButton),
         ),
-        FlatButton(
+        TextButton(
           onPressed: () {
             Navigator.of(context).pop();
           },

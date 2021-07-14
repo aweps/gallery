@@ -4,12 +4,11 @@
 
 import 'dart:math' as math;
 
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
-import 'package:animations/animations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 import 'package:gallery/data/gallery_options.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
 import 'package:gallery/layout/adaptive.dart';
 import 'package:gallery/layout/text_scale.dart';
 import 'package:gallery/studies/rally/charts/line_chart.dart';
@@ -21,12 +20,14 @@ import 'package:gallery/studies/rally/formatters.dart';
 
 class FinancialEntityView extends StatelessWidget {
   const FinancialEntityView({
+    Key key,
     this.heroLabel,
     this.heroAmount,
     this.wholeAmount,
     this.segments,
     this.financialEntityCards,
-  }) : assert(segments.length == financialEntityCards.length);
+  })  : assert(segments.length == financialEntityCards.length),
+        super(key: key);
 
   /// The amounts to assign each item.
   final List<RallyPieChartSegment> segments;
@@ -80,6 +81,7 @@ class FinancialEntityView extends StatelessWidget {
 /// A reusable widget to show balance information of a single entity as a card.
 class FinancialEntityCategoryView extends StatelessWidget {
   const FinancialEntityCategoryView({
+    Key key,
     @required this.indicatorColor,
     @required this.indicatorFraction,
     @required this.title,
@@ -87,7 +89,7 @@ class FinancialEntityCategoryView extends StatelessWidget {
     @required this.semanticsLabel,
     @required this.amount,
     @required this.suffix,
-  });
+  }) : super(key: key);
 
   final Color indicatorColor;
   final double indicatorFraction;
@@ -107,6 +109,10 @@ class FinancialEntityCategoryView extends StatelessWidget {
         label: semanticsLabel,
       ),
       excludeSemantics: true,
+      // TODO(shihaohong): State restoration of
+      // FinancialEntityCategoryDetailsPage on mobile is blocked because
+      // OpenContainer does not support restorablePush.
+      // See https://github.com/flutter/flutter/issues/69924.
       child: OpenContainer(
         transitionDuration: const Duration(milliseconds: 350),
         transitionType: ContainerTransitionType.fade,
@@ -116,12 +122,14 @@ class FinancialEntityCategoryView extends StatelessWidget {
         closedColor: RallyColors.primaryBackground,
         closedElevation: 0,
         closedBuilder: (context, openContainer) {
-          return FlatButton(
+          return TextButton(
+            style: TextButton.styleFrom(primary: Colors.black),
             onPressed: openContainer,
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
                   child: Row(
                     children: [
                       Container(
@@ -312,6 +320,8 @@ List<FinancialEntityCategoryView> buildBudgetDataListViews(
 }
 
 class FinancialEntityCategoryDetailsPage extends StatelessWidget {
+  FinancialEntityCategoryDetailsPage({Key key}) : super(key: key);
+
   final List<DetailedEventData> items =
       DummyDataService.getDetailedEventItems();
 
@@ -373,9 +383,12 @@ class _DetailedEventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = isDisplayDesktop(context);
-    return FlatButton(
+    return TextButton(
+      style: TextButton.styleFrom(
+        primary: Colors.black,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+      ),
       onPressed: () {},
-      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
           Container(

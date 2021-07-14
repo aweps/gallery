@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 // BEGIN colorsDemo
 
@@ -181,7 +181,7 @@ class _ColorItem extends StatelessWidget {
 }
 
 class PaletteTabView extends StatelessWidget {
-  PaletteTabView({
+  const PaletteTabView({
     Key key,
     @required this.colors,
   })  : assert(colors != null),
@@ -237,7 +237,7 @@ class PaletteTabView extends StatelessWidget {
 }
 
 class ColorsDemo extends StatelessWidget {
-  const ColorsDemo();
+  const ColorsDemo({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

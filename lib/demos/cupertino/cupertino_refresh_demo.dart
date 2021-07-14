@@ -6,12 +6,12 @@ import 'dart:math' show Random;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 // BEGIN cupertinoRefreshDemo
 
 class CupertinoRefreshControlDemo extends StatefulWidget {
-  const CupertinoRefreshControlDemo();
+  const CupertinoRefreshControlDemo({Key key}) : super(key: key);
 
   @override
   _CupertinoRefreshControlDemoState createState() =>

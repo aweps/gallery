@@ -4,15 +4,14 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:gallery/l10n/gallery_localizations.dart';
-
-enum BottomSheetDemoType {
-  persistent,
-  modal,
-}
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
+import 'package:gallery/demos/material/material_demo_types.dart';
 
 class BottomSheetDemo extends StatelessWidget {
-  const BottomSheetDemo({Key key, @required this.type}) : super(key: key);
+  const BottomSheetDemo({
+    Key key,
+    @required this.type,
+  }) : super(key: key);
 
   final BottomSheetDemoType type;
 
@@ -75,11 +74,11 @@ class BottomSheetDemo extends StatelessWidget {
 class _BottomSheetContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 300,
       child: Column(
         children: [
-          Container(
+          SizedBox(
             height: 70,
             child: Center(
               child: Text(
@@ -123,7 +122,7 @@ class _ModalBottomSheetDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: RaisedButton(
+      child: ElevatedButton(
         onPressed: () {
           _showModalBottomSheet(context);
         },
@@ -180,7 +179,7 @@ class _PersistentBottomSheetDemoState
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: RaisedButton(
+      child: ElevatedButton(
         onPressed: _showBottomSheetCallback,
         child: Text(GalleryLocalizations.of(context).demoBottomSheetButtonText),
       ),

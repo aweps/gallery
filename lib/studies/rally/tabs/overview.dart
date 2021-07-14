@@ -4,12 +4,11 @@
 
 import 'dart:math' as math;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:gallery/data/gallery_options.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:gallery/data/gallery_options.dart';
 import 'package:gallery/layout/adaptive.dart';
 import 'package:gallery/layout/text_scale.dart';
 import 'package:gallery/studies/rally/colors.dart';
@@ -19,6 +18,8 @@ import 'package:gallery/studies/rally/formatters.dart';
 
 /// A page that shows a status overview.
 class OverviewView extends StatefulWidget {
+  const OverviewView({Key key}) : super(key: key);
+
   @override
   _OverviewViewState createState() => _OverviewViewState();
 }
@@ -31,6 +32,7 @@ class _OverviewViewState extends State<OverviewView> {
     if (isDisplayDesktop(context)) {
       const sortKeyName = 'Overview';
       return SingleChildScrollView(
+        restorationId: 'overview_scroll_view',
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24),
           child: Row(
@@ -46,7 +48,7 @@ class _OverviewViewState extends State<OverviewView> {
               const SizedBox(width: 24),
               Flexible(
                 flex: 3,
-                child: Container(
+                child: SizedBox(
                   width: 400,
                   child: Semantics(
                     sortKey: const OrdinalSortKey(2, name: sortKeyName),
@@ -62,6 +64,7 @@ class _OverviewViewState extends State<OverviewView> {
       );
     } else {
       return SingleChildScrollView(
+        restorationId: 'overview_scroll_view',
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Column(
@@ -94,7 +97,7 @@ class _OverviewGrid extends StatelessWidget {
 
       // Only display multiple columns when the constraints allow it and we
       // have a regular text scale factor.
-      final minWidthForTwoColumns = 600;
+      const minWidthForTwoColumns = 600;
       final hasMultipleColumns = isDisplayDesktop(context) &&
           constraints.maxWidth > minWidthForTwoColumns &&
           textScaleFactor <= 2;
@@ -105,7 +108,7 @@ class _OverviewGrid extends StatelessWidget {
       return Wrap(
         runSpacing: spacing,
         children: [
-          Container(
+          SizedBox(
             width: boxWidth,
             child: _FinancialView(
               title: GalleryLocalizations.of(context).rallyAccounts,
@@ -118,7 +121,7 @@ class _OverviewGrid extends StatelessWidget {
             ),
           ),
           if (hasMultipleColumns) SizedBox(width: spacing),
-          Container(
+          SizedBox(
             width: boxWidth,
             child: _FinancialView(
               title: GalleryLocalizations.of(context).rallyBills,
@@ -169,10 +172,10 @@ class _AlertsView extends StatelessWidget {
                 children: [
                   Text(GalleryLocalizations.of(context).rallyAlerts),
                   if (!isDesktop)
-                    FlatButton(
+                    TextButton(
+                      style: TextButton.styleFrom(primary: Colors.white),
                       onPressed: () {},
                       child: Text(GalleryLocalizations.of(context).rallySeeAll),
-                      textColor: Colors.white,
                     ),
                 ],
               ),
@@ -278,13 +281,13 @@ class _FinancialView extends StatelessWidget {
             ),
             ...financialItemViews.sublist(
                 0, math.min(financialItemViews.length, 3)),
-            FlatButton(
+            TextButton(
+              style: TextButton.styleFrom(primary: Colors.white),
+              onPressed: () {},
               child: Text(
                 GalleryLocalizations.of(context).rallySeeAll,
                 semanticsLabel: buttonSemanticsLabel,
               ),
-              textColor: Colors.white,
-              onPressed: () {},
             ),
           ],
         ),

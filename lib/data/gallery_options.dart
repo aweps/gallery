@@ -3,9 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:io' show Platform;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
@@ -68,14 +66,7 @@ class GalleryOptions {
     }
   }
 
-  Locale get locale =>
-      _locale ??
-      deviceLocale ??
-      // TODO: When deviceLocale can be obtained on desktop, this won't be necessary
-      // https://github.com/flutter/flutter/issues/45152
-      (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
-          ? const Locale('en', 'US')
-          : null);
+  Locale get locale => _locale ?? deviceLocale;
 
   /// Returns a text direction based on the [CustomTextDirection] setting.
   /// If it is based on locale and the locale cannot be determined, returns
@@ -175,7 +166,7 @@ class GalleryOptions {
 
 // Applies text GalleryOptions to a widget
 class ApplyTextOptions extends StatelessWidget {
-  const ApplyTextOptions({@required this.child});
+  const ApplyTextOptions({Key key, @required this.child}) : super(key: key);
 
   final Widget child;
 
@@ -204,7 +195,7 @@ class ApplyTextOptions extends StatelessWidget {
 // See https://medium.com/flutter/managing-flutter-application-state-with-inheritedwidgets-1140452befe1
 
 class _ModelBindingScope extends InheritedWidget {
-  _ModelBindingScope({
+  const _ModelBindingScope({
     Key key,
     @required this.modelBindingState,
     Widget child,
@@ -218,7 +209,7 @@ class _ModelBindingScope extends InheritedWidget {
 }
 
 class ModelBinding extends StatefulWidget {
-  ModelBinding({
+  const ModelBinding({
     Key key,
     this.initialModel = const GalleryOptions(),
     this.child,

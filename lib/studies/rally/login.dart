@@ -4,9 +4,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 import 'package:gallery/data/gallery_options.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
 import 'package:gallery/layout/adaptive.dart';
 import 'package:gallery/layout/image_placeholder.dart';
 import 'package:gallery/layout/text_scale.dart';
@@ -14,15 +14,26 @@ import 'package:gallery/studies/rally/app.dart';
 import 'package:gallery/studies/rally/colors.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage();
+  const LoginPage({Key key}) : super(key: key);
 
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+class _LoginPageState extends State<LoginPage> with RestorationMixin {
+  final RestorableTextEditingController _usernameController =
+      RestorableTextEditingController();
+  final RestorableTextEditingController _passwordController =
+      RestorableTextEditingController();
+
+  @override
+  String get restorationId => 'login_page';
+
+  @override
+  void restoreState(RestorationBucket oldBucket, bool initialRestore) {
+    registerForRestoration(_usernameController, restorationId);
+    registerForRestoration(_passwordController, restorationId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +42,8 @@ class _LoginPageState extends State<LoginPage> {
         appBar: AppBar(automaticallyImplyLeading: false),
         body: SafeArea(
           child: _MainView(
-            usernameController: _usernameController,
-            passwordController: _passwordController,
+            usernameController: _usernameController.value,
+            passwordController: _passwordController.value,
           ),
         ),
       ),
@@ -58,7 +69,7 @@ class _MainView extends StatelessWidget {
   final TextEditingController passwordController;
 
   void _login(BuildContext context) {
-    Navigator.of(context).pushNamed(RallyApp.homeRoute);
+    Navigator.of(context).restorablePushNamed(RallyApp.homeRoute);
   }
 
   @override
@@ -110,6 +121,7 @@ class _MainView extends StatelessWidget {
           child: Align(
             alignment: isDesktop ? Alignment.center : Alignment.topCenter,
             child: ListView(
+              restorationId: 'login_list_view',
               shrinkWrap: true,
               padding: const EdgeInsets.symmetric(horizontal: 24),
               children: listViewChildren,
@@ -128,7 +140,7 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final spacing = const SizedBox(width: 30);
+    const spacing = SizedBox(width: 30);
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(top: 8),
@@ -222,6 +234,7 @@ class _UsernameInput extends StatelessWidget {
       child: Container(
         constraints: BoxConstraints(maxWidth: maxWidth ?? double.infinity),
         child: TextField(
+          textInputAction: TextInputAction.next,
           controller: usernameController,
           decoration: InputDecoration(
             labelText: GalleryLocalizations.of(context).rallyLoginUsername,
@@ -261,7 +274,7 @@ class _PasswordInput extends StatelessWidget {
 }
 
 class _ThumbButton extends StatefulWidget {
-  _ThumbButton({
+  const _ThumbButton({
     @required this.onTap,
   });
 
@@ -288,10 +301,10 @@ class _ThumbButtonState extends State<_ThumbButton> {
               if (event.logicalKey == LogicalKeyboardKey.enter ||
                   event.logicalKey == LogicalKeyboardKey.space) {
                 widget.onTap();
-                return true;
+                return KeyEventResult.handled;
               }
             }
-            return false;
+            return KeyEventResult.ignored;
           },
           onFocusChange: (hasFocus) {
             if (hasFocus) {
@@ -367,18 +380,17 @@ class _BorderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlineButton(
-      borderSide: const BorderSide(color: RallyColors.buttonColor),
-      color: RallyColors.buttonColor,
-      highlightedBorderColor: RallyColors.buttonColor,
-      focusColor: RallyColors.buttonColor.withOpacity(0.8),
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        primary: Colors.white,
+        side: const BorderSide(color: RallyColors.buttonColor),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
-      textColor: Colors.white,
       onPressed: () {
-        Navigator.of(context).pushNamed(RallyApp.homeRoute);
+        Navigator.of(context).restorablePushNamed(RallyApp.homeRoute);
       },
       child: Text(text),
     );
@@ -394,11 +406,14 @@ class _FilledButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
-      color: RallyColors.buttonColor,
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+    return TextButton(
+      style: TextButton.styleFrom(
+        backgroundColor: RallyColors.buttonColor,
+        primary: Colors.black,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
       onPressed: onTap,
       child: Row(

@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 // BEGIN typographyDemo
 
@@ -44,7 +44,7 @@ class _TextStyleItem extends StatelessWidget {
 }
 
 class TypographyDemo extends StatelessWidget {
-  const TypographyDemo();
+  const TypographyDemo({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

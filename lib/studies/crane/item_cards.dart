@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import 'package:gallery/layout/adaptive.dart';
 import 'package:gallery/layout/highlight_focus.dart';
@@ -14,8 +13,9 @@ import 'package:gallery/studies/crane/model/destination.dart';
 const mobileThumbnailSize = 60.0;
 
 class DestinationCard extends StatelessWidget {
-  const DestinationCard({@required this.destination})
-      : assert(destination != null);
+  const DestinationCard({Key key, @required this.destination})
+      : assert(destination != null),
+        super(key: key);
   final Destination destination;
 
   @override
@@ -95,6 +95,7 @@ class _DestinationImage extends StatelessWidget {
     final isDesktop = isDisplayDesktop(context);
 
     return Semantics(
+      label: destination.assetSemanticLabel,
       child: ExcludeSemantics(
         child: FadeInImagePlaceholder(
           image: AssetImage(
@@ -113,7 +114,6 @@ class _DestinationImage extends StatelessWidget {
           }),
         ),
       ),
-      label: destination.assetSemanticLabel,
     );
   }
 }

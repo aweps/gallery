@@ -3,15 +3,10 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
+import 'package:gallery/demos/material/material_demo_types.dart';
 
 // BEGIN gridListsDemo
-
-enum GridListDemoType {
-  imageOnly,
-  header,
-  footer,
-}
 
 class GridListDemo extends StatelessWidget {
   const GridListDemo({Key key, this.type}) : super(key: key);
@@ -91,6 +86,7 @@ class GridListDemo extends StatelessWidget {
         title: Text(GalleryLocalizations.of(context).demoGridListsTitle),
       ),
       body: GridView.count(
+        restorationId: 'grid_view_demo_grid_offset',
         crossAxisCount: 2,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
@@ -136,7 +132,7 @@ class _GridTitleText extends StatelessWidget {
 }
 
 class _GridDemoPhotoItem extends StatelessWidget {
-  _GridDemoPhotoItem({
+  const _GridDemoPhotoItem({
     Key key,
     @required this.photo,
     @required this.tileStyle,

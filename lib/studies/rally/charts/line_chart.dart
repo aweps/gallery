@@ -2,20 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:intl/intl.dart' as intl;
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 
 import 'package:gallery/data/gallery_options.dart';
-import 'package:gallery/layout/text_scale.dart';
 import 'package:gallery/layout/adaptive.dart';
+import 'package:gallery/layout/text_scale.dart';
 import 'package:gallery/studies/rally/colors.dart';
 import 'package:gallery/studies/rally/data.dart';
 import 'package:gallery/studies/rally/formatters.dart';
+import 'package:intl/intl.dart' as intl;
 
 class RallyLineChart extends StatelessWidget {
-  const RallyLineChart({this.events = const <DetailedEventData>[]})
-      : assert(events != null);
+  const RallyLineChart({Key key, this.events = const <DetailedEventData>[]})
+      : assert(events != null),
+        super(key: key);
 
   final List<DetailedEventData> events;
 
@@ -128,7 +129,7 @@ class RallyLineChartPainter extends CustomPainter {
 
       // We divide the graph and the amounts into [numGroups] groups, with
       // [numItemsPerGroup] amounts per group.
-      final numGroups = 10;
+      const numGroups = 10;
       final numItemsPerGroup = amounts.length ~/ numGroups;
 
       // For each group we calculate the median value.

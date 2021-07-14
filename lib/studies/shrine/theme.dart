@@ -3,10 +3,11 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 import 'package:gallery/layout/letter_spacing.dart';
 import 'package:gallery/studies/shrine/colors.dart';
 import 'package:gallery/studies/shrine/supplemental/cut_corners_border.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 const defaultLetterSpacing = 0.03;
 const mediumLetterSpacing = 0.04;
@@ -21,19 +22,15 @@ IconThemeData _customIconTheme(IconThemeData original) {
 ThemeData _buildShrineTheme() {
   final base = ThemeData.light();
   return base.copyWith(
-    appBarTheme: const AppBarTheme(brightness: Brightness.light, elevation: 0),
+    appBarTheme: const AppBarTheme(
+      systemOverlayStyle: SystemUiOverlayStyle.dark,
+      elevation: 0,
+    ),
     colorScheme: _shrineColorScheme,
-    accentColor: shrineBrown900,
     primaryColor: shrinePink100,
-    buttonColor: shrinePink100,
     scaffoldBackgroundColor: shrineBackgroundWhite,
     cardColor: shrineBackgroundWhite,
-    textSelectionColor: shrinePink100,
     errorColor: shrineErrorRed,
-    buttonTheme: const ButtonThemeData(
-      colorScheme: _shrineColorScheme,
-      textTheme: ButtonTextTheme.normal,
-    ),
     primaryIconTheme: _customIconTheme(base.iconTheme),
     inputDecorationTheme: const InputDecorationTheme(
       border: CutCornersBorder(
@@ -42,8 +39,10 @@ ThemeData _buildShrineTheme() {
       contentPadding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
     ),
     textTheme: _buildShrineTextTheme(base.textTheme),
+    textSelectionTheme: const TextSelectionThemeData(
+      selectionColor: shrinePink100,
+    ),
     primaryTextTheme: _buildShrineTextTheme(base.primaryTextTheme),
-    accentTextTheme: _buildShrineTextTheme(base.accentTextTheme),
     iconTheme: _customIconTheme(base.iconTheme),
   );
 }

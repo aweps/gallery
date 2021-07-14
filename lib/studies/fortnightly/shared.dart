@@ -3,14 +3,14 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
+
+import 'package:gallery/data/gallery_options.dart';
+import 'package:gallery/layout/image_placeholder.dart';
+import 'package:gallery/layout/text_scale.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
-import 'package:gallery/data/gallery_options.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
-import 'package:gallery/layout/image_placeholder.dart';
-import 'package:gallery/layout/text_scale.dart';
 
 class ArticleData {
   ArticleData(
@@ -28,7 +28,8 @@ class ArticleData {
 }
 
 class HorizontalArticlePreview extends StatelessWidget {
-  HorizontalArticlePreview({this.data, this.minutes});
+  const HorizontalArticlePreview({Key key, this.data, this.minutes})
+      : super(key: key);
 
   final ArticleData data;
   final int minutes;
@@ -79,12 +80,13 @@ class HorizontalArticlePreview extends StatelessWidget {
 }
 
 class VerticalArticlePreview extends StatelessWidget {
-  VerticalArticlePreview({
+  const VerticalArticlePreview({
+    Key key,
     this.data,
     this.width,
     this.headlineTextStyle,
     this.showSnippet = false,
-  });
+  }) : super(key: key);
 
   final ArticleData data;
   final double width;
@@ -231,6 +233,8 @@ List<Widget> buildArticlePreviewItems(BuildContext context) {
 }
 
 class HashtagBar extends StatelessWidget {
+  const HashtagBar({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final verticalDivider = Container(
@@ -244,6 +248,7 @@ class HashtagBar extends StatelessWidget {
     return SizedBox(
       height: height,
       child: ListView(
+        restorationId: 'hashtag_bar_list_view',
         scrollDirection: Axis.horizontal,
         children: [
           const SizedBox(width: 16),
@@ -289,7 +294,7 @@ class HashtagBar extends StatelessWidget {
 }
 
 class NavigationMenu extends StatelessWidget {
-  NavigationMenu({this.isCloseable = false});
+  const NavigationMenu({Key key, this.isCloseable = false}) : super(key: key);
 
   final bool isCloseable;
 
@@ -332,7 +337,7 @@ class NavigationMenu extends StatelessWidget {
 }
 
 class MenuItem extends StatelessWidget {
-  MenuItem(this.title, {this.header = false});
+  const MenuItem(this.title, {Key key, this.header = false}) : super(key: key);
 
   final String title;
   final bool header;
@@ -364,7 +369,8 @@ class MenuItem extends StatelessWidget {
 }
 
 class StockItem extends StatelessWidget {
-  StockItem({this.ticker, this.price, this.percent});
+  const StockItem({Key key, this.ticker, this.price, this.percent})
+      : super(key: key);
 
   final String ticker;
   final String price;
@@ -446,31 +452,31 @@ List<Widget> buildStockItems(BuildContext context) {
       ),
     ),
     articleDivider,
-    StockItem(
+    const StockItem(
       ticker: 'DIJA',
       price: '7,031.21',
       percent: -0.48,
     ),
     articleDivider,
-    StockItem(
+    const StockItem(
       ticker: 'SP',
       price: '1,967.84',
       percent: -0.23,
     ),
     articleDivider,
-    StockItem(
+    const StockItem(
       ticker: 'Nasdaq',
       price: '6,211.46',
       percent: 0.52,
     ),
     articleDivider,
-    StockItem(
+    const StockItem(
       ticker: 'Nikkei',
       price: '5,891',
       percent: 1.16,
     ),
     articleDivider,
-    StockItem(
+    const StockItem(
       ticker: 'DJ Total',
       price: '89.02',
       percent: 0.80,
@@ -480,7 +486,7 @@ List<Widget> buildStockItems(BuildContext context) {
 }
 
 class VideoPreview extends StatelessWidget {
-  VideoPreview({this.data, this.time});
+  const VideoPreview({Key key, this.data, this.time}) : super(key: key);
 
   final ArticleData data;
   final String time;
