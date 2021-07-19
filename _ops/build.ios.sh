@@ -25,7 +25,7 @@ if [[ ! -d ~/flutter ]]; then
 	rm -rf flutter_macos_${FLUTTER_VER}-stable.zip
 
 	export PATH="$PATH:~/flutter/flutter/bin"
-	flutter channel master
+	flutter channel beta
 	flutter upgrade
 	flutter precache
 	popd
@@ -36,4 +36,3 @@ pushd ${GITHUB_WORKSPACE:-.}
 flutter doctor
 flutter build ios --release --no-codesign --dart-define=${DART_DEFINES:-}
 popd
-
