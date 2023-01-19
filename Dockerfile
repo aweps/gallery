@@ -16,7 +16,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
  && rm -rf /var/lib/apt/lists/*
 
 # Upgrade to support web
-RUN flutter channel master && flutter upgrade
+RUN flutter channel beta && flutter upgrade
 RUN flutter config --enable-web && flutter doctor
 
 # Build Web Application
@@ -39,7 +39,7 @@ RUN curl --silent -o - "https://caddyserver.com/api/download?os=linux&arch=amd64
 RUN chmod 0755 /usr/bin/caddy
 
 COPY --from=webdev /src/build/web /srv/www
-#COPY --from=webdev /src/build/app/outputs/apk/release/app-release.apk /srv/android
+COPY --from=webdev /src/build/app/outputs/apk/release/app-release.apk /srv/android
 COPY Caddyfile /etc/
 
 EXPOSE 80 443
