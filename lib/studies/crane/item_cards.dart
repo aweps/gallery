@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import 'package:gallery/layout/adaptive.dart';
 import 'package:gallery/layout/highlight_focus.dart';
@@ -14,8 +13,11 @@ import 'package:gallery/studies/crane/model/destination.dart';
 const mobileThumbnailSize = 60.0;
 
 class DestinationCard extends StatelessWidget {
-  const DestinationCard({@required this.destination})
-      : assert(destination != null);
+  const DestinationCard({
+    super.key,
+    required this.destination,
+  });
+
   final Destination destination;
 
   @override
@@ -37,15 +39,15 @@ class DestinationCard extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 10),
-                    child: Text(
+                    child: SelectableText(
                       destination.destination,
-                      style: textTheme.subtitle1,
+                      style: textTheme.titleMedium,
                     ),
                   ),
-                  Text(
+                  SelectableText(
                     destination.subtitle(context),
                     semanticsLabel: destination.subtitleSemantics(context),
-                    style: textTheme.subtitle2,
+                    style: textTheme.titleSmall,
                   ),
                 ],
               ),
@@ -64,12 +66,12 @@ class DestinationCard extends StatelessWidget {
                     child: _DestinationImage(destination: destination),
                   ),
                 ),
-                title:
-                    Text(destination.destination, style: textTheme.subtitle1),
-                subtitle: Text(
+                title: SelectableText(destination.destination,
+                    style: textTheme.titleMedium),
+                subtitle: SelectableText(
                   destination.subtitle(context),
                   semanticsLabel: destination.subtitleSemantics(context),
-                  style: textTheme.subtitle2,
+                  style: textTheme.titleSmall,
                 ),
               ),
               const Divider(thickness: 1),
@@ -86,8 +88,10 @@ class DestinationCard extends StatelessWidget {
 }
 
 class _DestinationImage extends StatelessWidget {
-  const _DestinationImage({@required this.destination})
-      : assert(destination != null);
+  const _DestinationImage({
+    required this.destination,
+  });
+
   final Destination destination;
 
   @override
@@ -95,6 +99,7 @@ class _DestinationImage extends StatelessWidget {
     final isDesktop = isDisplayDesktop(context);
 
     return Semantics(
+      label: destination.assetSemanticLabel,
       child: ExcludeSemantics(
         child: FadeInImagePlaceholder(
           image: AssetImage(
@@ -113,7 +118,6 @@ class _DestinationImage extends StatelessWidget {
           }),
         ),
       ),
-      label: destination.assetSemanticLabel,
     );
   }
 }

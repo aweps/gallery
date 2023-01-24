@@ -2,90 +2,90 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
-
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
+import 'package:gallery/demos/material/material_demo_types.dart';
 
 // BEGIN bottomNavigationDemo
 
-enum BottomNavigationDemoType {
-  withLabels,
-  withoutLabels,
-}
-
 class BottomNavigationDemo extends StatefulWidget {
-  const BottomNavigationDemo({Key key, @required this.type}) : super(key: key);
+  const BottomNavigationDemo({
+    super.key,
+    required this.restorationId,
+    required this.type,
+  });
 
+  final String restorationId;
   final BottomNavigationDemoType type;
 
   @override
-  _BottomNavigationDemoState createState() => _BottomNavigationDemoState();
+  State<BottomNavigationDemo> createState() => _BottomNavigationDemoState();
 }
 
-class _BottomNavigationDemoState extends State<BottomNavigationDemo> {
-  int _currentIndex = 0;
+class _BottomNavigationDemoState extends State<BottomNavigationDemo>
+    with RestorationMixin {
+  final RestorableInt _currentIndex = RestorableInt(0);
+
+  @override
+  String get restorationId => widget.restorationId;
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_currentIndex, 'bottom_navigation_tab_index');
+  }
+
+  @override
+  void dispose() {
+    _currentIndex.dispose();
+    super.dispose();
+  }
 
   String _title(BuildContext context) {
+    final localizations = GalleryLocalizations.of(context)!;
     switch (widget.type) {
       case BottomNavigationDemoType.withLabels:
-        return GalleryLocalizations.of(context)
-            .demoBottomNavigationPersistentLabels;
+        return localizations.demoBottomNavigationPersistentLabels;
       case BottomNavigationDemoType.withoutLabels:
-        return GalleryLocalizations.of(context)
-            .demoBottomNavigationSelectedLabel;
+        return localizations.demoBottomNavigationSelectedLabel;
     }
-    return '';
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final localizations = GalleryLocalizations.of(context)!;
 
     var bottomNavigationBarItems = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         icon: const Icon(Icons.add_comment),
-        // ignore: deprecated_member_use
-        title: Text(
-          GalleryLocalizations.of(context).bottomNavigationCommentsTab,
-        ),
+        label: localizations.bottomNavigationCommentsTab,
       ),
       BottomNavigationBarItem(
         icon: const Icon(Icons.calendar_today),
-        // ignore: deprecated_member_use
-        title: Text(
-          GalleryLocalizations.of(context).bottomNavigationCalendarTab,
-        ),
+        label: localizations.bottomNavigationCalendarTab,
       ),
       BottomNavigationBarItem(
         icon: const Icon(Icons.account_circle),
-        // ignore: deprecated_member_use
-        title: Text(
-          GalleryLocalizations.of(context).bottomNavigationAccountTab,
-        ),
+        label: localizations.bottomNavigationAccountTab,
       ),
       BottomNavigationBarItem(
         icon: const Icon(Icons.alarm_on),
-        // ignore: deprecated_member_use
-        title: Text(
-          GalleryLocalizations.of(context).bottomNavigationAlarmTab,
-        ),
+        label: localizations.bottomNavigationAlarmTab,
       ),
       BottomNavigationBarItem(
         icon: const Icon(Icons.camera_enhance),
-        // ignore: deprecated_member_use
-        title: Text(
-          GalleryLocalizations.of(context).bottomNavigationCameraTab,
-        ),
+        label: localizations.bottomNavigationCameraTab,
       ),
     ];
 
     if (widget.type == BottomNavigationDemoType.withLabels) {
       bottomNavigationBarItems = bottomNavigationBarItems.sublist(
           0, bottomNavigationBarItems.length - 2);
-      _currentIndex =
-          _currentIndex.clamp(0, bottomNavigationBarItems.length - 1).toInt();
+      _currentIndex.value = _currentIndex.value
+          .clamp(0, bottomNavigationBarItems.length - 1)
+          .toInt();
     }
 
     return Scaffold(
@@ -95,31 +95,31 @@ class _BottomNavigationDemoState extends State<BottomNavigationDemo> {
       ),
       body: Center(
         child: PageTransitionSwitcher(
+          transitionBuilder: (child, animation, secondaryAnimation) {
+            return FadeThroughTransition(
+              animation: animation,
+              secondaryAnimation: secondaryAnimation,
+              child: child,
+            );
+          },
           child: _NavigationDestinationView(
             // Adding [UniqueKey] to make sure the widget rebuilds when transitioning.
             key: UniqueKey(),
-            item: bottomNavigationBarItems[_currentIndex],
+            item: bottomNavigationBarItems[_currentIndex.value],
           ),
-          transitionBuilder: (child, animation, secondaryAnimation) {
-            return FadeThroughTransition(
-              child: child,
-              animation: animation,
-              secondaryAnimation: secondaryAnimation,
-            );
-          },
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         showUnselectedLabels:
             widget.type == BottomNavigationDemoType.withLabels,
         items: bottomNavigationBarItems,
-        currentIndex: _currentIndex,
+        currentIndex: _currentIndex.value,
         type: BottomNavigationBarType.fixed,
-        selectedFontSize: textTheme.caption.fontSize,
-        unselectedFontSize: textTheme.caption.fontSize,
+        selectedFontSize: textTheme.bodySmall!.fontSize!,
+        unselectedFontSize: textTheme.bodySmall!.fontSize!,
         onTap: (index) {
           setState(() {
-            _currentIndex = index;
+            _currentIndex.value = index;
           });
         },
         selectedItemColor: colorScheme.onPrimary,
@@ -131,7 +131,10 @@ class _BottomNavigationDemoState extends State<BottomNavigationDemo> {
 }
 
 class _NavigationDestinationView extends StatelessWidget {
-  _NavigationDestinationView({Key key, this.item}) : super(key: key);
+  const _NavigationDestinationView({
+    super.key,
+    required this.item,
+  });
 
   final BottomNavigationBarItem item;
 
@@ -160,10 +163,9 @@ class _NavigationDestinationView extends StatelessWidget {
               size: 80,
             ),
             child: Semantics(
-              label: GalleryLocalizations.of(context)
+              label: GalleryLocalizations.of(context)!
                   .bottomNavigationContentPlaceholder(
-                // ignore: deprecated_member_use
-                item.title,
+                item.label!,
               ),
               child: item.icon,
             ),

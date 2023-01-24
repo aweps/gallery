@@ -31,7 +31,7 @@
 .pub-cache/
 .pub/
 /build/
-golden_test/failures/
+test_goldens/failures/
 
 # Android related
 **/android/**/gradle-wrapper.jar
@@ -69,9 +69,6 @@ golden_test/failures/
 **/ios/Flutter/flutter_export_environment.sh
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
-
-# Web related
-lib/generated_plugin_registrant.dart
 
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3

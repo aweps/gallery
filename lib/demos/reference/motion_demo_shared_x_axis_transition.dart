@@ -2,16 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 // BEGIN sharedXAxisTransitionDemo
 
 class SharedXAxisTransitionDemo extends StatefulWidget {
-  const SharedXAxisTransitionDemo();
+  const SharedXAxisTransitionDemo({super.key});
   @override
-  _SharedXAxisTransitionDemoState createState() =>
+  State<SharedXAxisTransitionDemo> createState() =>
       _SharedXAxisTransitionDemoState();
 }
 
@@ -26,7 +26,7 @@ class _SharedXAxisTransitionDemoState extends State<SharedXAxisTransitionDemo> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = GalleryLocalizations.of(context);
+    final localizations = GalleryLocalizations.of(context)!;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -39,7 +39,7 @@ class _SharedXAxisTransitionDemoState extends State<SharedXAxisTransitionDemo> {
               '(${localizations.demoSharedXAxisDemoInstructions})',
               style: Theme.of(context)
                   .textTheme
-                  .subtitle2
+                  .titleSmall!
                   .copyWith(color: Colors.white),
             ),
           ],
@@ -58,25 +58,25 @@ class _SharedXAxisTransitionDemoState extends State<SharedXAxisTransitionDemo> {
                   secondaryAnimation,
                 ) {
                   return SharedAxisTransition(
-                    child: child,
                     animation: animation,
                     secondaryAnimation: secondaryAnimation,
                     transitionType: SharedAxisTransitionType.horizontal,
+                    child: child,
                   );
                 },
                 child: _isLoggedIn ? const _CoursePage() : const _SignInPage(),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  FlatButton(
+                  TextButton(
                     onPressed: _isLoggedIn ? _toggleLoginStatus : null,
                     child: Text(localizations.demoSharedXAxisBackButtonText),
                   ),
-                  RaisedButton(
+                  ElevatedButton(
                     onPressed: _isLoggedIn ? null : _toggleLoginStatus,
                     child: Text(localizations.demoSharedXAxisNextButtonText),
                   ),
@@ -95,14 +95,14 @@ class _CoursePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = GalleryLocalizations.of(context);
+    final localizations = GalleryLocalizations.of(context)!;
 
     return ListView(
       children: [
         const SizedBox(height: 16),
         Text(
           localizations.demoSharedXAxisCoursePageTitle,
-          style: Theme.of(context).textTheme.headline5,
+          style: Theme.of(context).textTheme.headlineSmall,
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 10),
@@ -134,7 +134,7 @@ class _CourseSwitch extends StatefulWidget {
     this.course,
   });
 
-  final String course;
+  final String? course;
 
   @override
   _CourseSwitchState createState() => _CourseSwitchState();
@@ -147,11 +147,11 @@ class _CourseSwitchState extends State<_CourseSwitch> {
   Widget build(BuildContext context) {
     final localizations = GalleryLocalizations.of(context);
     final subtitle = _isCourseBundled
-        ? localizations.demoSharedXAxisBundledCourseSubtitle
-        : localizations.demoSharedXAxisIndividualCourseSubtitle;
+        ? localizations!.demoSharedXAxisBundledCourseSubtitle
+        : localizations!.demoSharedXAxisIndividualCourseSubtitle;
 
     return SwitchListTile(
-      title: Text(widget.course),
+      title: Text(widget.course!),
       subtitle: Text(subtitle),
       value: _isCourseBundled,
       onChanged: (newValue) {
@@ -173,74 +173,73 @@ class _SignInPage extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxHeight = constraints.maxHeight;
-        final spacing = SizedBox(height: maxHeight / 25);
+        const spacing = SizedBox(height: 10);
 
-        return Column(
-          children: [
-            SizedBox(height: maxHeight / 10),
-            Image.asset(
-              'placeholders/avatar_logo.png',
-              package: 'flutter_gallery_assets',
-              width: 80,
-            ),
-            spacing,
-            Text(
-              localizations.demoSharedXAxisSignInWelcomeText,
-              style: Theme.of(context).textTheme.headline5,
-            ),
-            spacing,
-            Text(
-              localizations.demoSharedXAxisSignInSubtitleText,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
+        return Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: maxHeight / 10),
+              Image.asset(
+                'placeholders/avatar_logo.png',
+                package: 'flutter_gallery_assets',
+                width: 80,
+                height: 80,
               ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsetsDirectional.only(
-                    top: 40,
-                    start: 15,
-                    end: 15,
-                    bottom: 10,
-                  ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      suffixIcon: const Icon(
-                        Icons.visibility,
-                        size: 20,
-                        color: Colors.black54,
+              spacing,
+              Text(
+                localizations!.demoSharedXAxisSignInWelcomeText,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              spacing,
+              Text(
+                localizations.demoSharedXAxisSignInSubtitleText,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(
+                      top: 40,
+                      start: 10,
+                      end: 10,
+                      bottom: 10,
+                    ),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        suffixIcon: const Icon(
+                          Icons.visibility,
+                          size: 20,
+                          color: Colors.black54,
+                        ),
+                        labelText:
+                            localizations.demoSharedXAxisSignInTextFieldLabel,
+                        border: const OutlineInputBorder(),
                       ),
-                      isDense: true,
-                      labelText:
-                          localizations.demoSharedXAxisSignInTextFieldLabel,
-                      border: const OutlineInputBorder(),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.only(start: 10),
-                  child: FlatButton(
+                  TextButton(
                     onPressed: () {},
                     child: Text(
                       localizations.demoSharedXAxisForgotEmailButtonText,
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.only(start: 10),
-                  child: FlatButton(
+                  spacing,
+                  TextButton(
                     onPressed: () {},
                     child: Text(
                       localizations.demoSharedXAxisCreateAccountButtonText,
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         );
       },
     );

@@ -3,83 +3,101 @@
 // found in the LICENSE file.
 
 import 'package:flutter/cupertino.dart';
-
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 // BEGIN cupertinoSliderDemo
 
 class CupertinoSliderDemo extends StatefulWidget {
-  const CupertinoSliderDemo();
+  const CupertinoSliderDemo({super.key});
 
   @override
-  _CupertinoSliderDemoState createState() => _CupertinoSliderDemoState();
+  State<CupertinoSliderDemo> createState() => _CupertinoSliderDemoState();
 }
 
-class _CupertinoSliderDemoState extends State<CupertinoSliderDemo> {
-  double _value = 25.0;
-  double _discreteValue = 20.0;
+class _CupertinoSliderDemoState extends State<CupertinoSliderDemo>
+    with RestorationMixin {
+  final RestorableDouble _value = RestorableDouble(25.0);
+  final RestorableDouble _discreteValue = RestorableDouble(20.0);
+
+  @override
+  String get restorationId => 'cupertino_slider_demo';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_value, 'value');
+    registerForRestoration(_discreteValue, 'discrete_value');
+  }
 
   @override
   Widget build(BuildContext context) {
+    final localizations = GalleryLocalizations.of(context)!;
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         automaticallyImplyLeading: false,
-        middle: Text(GalleryLocalizations.of(context).demoCupertinoSliderTitle),
+        middle: Text(localizations.demoCupertinoSliderTitle),
       ),
       child: DefaultTextStyle(
         style: CupertinoTheme.of(context).textTheme.textStyle,
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          child: Wrap(
             children: [
               Column(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: CupertinoSlider(
-                      value: _value,
-                      min: 0.0,
-                      max: 100.0,
-                      onChanged: (value) {
-                        setState(() {
-                          _value = value;
-                        });
-                      },
-                    ),
+                  const SizedBox(height: 32),
+                  CupertinoSlider(
+                    value: _value.value,
+                    min: 0.0,
+                    max: 100.0,
+                    onChanged: (value) {
+                      setState(() {
+                        _value.value = value;
+                      });
+                    },
+                  ),
+                  CupertinoSlider(
+                    value: _value.value,
+                    min: 0.0,
+                    max: 100.0,
+                    onChanged: null,
                   ),
                   MergeSemantics(
                     child: Text(
-                      GalleryLocalizations.of(context)
-                          .demoCupertinoSliderContinuous(
-                        _value.toStringAsFixed(1),
+                      localizations.demoCupertinoSliderContinuous(
+                        _value.value.toStringAsFixed(1),
                       ),
                     ),
                   ),
                 ],
               ),
+              // Disabled sliders
+              // TODO(guidezpl): See https://github.com/flutter/flutter/issues/106691
               Column(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: CupertinoSlider(
-                      value: _discreteValue,
-                      min: 0.0,
-                      max: 100.0,
-                      divisions: 5,
-                      onChanged: (value) {
-                        setState(() {
-                          _discreteValue = value;
-                        });
-                      },
-                    ),
+                  const SizedBox(height: 32),
+                  CupertinoSlider(
+                    value: _discreteValue.value,
+                    min: 0.0,
+                    max: 100.0,
+                    divisions: 5,
+                    onChanged: (value) {
+                      setState(() {
+                        _discreteValue.value = value;
+                      });
+                    },
+                  ),
+                  CupertinoSlider(
+                    value: _discreteValue.value,
+                    min: 0.0,
+                    max: 100.0,
+                    divisions: 5,
+                    onChanged: null,
                   ),
                   MergeSemantics(
                     child: Text(
-                      GalleryLocalizations.of(context)
-                          .demoCupertinoSliderDiscrete(
-                        _discreteValue.toStringAsFixed(1),
+                      localizations.demoCupertinoSliderDiscrete(
+                        _discreteValue.value.toStringAsFixed(1),
                       ),
                     ),
                   ),

@@ -3,82 +3,78 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
+import 'package:gallery/demos/material/material_demo_types.dart';
 
 // BEGIN gridListsDemo
 
-enum GridListDemoType {
-  imageOnly,
-  header,
-  footer,
-}
-
 class GridListDemo extends StatelessWidget {
-  const GridListDemo({Key key, this.type}) : super(key: key);
+  const GridListDemo({super.key, required this.type});
 
   final GridListDemoType type;
 
   List<_Photo> _photos(BuildContext context) {
+    final localizations = GalleryLocalizations.of(context)!;
     return [
       _Photo(
         assetName: 'places/india_chennai_flower_market.png',
-        title: GalleryLocalizations.of(context).placeChennai,
-        subtitle: GalleryLocalizations.of(context).placeFlowerMarket,
+        title: localizations.placeChennai,
+        subtitle: localizations.placeFlowerMarket,
       ),
       _Photo(
         assetName: 'places/india_tanjore_bronze_works.png',
-        title: GalleryLocalizations.of(context).placeTanjore,
-        subtitle: GalleryLocalizations.of(context).placeBronzeWorks,
+        title: localizations.placeTanjore,
+        subtitle: localizations.placeBronzeWorks,
       ),
       _Photo(
         assetName: 'places/india_tanjore_market_merchant.png',
-        title: GalleryLocalizations.of(context).placeTanjore,
-        subtitle: GalleryLocalizations.of(context).placeMarket,
+        title: localizations.placeTanjore,
+        subtitle: localizations.placeMarket,
       ),
       _Photo(
         assetName: 'places/india_tanjore_thanjavur_temple.png',
-        title: GalleryLocalizations.of(context).placeTanjore,
-        subtitle: GalleryLocalizations.of(context).placeThanjavurTemple,
+        title: localizations.placeTanjore,
+        subtitle: localizations.placeThanjavurTemple,
       ),
       _Photo(
         assetName: 'places/india_tanjore_thanjavur_temple_carvings.png',
-        title: GalleryLocalizations.of(context).placeTanjore,
-        subtitle: GalleryLocalizations.of(context).placeThanjavurTemple,
+        title: localizations.placeTanjore,
+        subtitle: localizations.placeThanjavurTemple,
       ),
       _Photo(
         assetName: 'places/india_pondicherry_salt_farm.png',
-        title: GalleryLocalizations.of(context).placePondicherry,
-        subtitle: GalleryLocalizations.of(context).placeSaltFarm,
+        title: localizations.placePondicherry,
+        subtitle: localizations.placeSaltFarm,
       ),
       _Photo(
         assetName: 'places/india_chennai_highway.png',
-        title: GalleryLocalizations.of(context).placeChennai,
-        subtitle: GalleryLocalizations.of(context).placeScooters,
+        title: localizations.placeChennai,
+        subtitle: localizations.placeScooters,
       ),
       _Photo(
         assetName: 'places/india_chettinad_silk_maker.png',
-        title: GalleryLocalizations.of(context).placeChettinad,
-        subtitle: GalleryLocalizations.of(context).placeSilkMaker,
+        title: localizations.placeChettinad,
+        subtitle: localizations.placeSilkMaker,
       ),
       _Photo(
         assetName: 'places/india_chettinad_produce.png',
-        title: GalleryLocalizations.of(context).placeChettinad,
-        subtitle: GalleryLocalizations.of(context).placeLunchPrep,
+        title: localizations.placeChettinad,
+        subtitle: localizations.placeLunchPrep,
       ),
       _Photo(
         assetName: 'places/india_tanjore_market_technology.png',
-        title: GalleryLocalizations.of(context).placeTanjore,
-        subtitle: GalleryLocalizations.of(context).placeMarket,
+        title: localizations.placeTanjore,
+        subtitle: localizations.placeMarket,
       ),
       _Photo(
         assetName: 'places/india_pondicherry_beach.png',
-        title: GalleryLocalizations.of(context).placePondicherry,
-        subtitle: GalleryLocalizations.of(context).placeBeach,
+        title: localizations.placePondicherry,
+        subtitle: localizations.placeBeach,
       ),
       _Photo(
         assetName: 'places/india_pondicherry_fisherman.png',
-        title: GalleryLocalizations.of(context).placePondicherry,
-        subtitle: GalleryLocalizations.of(context).placeFisherman,
+        title: localizations.placePondicherry,
+        subtitle: localizations.placeFisherman,
       ),
     ];
   }
@@ -88,9 +84,10 @@ class GridListDemo extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(GalleryLocalizations.of(context).demoGridListsTitle),
+        title: Text(GalleryLocalizations.of(context)!.demoGridListsTitle),
       ),
       body: GridView.count(
+        restorationId: 'grid_view_demo_grid_offset',
         crossAxisCount: 2,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
@@ -109,9 +106,9 @@ class GridListDemo extends StatelessWidget {
 
 class _Photo {
   _Photo({
-    this.assetName,
-    this.title,
-    this.subtitle,
+    required this.assetName,
+    required this.title,
+    required this.subtitle,
   });
 
   final String assetName;
@@ -136,24 +133,26 @@ class _GridTitleText extends StatelessWidget {
 }
 
 class _GridDemoPhotoItem extends StatelessWidget {
-  _GridDemoPhotoItem({
-    Key key,
-    @required this.photo,
-    @required this.tileStyle,
-  }) : super(key: key);
+  const _GridDemoPhotoItem({
+    required this.photo,
+    required this.tileStyle,
+  });
 
   final _Photo photo;
   final GridListDemoType tileStyle;
 
   @override
   Widget build(BuildContext context) {
-    final Widget image = Material(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-      clipBehavior: Clip.antiAlias,
-      child: Image.asset(
-        photo.assetName,
-        package: 'flutter_gallery_assets',
-        fit: BoxFit.cover,
+    final Widget image = Semantics(
+      label: '${photo.title} ${photo.subtitle}',
+      child: Material(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        clipBehavior: Clip.antiAlias,
+        child: Image.asset(
+          photo.assetName,
+          package: 'flutter_gallery_assets',
+          fit: BoxFit.cover,
+        ),
       ),
     );
 
@@ -192,7 +191,6 @@ class _GridDemoPhotoItem extends StatelessWidget {
           child: image,
         );
     }
-    return null;
   }
 }
 

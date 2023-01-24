@@ -167,4 +167,8 @@ class GalleryIcons {
     0xe927,
     fontFamily: 'GalleryIcons',
   );
+  static const IconData navigationRail = Icons.vertical_split;
+  static const IconData appbar = Icons.web_asset;
+  static const IconData divider = Icons.credit_card;
+  static const IconData search = Icons.search;
 }
