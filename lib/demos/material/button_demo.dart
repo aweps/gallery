@@ -3,50 +3,42 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-
-import 'package:gallery/l10n/gallery_localizations.dart';
-
-enum ButtonDemoType {
-  flat,
-  raised,
-  outline,
-  toggle,
-  floating,
-}
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
+import 'package:gallery/demos/material/material_demo_types.dart';
 
 class ButtonDemo extends StatelessWidget {
-  const ButtonDemo({Key key, this.type}) : super(key: key);
+  const ButtonDemo({super.key, required this.type});
 
   final ButtonDemoType type;
 
   String _title(BuildContext context) {
+    final localizations = GalleryLocalizations.of(context)!;
     switch (type) {
-      case ButtonDemoType.flat:
-        return GalleryLocalizations.of(context).demoFlatButtonTitle;
-      case ButtonDemoType.raised:
-        return GalleryLocalizations.of(context).demoRaisedButtonTitle;
-      case ButtonDemoType.outline:
-        return GalleryLocalizations.of(context).demoOutlineButtonTitle;
+      case ButtonDemoType.text:
+        return localizations.demoTextButtonTitle;
+      case ButtonDemoType.elevated:
+        return localizations.demoElevatedButtonTitle;
+      case ButtonDemoType.outlined:
+        return localizations.demoOutlinedButtonTitle;
       case ButtonDemoType.toggle:
-        return GalleryLocalizations.of(context).demoToggleButtonTitle;
+        return localizations.demoToggleButtonTitle;
       case ButtonDemoType.floating:
-        return GalleryLocalizations.of(context).demoFloatingButtonTitle;
+        return localizations.demoFloatingButtonTitle;
     }
-    return '';
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget buttons;
+    Widget? buttons;
     switch (type) {
-      case ButtonDemoType.flat:
-        buttons = _FlatButtonDemo();
+      case ButtonDemoType.text:
+        buttons = _TextButtonDemo();
         break;
-      case ButtonDemoType.raised:
-        buttons = _RaisedButtonDemo();
+      case ButtonDemoType.elevated:
+        buttons = _ElevatedButtonDemo();
         break;
-      case ButtonDemoType.outline:
-        buttons = _OutlineButtonDemo();
+      case ButtonDemoType.outlined:
+        buttons = _OutlinedButtonDemo();
         break;
       case ButtonDemoType.toggle:
         buttons = _ToggleButtonsDemo();
@@ -66,87 +58,144 @@ class ButtonDemo extends StatelessWidget {
   }
 }
 
-// BEGIN buttonDemoFlat
+// BEGIN buttonDemoText
 
-class _FlatButtonDemo extends StatelessWidget {
+class _TextButtonDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FlatButton(
-            child: Text(GalleryLocalizations.of(context).buttonText),
-            onPressed: () {},
-          ),
-          const SizedBox(height: 12),
-          FlatButton.icon(
-            icon: const Icon(Icons.add, size: 18),
-            label: Text(GalleryLocalizations.of(context).buttonText),
-            onPressed: () {},
-          ),
-        ],
-      ),
+    final localizations = GalleryLocalizations.of(context)!;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () {},
+              child: Text(localizations.buttonText),
+            ),
+            const SizedBox(width: 12),
+            TextButton.icon(
+              icon: const Icon(Icons.add, size: 18),
+              label: Text(localizations.buttonText),
+              onPressed: () {},
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Disabled buttons
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: null,
+              child: Text(localizations.buttonText),
+            ),
+            const SizedBox(width: 12),
+            TextButton.icon(
+              icon: const Icon(Icons.add, size: 18),
+              label: Text(localizations.buttonText),
+              onPressed: null,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
 
 // END
 
-// BEGIN buttonDemoRaised
+// BEGIN buttonDemoElevated
 
-class _RaisedButtonDemo extends StatelessWidget {
+class _ElevatedButtonDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          RaisedButton(
-            child: Text(GalleryLocalizations.of(context).buttonText),
-            onPressed: () {},
-          ),
-          const SizedBox(height: 12),
-          RaisedButton.icon(
-            icon: const Icon(Icons.add, size: 18),
-            label: Text(GalleryLocalizations.of(context).buttonText),
-            onPressed: () {},
-          ),
-        ],
-      ),
+    final localizations = GalleryLocalizations.of(context)!;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {},
+              child: Text(localizations.buttonText),
+            ),
+            const SizedBox(width: 12),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.add, size: 18),
+              label: Text(localizations.buttonText),
+              onPressed: () {},
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Disabled buttons
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: null,
+              child: Text(localizations.buttonText),
+            ),
+            const SizedBox(width: 12),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.add, size: 18),
+              label: Text(localizations.buttonText),
+              onPressed: null,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
 
 // END
 
-// BEGIN buttonDemoOutline
+// BEGIN buttonDemoOutlined
 
-class _OutlineButtonDemo extends StatelessWidget {
+class _OutlinedButtonDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          OutlineButton(
-            // TODO: Should update to OutlineButton follow material spec.
-            highlightedBorderColor:
-                Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
-            child: Text(GalleryLocalizations.of(context).buttonText),
-            onPressed: () {},
-          ),
-          const SizedBox(height: 12),
-          OutlineButton.icon(
-            // TODO: Should update to OutlineButton follow material spec.
-            highlightedBorderColor:
-                Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
-            icon: const Icon(Icons.add, size: 18),
-            label: Text(GalleryLocalizations.of(context).buttonText),
-            onPressed: () {},
-          ),
-        ],
-      ),
+    final localizations = GalleryLocalizations.of(context)!;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            OutlinedButton(
+              onPressed: () {},
+              child: Text(localizations.buttonText),
+            ),
+            const SizedBox(width: 12),
+            OutlinedButton.icon(
+              icon: const Icon(Icons.add, size: 18),
+              label: Text(localizations.buttonText),
+              onPressed: () {},
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Disabled buttons
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            OutlinedButton(
+              onPressed: null,
+              child: Text(localizations.buttonText),
+            ),
+            const SizedBox(width: 12),
+            OutlinedButton.icon(
+              icon: const Icon(Icons.add, size: 18),
+              label: Text(localizations.buttonText),
+              onPressed: null,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -160,24 +209,63 @@ class _ToggleButtonsDemo extends StatefulWidget {
   _ToggleButtonsDemoState createState() => _ToggleButtonsDemoState();
 }
 
-class _ToggleButtonsDemoState extends State<_ToggleButtonsDemo> {
-  final isSelected = <bool>[false, false, false];
+class _ToggleButtonsDemoState extends State<_ToggleButtonsDemo>
+    with RestorationMixin {
+  final isSelected = [
+    RestorableBool(false),
+    RestorableBool(true),
+    RestorableBool(false),
+  ];
+
+  @override
+  String get restorationId => 'toggle_button_demo';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(isSelected[0], 'first_item');
+    registerForRestoration(isSelected[1], 'second_item');
+    registerForRestoration(isSelected[2], 'third_item');
+  }
+
+  @override
+  void dispose() {
+    for (final restorableBool in isSelected) {
+      restorableBool.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: ToggleButtons(
-        children: const [
-          Icon(Icons.ac_unit),
-          Icon(Icons.call),
-          Icon(Icons.cake),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ToggleButtons(
+            onPressed: (index) {
+              setState(() {
+                isSelected[index].value = !isSelected[index].value;
+              });
+            },
+            isSelected: isSelected.map((element) => element.value).toList(),
+            children: const [
+              Icon(Icons.format_bold),
+              Icon(Icons.format_italic),
+              Icon(Icons.format_underline),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Disabled toggle buttons
+          ToggleButtons(
+            onPressed: null,
+            isSelected: isSelected.map((element) => element.value).toList(),
+            children: const [
+              Icon(Icons.format_bold),
+              Icon(Icons.format_italic),
+              Icon(Icons.format_underline),
+            ],
+          ),
         ],
-        onPressed: (index) {
-          setState(() {
-            isSelected[index] = !isSelected[index];
-          });
-        },
-        isSelected: isSelected,
       ),
     );
   }
@@ -190,19 +278,20 @@ class _ToggleButtonsDemoState extends State<_ToggleButtonsDemo> {
 class _FloatingActionButtonDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final localizations = GalleryLocalizations.of(context)!;
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           FloatingActionButton(
-            child: const Icon(Icons.add),
             onPressed: () {},
-            tooltip: GalleryLocalizations.of(context).buttonTextCreate,
+            tooltip: localizations.buttonTextCreate,
+            child: const Icon(Icons.add),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(width: 12),
           FloatingActionButton.extended(
             icon: const Icon(Icons.add),
-            label: Text(GalleryLocalizations.of(context).buttonTextCreate),
+            label: Text(localizations.buttonTextCreate),
             onPressed: () {},
           ),
         ],

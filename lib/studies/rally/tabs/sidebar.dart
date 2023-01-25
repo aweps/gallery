@@ -8,13 +8,15 @@ import 'package:gallery/studies/rally/colors.dart';
 
 class TabWithSidebar extends StatelessWidget {
   const TabWithSidebar({
-    Key key,
-    @required this.mainView,
-    @required this.sidebarItems,
-  }) : super(key: key);
+    super.key,
+    this.restorationId,
+    required this.mainView,
+    required this.sidebarItems,
+  });
 
   final Widget mainView;
   final List<Widget> sidebarItems;
+  final String? restorationId;
 
   @override
   Widget build(BuildContext context) {
@@ -46,13 +48,20 @@ class TabWithSidebar extends StatelessWidget {
         ],
       );
     } else {
-      return SingleChildScrollView(child: mainView);
+      return SingleChildScrollView(
+        restorationId: restorationId,
+        child: mainView,
+      );
     }
   }
 }
 
 class SidebarItem extends StatelessWidget {
-  const SidebarItem({Key key, this.value, this.title}) : super(key: key);
+  const SidebarItem({
+    super.key,
+    required this.value,
+    required this.title,
+  });
 
   final String value;
   final String title;
@@ -64,17 +73,17 @@ class SidebarItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 8),
-        Text(
+        SelectableText(
           title,
-          style: textTheme.bodyText2.copyWith(
+          style: textTheme.bodyMedium!.copyWith(
             fontSize: 16,
             color: RallyColors.gray60,
           ),
         ),
         const SizedBox(height: 8),
-        Text(
+        SelectableText(
           value,
-          style: textTheme.bodyText1.copyWith(fontSize: 20),
+          style: textTheme.bodyLarge!.copyWith(fontSize: 20),
         ),
         const SizedBox(height: 8),
         Container(

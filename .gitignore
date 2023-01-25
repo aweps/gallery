@@ -40,7 +40,7 @@ app.*.map.json
 .pub-cache/
 .pub/
 /build/
-golden_test/failures/
+test_goldens/failures/
 build/
 lib/generated_plugin_registrant.dart
 
@@ -81,9 +81,6 @@ lib/generated_plugin_registrant.dart
 **/ios/Flutter/flutter_export_environment.sh
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
-
-# Web related
-lib/generated_plugin_registrant.dart
 
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3

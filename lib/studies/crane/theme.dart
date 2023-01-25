@@ -3,10 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-
 import 'package:gallery/layout/letter_spacing.dart';
 import 'package:gallery/studies/crane/colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 final ThemeData craneTheme = _buildCraneTheme();
 
@@ -21,23 +20,18 @@ ThemeData _buildCraneTheme() {
     colorScheme: const ColorScheme.light().copyWith(
       primary: cranePurple800,
       secondary: craneRed700,
+      error: craneErrorOrange,
     ),
-    accentColor: cranePurple700,
-    primaryColor: cranePurple800,
-    buttonColor: craneRed700,
     hintColor: craneWhite60,
     indicatorColor: cranePrimaryWhite,
     scaffoldBackgroundColor: cranePrimaryWhite,
     cardColor: cranePrimaryWhite,
-    textSelectionColor: cranePurple700,
-    errorColor: craneErrorOrange,
     highlightColor: Colors.transparent,
-    buttonTheme: const ButtonThemeData(
-      textTheme: ButtonTextTheme.accent,
-    ),
     textTheme: _buildCraneTextTheme(base.textTheme),
+    textSelectionTheme: const TextSelectionThemeData(
+      selectionColor: cranePurple700,
+    ),
     primaryTextTheme: _buildCraneTextTheme(base.primaryTextTheme),
-    accentTextTheme: _buildCraneTextTheme(base.accentTextTheme),
     iconTheme: _customIconTheme(base.iconTheme, craneWhite60),
     primaryIconTheme: _customIconTheme(base.iconTheme, cranePrimaryWhite),
   );
@@ -46,59 +40,59 @@ ThemeData _buildCraneTheme() {
 TextTheme _buildCraneTextTheme(TextTheme base) {
   return GoogleFonts.ralewayTextTheme(
     base.copyWith(
-      headline1: base.headline1.copyWith(
+      displayLarge: base.displayLarge!.copyWith(
         fontWeight: FontWeight.w300,
         fontSize: 96,
       ),
-      headline2: base.headline2.copyWith(
+      displayMedium: base.displayMedium!.copyWith(
         fontWeight: FontWeight.w400,
         fontSize: 60,
       ),
-      headline3: base.headline3.copyWith(
+      displaySmall: base.displaySmall!.copyWith(
         fontWeight: FontWeight.w600,
         fontSize: 48,
       ),
-      headline4: base.headline4.copyWith(
+      headlineMedium: base.headlineMedium!.copyWith(
         fontWeight: FontWeight.w600,
         fontSize: 34,
       ),
-      headline5: base.headline5.copyWith(
+      headlineSmall: base.headlineSmall!.copyWith(
         fontWeight: FontWeight.w600,
         fontSize: 24,
       ),
-      headline6: base.headline6.copyWith(
+      titleLarge: base.titleLarge!.copyWith(
         fontWeight: FontWeight.w600,
         fontSize: 20,
       ),
-      subtitle1: base.subtitle1.copyWith(
+      titleMedium: base.titleMedium!.copyWith(
         fontWeight: FontWeight.w500,
         fontSize: 16,
         letterSpacing: letterSpacingOrNone(0.5),
       ),
-      subtitle2: base.subtitle2.copyWith(
+      titleSmall: base.titleSmall!.copyWith(
         fontWeight: FontWeight.w600,
         fontSize: 12,
         color: craneGrey,
       ),
-      bodyText1: base.bodyText1.copyWith(
+      bodyLarge: base.bodyLarge!.copyWith(
         fontWeight: FontWeight.w500,
         fontSize: 16,
       ),
-      bodyText2: base.bodyText2.copyWith(
+      bodyMedium: base.bodyMedium!.copyWith(
         fontWeight: FontWeight.w400,
         fontSize: 14,
       ),
-      button: base.button.copyWith(
+      labelLarge: base.labelLarge!.copyWith(
         fontWeight: FontWeight.w600,
         fontSize: 13,
         letterSpacing: letterSpacingOrNone(0.8),
       ),
-      caption: base.caption.copyWith(
+      bodySmall: base.bodySmall!.copyWith(
         fontWeight: FontWeight.w500,
         fontSize: 12,
         color: craneGrey,
       ),
-      overline: base.overline.copyWith(
+      labelSmall: base.labelSmall!.copyWith(
         fontWeight: FontWeight.w600,
         fontSize: 12,
       ),

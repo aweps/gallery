@@ -3,51 +3,41 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 // BEGIN snackbarsDemo
 
 class SnackbarsDemo extends StatelessWidget {
-  const SnackbarsDemo();
+  const SnackbarsDemo({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final localizations = GalleryLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(GalleryLocalizations.of(context).demoSnackbarsTitle),
+        title: Text(localizations.demoSnackbarsTitle),
       ),
-      body: Builder(
-        // Create an inner BuildContext so that the snackBar onPressed methods
-        // can refer to the Scaffold with Scaffold.of().
-        builder: (context) {
-          return Center(
-            child: RaisedButton(
-              child: Text(
-                  GalleryLocalizations.of(context).demoSnackbarsButtonLabel),
-              onPressed: () {
-                Scaffold.of(context).hideCurrentSnackBar();
-                Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text(
-                    GalleryLocalizations.of(context).demoSnackbarsText,
-                  ),
-                  action: SnackBarAction(
-                    label: GalleryLocalizations.of(context)
-                        .demoSnackbarsActionButtonLabel,
-                    onPressed: () {
-                      Scaffold.of(context).hideCurrentSnackBar();
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                          GalleryLocalizations.of(context).demoSnackbarsAction,
-                        ),
-                      ));
-                    },
-                  ),
-                ));
-              },
-            ),
-          );
-        },
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(localizations.demoSnackbarsText),
+              action: SnackBarAction(
+                label: localizations.demoSnackbarsActionButtonLabel,
+                onPressed: () {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                    localizations.demoSnackbarsAction,
+                  )));
+                },
+              ),
+            ));
+          },
+          child: Text(localizations.demoSnackbarsButtonLabel),
+        ),
       ),
     );
   }
