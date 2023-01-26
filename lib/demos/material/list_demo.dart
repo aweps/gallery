@@ -4,29 +4,27 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
+import 'package:gallery/demos/material/material_demo_types.dart';
 
 // BEGIN listDemo
 
-enum ListDemoType {
-  oneLine,
-  twoLine,
-}
-
 class ListDemo extends StatelessWidget {
-  const ListDemo({Key key, this.type}) : super(key: key);
+  const ListDemo({super.key, required this.type});
 
   final ListDemoType type;
 
   @override
   Widget build(BuildContext context) {
+    final localizations = GalleryLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(GalleryLocalizations.of(context).demoListsTitle),
+        title: Text(localizations.demoListsTitle),
       ),
       body: Scrollbar(
         child: ListView(
+          restorationId: 'list_demo_list_view',
           padding: const EdgeInsets.symmetric(vertical: 8),
           children: [
             for (int index = 1; index < 21; index++)
@@ -35,10 +33,10 @@ class ListDemo extends StatelessWidget {
                   child: CircleAvatar(child: Text('$index')),
                 ),
                 title: Text(
-                  GalleryLocalizations.of(context).demoBottomSheetItem(index),
+                  localizations.demoBottomSheetItem(index),
                 ),
                 subtitle: type == ListDemoType.twoLine
-                    ? Text(GalleryLocalizations.of(context).demoListsSecondary)
+                    ? Text(localizations.demoListsSecondary)
                     : null,
               ),
           ],

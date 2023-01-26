@@ -5,29 +5,24 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
-
-enum SlidersDemoType {
-  sliders,
-  rangeSliders,
-  customSliders,
-}
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
+import 'package:gallery/demos/material/material_demo_types.dart';
 
 class SlidersDemo extends StatelessWidget {
-  const SlidersDemo({Key key, this.type}) : super(key: key);
+  const SlidersDemo({super.key, required this.type});
 
   final SlidersDemoType type;
 
   String _title(BuildContext context) {
+    final localizations = GalleryLocalizations.of(context)!;
     switch (type) {
       case SlidersDemoType.sliders:
-        return GalleryLocalizations.of(context).demoSlidersTitle;
+        return localizations.demoSlidersTitle;
       case SlidersDemoType.rangeSliders:
-        return GalleryLocalizations.of(context).demoRangeSlidersTitle;
+        return localizations.demoRangeSlidersTitle;
       case SlidersDemoType.customSliders:
-        return GalleryLocalizations.of(context).demoCustomSlidersTitle;
+        return localizations.demoCustomSlidersTitle;
     }
-    return '';
   }
 
   @override
@@ -59,12 +54,29 @@ class _Sliders extends StatefulWidget {
   _SlidersState createState() => _SlidersState();
 }
 
-class _SlidersState extends State<_Sliders> {
-  double _continuousValue = 25;
-  double _discreteValue = 20;
+class _SlidersState extends State<_Sliders> with RestorationMixin {
+  final RestorableDouble _continuousValue = RestorableDouble(25);
+  final RestorableDouble _discreteValue = RestorableDouble(20);
+
+  @override
+  String get restorationId => 'slider_demo';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_continuousValue, 'continuous_value');
+    registerForRestoration(_discreteValue, 'discrete_value');
+  }
+
+  @override
+  void dispose() {
+    _continuousValue.dispose();
+    _discreteValue.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final localizations = GalleryLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Column(
@@ -74,8 +86,7 @@ class _SlidersState extends State<_Sliders> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Semantics(
-                label: GalleryLocalizations.of(context)
-                    .demoSlidersEditableNumericalValue,
+                label: localizations.demoSlidersEditableNumericalValue,
                 child: SizedBox(
                   width: 64,
                   height: 48,
@@ -83,30 +94,39 @@ class _SlidersState extends State<_Sliders> {
                     textAlign: TextAlign.center,
                     onSubmitted: (value) {
                       final newValue = double.tryParse(value);
-                      if (newValue != null && newValue != _continuousValue) {
+                      if (newValue != null &&
+                          newValue != _continuousValue.value) {
                         setState(() {
-                          _continuousValue = newValue.clamp(0, 100) as double;
+                          _continuousValue.value =
+                              newValue.clamp(0, 100) as double;
                         });
                       }
                     },
                     keyboardType: TextInputType.number,
                     controller: TextEditingController(
-                      text: _continuousValue.toStringAsFixed(0),
+                      text: _continuousValue.value.toStringAsFixed(0),
                     ),
                   ),
                 ),
               ),
               Slider(
-                value: _continuousValue,
+                value: _continuousValue.value,
                 min: 0,
                 max: 100,
                 onChanged: (value) {
                   setState(() {
-                    _continuousValue = value;
+                    _continuousValue.value = value;
                   });
                 },
               ),
-              Text(GalleryLocalizations.of(context)
+              // Disabled slider
+              Slider(
+                value: _continuousValue.value,
+                min: 0,
+                max: 100,
+                onChanged: null,
+              ),
+              Text(localizations
                   .demoSlidersContinuousWithEditableNumericalValue),
             ],
           ),
@@ -115,18 +135,27 @@ class _SlidersState extends State<_Sliders> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Slider(
-                value: _discreteValue,
+                value: _discreteValue.value,
                 min: 0,
                 max: 200,
                 divisions: 5,
-                label: _discreteValue.round().toString(),
+                label: _discreteValue.value.round().toString(),
                 onChanged: (value) {
                   setState(() {
-                    _discreteValue = value;
+                    _discreteValue.value = value;
                   });
                 },
               ),
-              Text(GalleryLocalizations.of(context).demoSlidersDiscrete),
+              // Disabled slider
+              Slider(
+                value: _discreteValue.value,
+                min: 0,
+                max: 200,
+                divisions: 5,
+                label: _discreteValue.value.round().toString(),
+                onChanged: null,
+              ),
+              Text(localizations.demoSlidersDiscrete),
             ],
           ),
         ],
@@ -144,12 +173,43 @@ class _RangeSliders extends StatefulWidget {
   _RangeSlidersState createState() => _RangeSlidersState();
 }
 
-class _RangeSlidersState extends State<_RangeSliders> {
-  RangeValues _continuousValues = const RangeValues(25, 75);
-  RangeValues _discreteValues = const RangeValues(40, 120);
+class _RangeSlidersState extends State<_RangeSliders> with RestorationMixin {
+  final RestorableDouble _continuousStartValue = RestorableDouble(25);
+  final RestorableDouble _continuousEndValue = RestorableDouble(75);
+  final RestorableDouble _discreteStartValue = RestorableDouble(40);
+  final RestorableDouble _discreteEndValue = RestorableDouble(120);
+
+  @override
+  String get restorationId => 'range_sliders_demo';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_continuousStartValue, 'continuous_start_value');
+    registerForRestoration(_continuousEndValue, 'continuous_end_value');
+    registerForRestoration(_discreteStartValue, 'discrete_start_value');
+    registerForRestoration(_discreteEndValue, 'discrete_end_value');
+  }
+
+  @override
+  void dispose() {
+    _continuousStartValue.dispose();
+    _continuousEndValue.dispose();
+    _discreteStartValue.dispose();
+    _discreteEndValue.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final continuousValues = RangeValues(
+      _continuousStartValue.value,
+      _continuousEndValue.value,
+    );
+    final discreteValues = RangeValues(
+      _discreteStartValue.value,
+      _discreteEndValue.value,
+    );
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Column(
@@ -159,16 +219,24 @@ class _RangeSlidersState extends State<_RangeSliders> {
             mainAxisSize: MainAxisSize.min,
             children: [
               RangeSlider(
-                values: _continuousValues,
+                values: continuousValues,
                 min: 0,
                 max: 100,
                 onChanged: (values) {
                   setState(() {
-                    _continuousValues = values;
+                    _continuousStartValue.value = values.start;
+                    _continuousEndValue.value = values.end;
                   });
                 },
               ),
-              Text(GalleryLocalizations.of(context).demoSlidersContinuous),
+              // Disabled range slider
+              RangeSlider(
+                values: continuousValues,
+                min: 0,
+                max: 100,
+                onChanged: null,
+              ),
+              Text(GalleryLocalizations.of(context)!.demoSlidersContinuous),
             ],
           ),
           const SizedBox(height: 80),
@@ -176,21 +244,34 @@ class _RangeSlidersState extends State<_RangeSliders> {
             mainAxisSize: MainAxisSize.min,
             children: [
               RangeSlider(
-                values: _discreteValues,
+                values: discreteValues,
                 min: 0,
                 max: 200,
                 divisions: 5,
                 labels: RangeLabels(
-                  _discreteValues.start.round().toString(),
-                  _discreteValues.end.round().toString(),
+                  discreteValues.start.round().toString(),
+                  discreteValues.end.round().toString(),
                 ),
                 onChanged: (values) {
                   setState(() {
-                    _discreteValues = values;
+                    _discreteStartValue.value = values.start;
+                    _discreteEndValue.value = values.end;
                   });
                 },
               ),
-              Text(GalleryLocalizations.of(context).demoSlidersDiscrete),
+              // Disabled range slider
+              RangeSlider(
+                values: discreteValues,
+                min: 0,
+                max: 200,
+                divisions: 5,
+                labels: RangeLabels(
+                  discreteValues.start.round().toString(),
+                  discreteValues.end.round().toString(),
+                ),
+                onChanged: null,
+              ),
+              Text(GalleryLocalizations.of(context)!.demoSlidersDiscrete),
             ],
           ),
         ],
@@ -237,6 +318,7 @@ Path _leftTriangle(double size, Offset thumbCenter) =>
 
 class _CustomRangeThumbShape extends RangeSliderThumbShape {
   const _CustomRangeThumbShape();
+
   static const double _thumbSize = 4;
   static const double _disabledThumbSize = 3;
 
@@ -256,15 +338,15 @@ class _CustomRangeThumbShape extends RangeSliderThumbShape {
   void paint(
     PaintingContext context,
     Offset center, {
-    @required Animation<double> activationAnimation,
-    @required Animation<double> enableAnimation,
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
     bool isDiscrete = false,
     bool isEnabled = false,
-    bool isOnTop,
-    TextDirection textDirection,
-    @required SliderThemeData sliderTheme,
-    Thumb thumb,
-    bool isPressed,
+    bool? isOnTop,
+    TextDirection? textDirection,
+    required SliderThemeData sliderTheme,
+    Thumb? thumb,
+    bool? isPressed,
   }) {
     final canvas = context.canvas;
     final colorTween = ColorTween(
@@ -274,9 +356,9 @@ class _CustomRangeThumbShape extends RangeSliderThumbShape {
 
     final size = _thumbSize * sizeTween.evaluate(enableAnimation);
     Path thumbPath;
-    switch (textDirection) {
+    switch (textDirection!) {
       case TextDirection.rtl:
-        switch (thumb) {
+        switch (thumb!) {
           case Thumb.start:
             thumbPath = _rightTriangle(size, center);
             break;
@@ -286,7 +368,7 @@ class _CustomRangeThumbShape extends RangeSliderThumbShape {
         }
         break;
       case TextDirection.ltr:
-        switch (thumb) {
+        switch (thumb!) {
           case Thumb.start:
             thumbPath = _leftTriangle(size, center);
             break;
@@ -298,7 +380,7 @@ class _CustomRangeThumbShape extends RangeSliderThumbShape {
     }
     canvas.drawPath(
       thumbPath,
-      Paint()..color = colorTween.evaluate(enableAnimation),
+      Paint()..color = colorTween.evaluate(enableAnimation)!,
     );
   }
 }
@@ -325,16 +407,16 @@ class _CustomThumbShape extends SliderComponentShape {
   void paint(
     PaintingContext context,
     Offset thumbCenter, {
-    Animation<double> activationAnimation,
-    Animation<double> enableAnimation,
-    bool isDiscrete,
-    TextPainter labelPainter,
-    RenderBox parentBox,
-    SliderThemeData sliderTheme,
-    TextDirection textDirection,
-    double value,
-    double textScaleFactor,
-    Size sizeWithOverflow,
+    Animation<double>? activationAnimation,
+    required Animation<double> enableAnimation,
+    bool? isDiscrete,
+    TextPainter? labelPainter,
+    RenderBox? parentBox,
+    required SliderThemeData sliderTheme,
+    TextDirection? textDirection,
+    double? value,
+    double? textScaleFactor,
+    Size? sizeWithOverflow,
   }) {
     final canvas = context.canvas;
     final colorTween = ColorTween(
@@ -345,7 +427,7 @@ class _CustomThumbShape extends SliderComponentShape {
     final thumbPath = _downTriangle(size, thumbCenter);
     canvas.drawPath(
       thumbPath,
-      Paint()..color = colorTween.evaluate(enableAnimation),
+      Paint()..color = colorTween.evaluate(enableAnimation)!,
     );
   }
 }
@@ -371,16 +453,16 @@ class _CustomValueIndicatorShape extends SliderComponentShape {
   void paint(
     PaintingContext context,
     Offset thumbCenter, {
-    Animation<double> activationAnimation,
-    Animation<double> enableAnimation,
-    bool isDiscrete,
-    TextPainter labelPainter,
-    RenderBox parentBox,
-    SliderThemeData sliderTheme,
-    TextDirection textDirection,
-    double value,
-    double textScaleFactor,
-    Size sizeWithOverflow,
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
+    bool? isDiscrete,
+    required TextPainter labelPainter,
+    RenderBox? parentBox,
+    required SliderThemeData sliderTheme,
+    TextDirection? textDirection,
+    double? value,
+    double? textScaleFactor,
+    Size? sizeWithOverflow,
   }) {
     final canvas = context.canvas;
     final enableColor = ColorTween(
@@ -396,7 +478,7 @@ class _CustomValueIndicatorShape extends SliderComponentShape {
         Offset(0, -slideUpTween.evaluate(activationAnimation));
     final thumbPath = _upTriangle(size, thumbCenter + slideUpOffset);
     final paintColor = enableColor
-        .evaluate(enableAnimation)
+        .evaluate(enableAnimation)!
         .withAlpha((255 * activationAnimation.value).round());
     canvas.drawPath(
       thumbPath,
@@ -423,13 +505,39 @@ class _CustomSliders extends StatefulWidget {
   _CustomSlidersState createState() => _CustomSlidersState();
 }
 
-class _CustomSlidersState extends State<_CustomSliders> {
-  double _discreteCustomValue = 25;
-  RangeValues _continuousCustomValues = const RangeValues(40, 160);
+class _CustomSlidersState extends State<_CustomSliders> with RestorationMixin {
+  final RestorableDouble _continuousStartCustomValue = RestorableDouble(40);
+  final RestorableDouble _continuousEndCustomValue = RestorableDouble(160);
+  final RestorableDouble _discreteCustomValue = RestorableDouble(25);
+
+  @override
+  String get restorationId => 'custom_sliders_demo';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(
+        _continuousStartCustomValue, 'continuous_start_custom_value');
+    registerForRestoration(
+        _continuousEndCustomValue, 'continuous_end_custom_value');
+    registerForRestoration(_discreteCustomValue, 'discrete_custom_value');
+  }
+
+  @override
+  void dispose() {
+    _continuousStartCustomValue.dispose();
+    _continuousEndCustomValue.dispose();
+    _discreteCustomValue.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final customRangeValue = RangeValues(
+      _continuousStartCustomValue.value,
+      _continuousEndCustomValue.value,
+    );
     final theme = Theme.of(context);
+    final localizations = GalleryLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Column(
@@ -453,26 +561,25 @@ class _CustomSlidersState extends State<_CustomSliders> {
                   valueIndicatorColor: Colors.deepPurpleAccent,
                   thumbShape: const _CustomThumbShape(),
                   valueIndicatorShape: const _CustomValueIndicatorShape(),
-                  valueIndicatorTextStyle: theme.accentTextTheme.bodyText1
+                  valueIndicatorTextStyle: theme.textTheme.bodyLarge!
                       .copyWith(color: theme.colorScheme.onSurface),
                 ),
                 child: Slider(
-                  value: _discreteCustomValue,
+                  value: _discreteCustomValue.value,
                   min: 0,
                   max: 200,
                   divisions: 5,
                   semanticFormatterCallback: (value) =>
                       value.round().toString(),
-                  label: '${_discreteCustomValue.round()}',
+                  label: '${_discreteCustomValue.value.round()}',
                   onChanged: (value) {
                     setState(() {
-                      _discreteCustomValue = value;
+                      _discreteCustomValue.value = value;
                     });
                   },
                 ),
               ),
-              Text(GalleryLocalizations.of(context)
-                  .demoSlidersDiscreteSliderWithCustomTheme),
+              Text(localizations.demoSlidersDiscreteSliderWithCustomTheme),
             ],
           ),
           const SizedBox(height: 80),
@@ -492,17 +599,18 @@ class _CustomSlidersState extends State<_CustomSliders> {
                   showValueIndicator: ShowValueIndicator.never,
                 ),
                 child: RangeSlider(
-                  values: _continuousCustomValues,
+                  values: customRangeValue,
                   min: 0,
                   max: 200,
                   onChanged: (values) {
                     setState(() {
-                      _continuousCustomValues = values;
+                      _continuousStartCustomValue.value = values.start;
+                      _continuousEndCustomValue.value = values.end;
                     });
                   },
                 ),
               ),
-              Text(GalleryLocalizations.of(context)
+              Text(localizations
                   .demoSlidersContinuousRangeSliderWithCustomTheme),
             ],
           ),

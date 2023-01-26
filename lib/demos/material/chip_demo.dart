@@ -3,37 +3,34 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
-
-enum ChipDemoType {
-  action,
-  choice,
-  filter,
-  input,
-}
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
+import 'package:gallery/demos/material/material_demo_types.dart';
 
 class ChipDemo extends StatelessWidget {
-  const ChipDemo({Key key, this.type}) : super(key: key);
+  const ChipDemo({
+    super.key,
+    required this.type,
+  });
 
   final ChipDemoType type;
 
   String _title(BuildContext context) {
+    final localizations = GalleryLocalizations.of(context)!;
     switch (type) {
       case ChipDemoType.action:
-        return GalleryLocalizations.of(context).demoActionChipTitle;
+        return localizations.demoActionChipTitle;
       case ChipDemoType.choice:
-        return GalleryLocalizations.of(context).demoChoiceChipTitle;
+        return localizations.demoChoiceChipTitle;
       case ChipDemoType.filter:
-        return GalleryLocalizations.of(context).demoFilterChipTitle;
+        return localizations.demoFilterChipTitle;
       case ChipDemoType.input:
-        return GalleryLocalizations.of(context).demoInputChipTitle;
+        return localizations.demoInputChipTitle;
     }
-    return '';
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget buttons;
+    Widget? buttons;
     switch (type) {
       case ChipDemoType.action:
         buttons = _ActionChipDemo();
@@ -71,7 +68,7 @@ class _ActionChipDemo extends StatelessWidget {
           Icons.brightness_5,
           color: Colors.black54,
         ),
-        label: Text(GalleryLocalizations.of(context).chipTurnOnLights),
+        label: Text(GalleryLocalizations.of(context)!.chipTurnOnLights),
       ),
     );
   }
@@ -86,42 +83,86 @@ class _ChoiceChipDemo extends StatefulWidget {
   _ChoiceChipDemoState createState() => _ChoiceChipDemoState();
 }
 
-class _ChoiceChipDemoState extends State<_ChoiceChipDemo> {
-  int indexSelected = -1;
+class _ChoiceChipDemoState extends State<_ChoiceChipDemo>
+    with RestorationMixin {
+  final RestorableIntN _indexSelected = RestorableIntN(null);
+
+  @override
+  String get restorationId => 'choice_chip_demo';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_indexSelected, 'choice_chip');
+  }
+
+  @override
+  void dispose() {
+    _indexSelected.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final localizations = GalleryLocalizations.of(context)!;
     return Center(
-      child: Wrap(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ChoiceChip(
-            label: Text(GalleryLocalizations.of(context).chipSmall),
-            selected: indexSelected == 0,
-            onSelected: (value) {
-              setState(() {
-                indexSelected = value ? 0 : -1;
-              });
-            },
+          Wrap(
+            children: [
+              ChoiceChip(
+                label: Text(localizations.chipSmall),
+                selected: _indexSelected.value == 0,
+                onSelected: (value) {
+                  setState(() {
+                    _indexSelected.value = value ? 0 : -1;
+                  });
+                },
+              ),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: Text(localizations.chipMedium),
+                selected: _indexSelected.value == 1,
+                onSelected: (value) {
+                  setState(() {
+                    _indexSelected.value = value ? 1 : -1;
+                  });
+                },
+              ),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: Text(localizations.chipLarge),
+                selected: _indexSelected.value == 2,
+                onSelected: (value) {
+                  setState(() {
+                    _indexSelected.value = value ? 2 : -1;
+                  });
+                },
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          ChoiceChip(
-            label: Text(GalleryLocalizations.of(context).chipMedium),
-            selected: indexSelected == 1,
-            onSelected: (value) {
-              setState(() {
-                indexSelected = value ? 1 : -1;
-              });
-            },
-          ),
-          const SizedBox(width: 8),
-          ChoiceChip(
-            label: Text(GalleryLocalizations.of(context).chipLarge),
-            selected: indexSelected == 2,
-            onSelected: (value) {
-              setState(() {
-                indexSelected = value ? 2 : -1;
-              });
-            },
+          const SizedBox(height: 12),
+          // Disabled chips
+          Wrap(
+            children: [
+              ChoiceChip(
+                label: Text(localizations.chipSmall),
+                selected: _indexSelected.value == 0,
+                onSelected: null,
+              ),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: Text(localizations.chipMedium),
+                selected: _indexSelected.value == 1,
+                onSelected: null,
+              ),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: Text(localizations.chipLarge),
+                selected: _indexSelected.value == 2,
+                onSelected: null,
+              ),
+            ],
           ),
         ],
       ),
@@ -138,51 +179,92 @@ class _FilterChipDemo extends StatefulWidget {
   _FilterChipDemoState createState() => _FilterChipDemoState();
 }
 
-class _FilterChipDemoState extends State<_FilterChipDemo> {
-  bool isSelectedElevator = false;
-  bool isSelectedWasher = false;
-  bool isSelectedFireplace = false;
+class _FilterChipDemoState extends State<_FilterChipDemo>
+    with RestorationMixin {
+  final RestorableBool isSelectedElevator = RestorableBool(false);
+  final RestorableBool isSelectedWasher = RestorableBool(false);
+  final RestorableBool isSelectedFireplace = RestorableBool(false);
+
+  @override
+  String get restorationId => 'filter_chip_demo';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(isSelectedElevator, 'selected_elevator');
+    registerForRestoration(isSelectedWasher, 'selected_washer');
+    registerForRestoration(isSelectedFireplace, 'selected_fireplace');
+  }
+
+  @override
+  void dispose() {
+    isSelectedElevator.dispose();
+    isSelectedWasher.dispose();
+    isSelectedFireplace.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final chips = [
-      FilterChip(
-        label: Text(GalleryLocalizations.of(context).chipElevator),
-        selected: isSelectedElevator,
-        onSelected: (value) {
-          setState(() {
-            isSelectedElevator = !isSelectedElevator;
-          });
-        },
-      ),
-      FilterChip(
-        label: Text(GalleryLocalizations.of(context).chipWasher),
-        selected: isSelectedWasher,
-        onSelected: (value) {
-          setState(() {
-            isSelectedWasher = !isSelectedWasher;
-          });
-        },
-      ),
-      FilterChip(
-        label: Text(GalleryLocalizations.of(context).chipFireplace),
-        selected: isSelectedFireplace,
-        onSelected: (value) {
-          setState(() {
-            isSelectedFireplace = !isSelectedFireplace;
-          });
-        },
-      ),
-    ];
+    final localizations = GalleryLocalizations.of(context)!;
 
     return Center(
-      child: Wrap(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          for (final chip in chips)
-            Padding(
-              padding: const EdgeInsets.all(4),
-              child: chip,
-            )
+          Wrap(
+            spacing: 8.0,
+            children: [
+              FilterChip(
+                label: Text(localizations.chipElevator),
+                selected: isSelectedElevator.value,
+                onSelected: (value) {
+                  setState(() {
+                    isSelectedElevator.value = !isSelectedElevator.value;
+                  });
+                },
+              ),
+              FilterChip(
+                label: Text(localizations.chipWasher),
+                selected: isSelectedWasher.value,
+                onSelected: (value) {
+                  setState(() {
+                    isSelectedWasher.value = !isSelectedWasher.value;
+                  });
+                },
+              ),
+              FilterChip(
+                label: Text(localizations.chipFireplace),
+                selected: isSelectedFireplace.value,
+                onSelected: (value) {
+                  setState(() {
+                    isSelectedFireplace.value = !isSelectedFireplace.value;
+                  });
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Disabled chips
+          Wrap(
+            spacing: 8.0,
+            children: [
+              FilterChip(
+                label: Text(localizations.chipElevator),
+                selected: isSelectedElevator.value,
+                onSelected: null,
+              ),
+              FilterChip(
+                label: Text(localizations.chipWasher),
+                selected: isSelectedWasher.value,
+                onSelected: null,
+              ),
+              FilterChip(
+                label: Text(localizations.chipFireplace),
+                selected: isSelectedFireplace.value,
+                onSelected: null,
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -197,16 +279,34 @@ class _InputChipDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: InputChip(
-        onPressed: () {},
-        onDeleted: () {},
-        avatar: const Icon(
-          Icons.directions_bike,
-          size: 20,
-          color: Colors.black54,
-        ),
-        deleteIconColor: Colors.black54,
-        label: Text(GalleryLocalizations.of(context).chipBiking),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          InputChip(
+            onPressed: () {},
+            onDeleted: () {},
+            avatar: const Icon(
+              Icons.directions_bike,
+              size: 20,
+              color: Colors.black54,
+            ),
+            deleteIconColor: Colors.black54,
+            label: Text(GalleryLocalizations.of(context)!.chipBiking),
+          ),
+          const SizedBox(height: 12),
+          // Disabled chip
+          InputChip(
+            onPressed: null,
+            onDeleted: null,
+            avatar: const Icon(
+              Icons.directions_bike,
+              size: 20,
+              color: Colors.black54,
+            ),
+            deleteIconColor: Colors.black54,
+            label: Text(GalleryLocalizations.of(context)!.chipBiking),
+          ),
+        ],
       ),
     );
   }

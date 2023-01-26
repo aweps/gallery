@@ -4,22 +4,25 @@
 
 import 'dart:io' show Platform;
 
+import 'package:dual_screen/dual_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 import 'package:gallery/codeviewer/code_displayer.dart';
 import 'package:gallery/codeviewer/code_style.dart';
 import 'package:gallery/constants.dart';
 import 'package:gallery/data/demos.dart';
 import 'package:gallery/data/gallery_options.dart';
 import 'package:gallery/feature_discovery/feature_discovery.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
 import 'package:gallery/layout/adaptive.dart';
 import 'package:gallery/pages/splash.dart';
 import 'package:gallery/themes/gallery_theme_data.dart';
+import 'package:gallery/themes/material_demo_theme_data.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 const _demoViewedCountKey = 'demoViewedCountKey';
 
@@ -33,19 +36,19 @@ enum _DemoState {
 
 class DemoPage extends StatefulWidget {
   const DemoPage({
-    Key key,
-    @required this.slug,
-  }) : super(key: key);
+    super.key,
+    required this.slug,
+  });
 
   static const String baseRoute = '/demo';
-  final String slug;
+  final String? slug;
 
   @override
-  _DemoPageState createState() => _DemoPageState();
+  State<DemoPage> createState() => _DemoPageState();
 }
 
 class _DemoPageState extends State<DemoPage> {
-  Map<String, GalleryDemo> slugToDemoMap;
+  late Map<String?, GalleryDemo> slugToDemoMap;
 
   @override
   void didChangeDependencies() {
@@ -54,7 +57,7 @@ class _DemoPageState extends State<DemoPage> {
     // page, we save it in a variable. The cost of running `slugToDemo` is
     // still only close to constant, as it's just iterating over all of the
     // demos.
-    slugToDemoMap = slugToDemo(context);
+    slugToDemoMap = Demos.asSlugToDemoMap(context);
   }
 
   @override
@@ -63,34 +66,50 @@ class _DemoPageState extends State<DemoPage> {
       // Return to root if invalid slug.
       Navigator.of(context).pop();
     }
-    return GalleryDemoPage(demo: slugToDemoMap[widget.slug]);
+    return ScaffoldMessenger(
+        child: GalleryDemoPage(
+      restorationId: widget.slug!,
+      demo: slugToDemoMap[widget.slug]!,
+    ));
   }
 }
 
 class GalleryDemoPage extends StatefulWidget {
   const GalleryDemoPage({
-    Key key,
-    @required this.demo,
-  }) : super(key: key);
+    super.key,
+    required this.restorationId,
+    required this.demo,
+  });
 
+  final String restorationId;
   final GalleryDemo demo;
 
   @override
-  _GalleryDemoPageState createState() => _GalleryDemoPageState();
+  State<GalleryDemoPage> createState() => _GalleryDemoPageState();
 }
 
 class _GalleryDemoPageState extends State<GalleryDemoPage>
-    with TickerProviderStateMixin {
-  _DemoState _state = _DemoState.normal;
-  int _configIndex = 0;
-  bool _isDesktop;
-  bool _showFeatureHighlight = true;
-  int _demoViewedCount;
+    with RestorationMixin, TickerProviderStateMixin {
+  final RestorableInt _demoStateIndex = RestorableInt(_DemoState.normal.index);
+  final RestorableInt _configIndex = RestorableInt(0);
 
-  AnimationController _codeBackgroundColorController;
+  bool? _isDesktop;
+  bool _showFeatureHighlight = true;
+  late int _demoViewedCount;
+
+  late AnimationController _codeBackgroundColorController;
+
+  @override
+  String get restorationId => widget.restorationId;
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_demoStateIndex, 'demo_state');
+    registerForRestoration(_configIndex, 'configuration_index');
+  }
 
   GalleryDemoConfiguration get _currentConfig {
-    return widget.demo.configurations[_configIndex];
+    return widget.demo.configurations[_configIndex.value];
   }
 
   bool get _hasOptions => widget.demo.configurations.length > 1;
@@ -105,8 +124,7 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
         _isSupportedSharedPreferencesPlatform &&
         !isDisplayDesktop(context) &&
         !GalleryOptions.of(context).isTestMode &&
-        (_demoViewedCount != null &&
-            (_demoViewedCount == 0 || _demoViewedCount == 3));
+        (_demoViewedCount == 0 || _demoViewedCount == 3);
   }
 
   @override
@@ -126,6 +144,8 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
 
   @override
   void dispose() {
+    _demoStateIndex.dispose();
+    _configIndex.dispose();
     _codeBackgroundColorController.dispose();
     super.dispose();
   }
@@ -140,7 +160,7 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
   void setStateAndUpdate(VoidCallback callback) {
     setState(() {
       callback();
-      if (_state == _DemoState.code) {
+      if (_demoStateIndex.value == _DemoState.code.index) {
         _codeBackgroundColorController.forward();
       } else {
         _codeBackgroundColorController.reverse();
@@ -149,35 +169,37 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
   }
 
   void _handleTap(_DemoState newState) {
+    var newStateIndex = newState.index;
+
     // Do not allow normal state for desktop.
-    if (_state == newState && isDisplayDesktop(context)) {
-      if (_state == _DemoState.fullscreen) {
+    if (_demoStateIndex.value == newStateIndex && isDisplayDesktop(context)) {
+      if (_demoStateIndex.value == _DemoState.fullscreen.index) {
         setStateAndUpdate(() {
-          _state = _hasOptions ? _DemoState.options : _DemoState.info;
+          _demoStateIndex.value =
+              _hasOptions ? _DemoState.options.index : _DemoState.info.index;
         });
       }
       return;
     }
 
     setStateAndUpdate(() {
-      _state = _state == newState ? _DemoState.normal : newState;
+      _demoStateIndex.value = _demoStateIndex.value == newStateIndex
+          ? _DemoState.normal.index
+          : newStateIndex;
     });
   }
 
   Future<void> _showDocumentation(BuildContext context) async {
     final url = _currentConfig.documentationUrl;
-    if (url == null) {
-      return;
-    }
 
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
+    if (await canLaunchUrlString(url)) {
+      await launchUrlString(url);
+    } else if (mounted) {
       await showDialog<void>(
         context: context,
         builder: (context) {
           return SimpleDialog(
-            title: Text(GalleryLocalizations.of(context).demoInvalidURL),
+            title: Text(GalleryLocalizations.of(context)!.demoInvalidURL),
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -192,23 +214,28 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
 
   void _resolveState(BuildContext context) {
     final isDesktop = isDisplayDesktop(context);
-    if (_state == _DemoState.fullscreen && !isDesktop) {
+    final isFoldable = isDisplayFoldable(context);
+    if (_DemoState.values[_demoStateIndex.value] == _DemoState.fullscreen &&
+        !isDesktop) {
       // Do not allow fullscreen state for mobile.
-      _state = _DemoState.normal;
-    } else if (_state == _DemoState.normal && isDesktop) {
+      _demoStateIndex.value = _DemoState.normal.index;
+    } else if (_DemoState.values[_demoStateIndex.value] == _DemoState.normal &&
+        (isDesktop || isFoldable)) {
       // Do not allow normal state for desktop.
-      _state = _hasOptions ? _DemoState.options : _DemoState.info;
+      _demoStateIndex.value =
+          _hasOptions ? _DemoState.options.index : _DemoState.info.index;
     } else if (isDesktop != _isDesktop) {
       _isDesktop = isDesktop;
       // When going from desktop to mobile, return to normal state.
       if (!isDesktop) {
-        _state = _DemoState.normal;
+        _demoStateIndex.value = _DemoState.normal.index;
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isFoldable = isDisplayFoldable(context);
     final isDesktop = isDisplayDesktop(context);
     _resolveState(context);
 
@@ -216,6 +243,8 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
     final iconColor = colorScheme.onSurface;
     final selectedIconColor = colorScheme.primary;
     final appBarPadding = isDesktop ? 20.0 : 0.0;
+    final currentDemoState = _DemoState.values[_demoStateIndex.value];
+    final localizations = GalleryLocalizations.of(context)!;
 
     final appBar = AppBar(
       backgroundColor: Colors.transparent,
@@ -234,9 +263,8 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
         if (_hasOptions)
           IconButton(
             icon: FeatureDiscovery(
-              title: GalleryLocalizations.of(context).demoOptionsFeatureTitle,
-              description: GalleryLocalizations.of(context)
-                  .demoOptionsFeatureDescription,
+              title: localizations.demoOptionsFeatureTitle,
+              description: localizations.demoOptionsFeatureDescription,
               showOverlay: _showFeatureHighlightForPlatform(context),
               color: colorScheme.primary,
               onDismiss: () {
@@ -251,39 +279,44 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
               },
               child: Icon(
                 Icons.tune,
-                color: _state == _DemoState.options ||
+                color: currentDemoState == _DemoState.options ||
                         _showFeatureHighlightForPlatform(context)
                     ? selectedIconColor
                     : iconColor,
               ),
             ),
-            tooltip: GalleryLocalizations.of(context).demoOptionsTooltip,
+            tooltip: localizations.demoOptionsTooltip,
             onPressed: () => _handleTap(_DemoState.options),
           ),
         IconButton(
           icon: const Icon(Icons.info),
-          tooltip: GalleryLocalizations.of(context).demoInfoTooltip,
-          color: _state == _DemoState.info ? selectedIconColor : iconColor,
+          tooltip: localizations.demoInfoTooltip,
+          color: currentDemoState == _DemoState.info
+              ? selectedIconColor
+              : iconColor,
           onPressed: () => _handleTap(_DemoState.info),
         ),
         IconButton(
           icon: const Icon(Icons.code),
-          tooltip: GalleryLocalizations.of(context).demoCodeTooltip,
-          color: _state == _DemoState.code ? selectedIconColor : iconColor,
+          tooltip: localizations.demoCodeTooltip,
+          color: currentDemoState == _DemoState.code
+              ? selectedIconColor
+              : iconColor,
           onPressed: () => _handleTap(_DemoState.code),
         ),
         IconButton(
           icon: const Icon(Icons.library_books),
-          tooltip: GalleryLocalizations.of(context).demoDocumentationTooltip,
+          tooltip: localizations.demoDocumentationTooltip,
           color: iconColor,
           onPressed: () => _showDocumentation(context),
         ),
         if (isDesktop)
           IconButton(
             icon: const Icon(Icons.fullscreen),
-            tooltip: GalleryLocalizations.of(context).demoFullscreenTooltip,
-            color:
-                _state == _DemoState.fullscreen ? selectedIconColor : iconColor,
+            tooltip: localizations.demoFullscreenTooltip,
+            color: currentDemoState == _DemoState.fullscreen
+                ? selectedIconColor
+                : iconColor,
             onPressed: () => _handleTap(_DemoState.fullscreen),
           ),
         SizedBox(width: appBarPadding),
@@ -298,21 +331,21 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
         appBar.preferredSize.height;
     final maxSectionHeight = isDesktop ? contentHeight : contentHeight - 64;
     final horizontalPadding = isDesktop ? mediaQuery.size.width * 0.12 : 0.0;
-    final maxSectionWidth = 420.0;
+    const maxSectionWidth = 420.0;
 
     Widget section;
-    switch (_state) {
+    switch (currentDemoState) {
       case _DemoState.options:
         section = _DemoSectionOptions(
           maxHeight: maxSectionHeight,
           maxWidth: maxSectionWidth,
           configurations: widget.demo.configurations,
-          configIndex: _configIndex,
+          configIndex: _configIndex.value,
           onConfigChanged: (index) {
             setStateAndUpdate(() {
-              _configIndex = index;
+              _configIndex.value = index;
               if (!isDesktop) {
-                _state = _DemoState.normal;
+                _demoStateIndex.value = _DemoState.normal.index;
               }
             });
           },
@@ -353,12 +386,14 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
     }
 
     Widget body;
-    Widget demoContent = DemoContent(
-      height: contentHeight,
-      buildRoute: _currentConfig.buildRoute,
+    Widget demoContent = ScaffoldMessenger(
+      child: DemoWrapper(
+        height: contentHeight,
+        buildRoute: _currentConfig.buildRoute,
+      ),
     );
     if (isDesktop) {
-      final isFullScreen = _state == _DemoState.fullscreen;
+      final isFullScreen = currentDemoState == _DemoState.fullscreen;
       final Widget sectionAndDemo = Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -374,29 +409,41 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
           child: sectionAndDemo,
         ),
       );
+    } else if (isFoldable) {
+      body = Padding(
+        padding: const EdgeInsets.only(top: 12.0),
+        child: TwoPane(
+          startPane: demoContent,
+          endPane: section,
+        ),
+      );
     } else {
       section = AnimatedSize(
-        vsync: this,
         duration: const Duration(milliseconds: 200),
         alignment: Alignment.topCenter,
         curve: Curves.easeIn,
         child: section,
       );
 
+      final isDemoNormal = currentDemoState == _DemoState.normal;
       // Add a tap gesture to collapse the currently opened section.
       demoContent = Semantics(
-        label: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-        child: GestureDetector(
-          onTap: () {
-            if (_state != _DemoState.normal) {
-              setStateAndUpdate(() {
-                _state = _DemoState.normal;
-              });
-            }
-          },
-          child: Semantics(
-            excludeSemantics: _state != _DemoState.normal,
-            child: demoContent,
+        label:
+            '${GalleryLocalizations.of(context)!.demo}, ${widget.demo.title}',
+        child: MouseRegion(
+          cursor: isDemoNormal ? MouseCursor.defer : SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: isDemoNormal
+                ? null
+                : () {
+                    setStateAndUpdate(() {
+                      _demoStateIndex.value = _DemoState.normal.index;
+                    });
+                  },
+            child: Semantics(
+              excludeSemantics: !isDemoNormal,
+              child: demoContent,
+            ),
           ),
         ),
       );
@@ -419,7 +466,7 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
 
     Widget page;
 
-    if (isDesktop) {
+    if (isDesktop || isFoldable) {
       page = AnimatedBuilder(
           animation: _codeBackgroundColorController,
           builder: (context, child) {
@@ -451,13 +498,15 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
             if (themeBrightness == Brightness.light) {
               // If it is currently in light mode, add a
               // dark background for code.
-              Widget codeBackground = Container(
-                padding: const EdgeInsets.only(top: 56),
+              Widget codeBackground = SafeArea(
                 child: Container(
-                  color: ColorTween(
-                    begin: Colors.transparent,
-                    end: GalleryThemeData.darkThemeData.canvasColor,
-                  ).animate(_codeBackgroundColorController).value,
+                  padding: const EdgeInsets.only(top: 56),
+                  child: Container(
+                    color: ColorTween(
+                      begin: Colors.transparent,
+                      end: GalleryThemeData.darkThemeData.canvasColor,
+                    ).animate(_codeBackgroundColorController).value,
+                  ),
                 ),
               );
 
@@ -481,6 +530,7 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
           child: Scaffold(
             appBar: appBar,
             body: body,
+            resizeToAvoidBottomInset: false,
           ),
         ),
       );
@@ -503,13 +553,12 @@ class _GalleryDemoPageState extends State<GalleryDemoPage>
 
 class _DemoSectionOptions extends StatelessWidget {
   const _DemoSectionOptions({
-    Key key,
-    this.maxHeight,
-    this.maxWidth,
-    this.configurations,
-    this.configIndex,
-    this.onConfigChanged,
-  }) : super(key: key);
+    required this.maxHeight,
+    required this.maxWidth,
+    required this.configurations,
+    required this.configIndex,
+    required this.onConfigChanged,
+  });
 
   final double maxHeight;
   final double maxWidth;
@@ -537,8 +586,8 @@ class _DemoSectionOptions extends StatelessWidget {
                 end: 24,
               ),
               child: Text(
-                GalleryLocalizations.of(context).demoOptionsTooltip,
-                style: textTheme.headline4.apply(
+                GalleryLocalizations.of(context)!.demoOptionsTooltip,
+                style: textTheme.headlineMedium!.apply(
                   color: colorScheme.onSurface,
                   fontSizeDelta:
                       isDisplayDesktop(context) ? desktopDisplay1FontDelta : 0,
@@ -575,15 +624,14 @@ class _DemoSectionOptions extends StatelessWidget {
 
 class _DemoSectionOptionsItem extends StatelessWidget {
   const _DemoSectionOptionsItem({
-    Key key,
-    this.title,
-    this.isSelected,
+    required this.title,
+    required this.isSelected,
     this.onTap,
-  }) : super(key: key);
+  });
 
   final String title;
   final bool isSelected;
-  final GestureTapCallback onTap;
+  final GestureTapCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -598,7 +646,7 @@ class _DemoSectionOptionsItem extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: Text(
             title,
-            style: Theme.of(context).textTheme.bodyText2.apply(
+            style: Theme.of(context).textTheme.bodyMedium!.apply(
                   color:
                       isSelected ? colorScheme.primary : colorScheme.onSurface,
                 ),
@@ -611,12 +659,11 @@ class _DemoSectionOptionsItem extends StatelessWidget {
 
 class _DemoSectionInfo extends StatelessWidget {
   const _DemoSectionInfo({
-    Key key,
-    this.maxHeight,
-    this.maxWidth,
-    this.title,
-    this.description,
-  }) : super(key: key);
+    required this.maxHeight,
+    required this.maxWidth,
+    required this.title,
+    required this.description,
+  });
 
   final double maxHeight;
   final double maxWidth;
@@ -643,18 +690,20 @@ class _DemoSectionInfo extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              SelectableText(
                 title,
-                style: textTheme.headline4.apply(
+                style: textTheme.headlineMedium!.apply(
                   color: colorScheme.onSurface,
                   fontSizeDelta:
                       isDisplayDesktop(context) ? desktopDisplay1FontDelta : 0,
                 ),
               ),
               const SizedBox(height: 12),
-              Text(
+              SelectableText(
                 description,
-                style: textTheme.bodyText2.apply(color: colorScheme.onSurface),
+                style: textTheme.bodyMedium!.apply(
+                  color: colorScheme.onSurface,
+                ),
               ),
             ],
           ),
@@ -664,12 +713,12 @@ class _DemoSectionInfo extends StatelessWidget {
   }
 }
 
-class DemoContent extends StatelessWidget {
-  const DemoContent({
-    Key key,
-    @required this.height,
-    @required this.buildRoute,
-  }) : super(key: key);
+class DemoWrapper extends StatelessWidget {
+  const DemoWrapper({
+    super.key,
+    required this.height,
+    required this.buildRoute,
+  });
 
   final double height;
   final WidgetBuilder buildRoute;
@@ -681,11 +730,23 @@ class DemoContent extends StatelessWidget {
       height: height,
       child: Material(
         clipBehavior: Clip.antiAlias,
+        color: const Color(0x00000000),
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(10.0),
           bottom: Radius.circular(2.0),
         ),
-        child: DemoWrapper(child: Builder(builder: buildRoute)),
+        child: Theme(
+          data: MaterialDemoThemeData.themeData.copyWith(
+            platform: GalleryOptions.of(context).platform,
+          ),
+          child: CupertinoTheme(
+            data: const CupertinoThemeData()
+                .copyWith(brightness: Brightness.light),
+            child: ApplyTextOptions(
+              child: Builder(builder: buildRoute),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -693,13 +754,12 @@ class DemoContent extends StatelessWidget {
 
 class _DemoSectionCode extends StatelessWidget {
   const _DemoSectionCode({
-    Key key,
     this.maxHeight,
     this.codeWidget,
-  }) : super(key: key);
+  });
 
-  final double maxHeight;
-  final Widget codeWidget;
+  final double? maxHeight;
+  final Widget? codeWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -721,7 +781,7 @@ class _DemoSectionCode extends StatelessWidget {
 }
 
 class CodeDisplayPage extends StatelessWidget {
-  const CodeDisplayPage(this.code);
+  const CodeDisplayPage(this.code, {super.key});
 
   final CodeDisplayer code;
 
@@ -729,25 +789,25 @@ class CodeDisplayPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDesktop = isDisplayDesktop(context);
 
-    final _richTextCode = code(context);
-    final _plainTextCode = _richTextCode.toPlainText();
+    final richTextCode = code(context);
+    final plainTextCode = richTextCode.toPlainText();
 
-    void _showSnackBarOnCopySuccess(dynamic result) {
-      Scaffold.of(context).showSnackBar(
+    void showSnackBarOnCopySuccess(dynamic result) {
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            GalleryLocalizations.of(context)
+            GalleryLocalizations.of(context)!
                 .demoCodeViewerCopiedToClipboardMessage,
           ),
         ),
       );
     }
 
-    void _showSnackBarOnCopyFailure(Object exception) {
-      Scaffold.of(context).showSnackBar(
+    void showSnackBarOnCopyFailure(Object exception) {
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            GalleryLocalizations.of(context)
+            GalleryLocalizations.of(context)!
                 .demoCodeViewerFailedToCopyToClipboardMessage(exception),
           ),
         ),
@@ -761,21 +821,22 @@ class CodeDisplayPage extends StatelessWidget {
           padding: isDesktop
               ? const EdgeInsets.only(bottom: 8)
               : const EdgeInsets.symmetric(vertical: 8),
-          child: FlatButton(
-            color: Colors.white.withOpacity(0.15),
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(4)),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withOpacity(0.15),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+              ),
             ),
             onPressed: () async {
-              await Clipboard.setData(ClipboardData(text: _plainTextCode))
-                  .then(_showSnackBarOnCopySuccess)
-                  .catchError(_showSnackBarOnCopyFailure);
+              await Clipboard.setData(ClipboardData(text: plainTextCode))
+                  .then(showSnackBarOnCopySuccess)
+                  .catchError(showSnackBarOnCopyFailure);
             },
             child: Text(
-              GalleryLocalizations.of(context).demoCodeViewerCopyAll,
-              style: Theme.of(context).textTheme.button.copyWith(
+              GalleryLocalizations.of(context)!.demoCodeViewerCopyAll,
+              style: Theme.of(context).textTheme.labelLarge!.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w500,
                   ),
@@ -786,9 +847,9 @@ class CodeDisplayPage extends StatelessWidget {
           child: SingleChildScrollView(
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: RichText(
+              child: SelectableText.rich(
+                richTextCode,
                 textDirection: TextDirection.ltr,
-                text: _richTextCode,
               ),
             ),
           ),

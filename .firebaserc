@@ -1,7 +1,17 @@
 {
   "projects": {
-    "default": "gallery-flutter-dev",
-    "prod": "gallery-flutter-dev",
-    "staging": "gallery-staging-flutter-dev"
+    "gallery": "gallery-flutter-dev"
+  },
+  "targets": {
+    "gallery-flutter-dev": {
+      "hosting": {
+        "prod": [
+          "gallery-flutter-dev"
+        ],
+        "staging": [
+          "gallery-flutter-staging"
+        ]
+      }
+    }
   }
 }

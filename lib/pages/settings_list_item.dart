@@ -5,8 +5,6 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:gallery/data/gallery_options.dart';
-import 'package:gallery/l10n/gallery_localizations.dart';
 
 // Common constants between SlowMotionSetting and SettingsListItem.
 final settingItemBorderRadius = BorderRadius.circular(10);
@@ -14,17 +12,27 @@ const settingItemHeaderMargin = EdgeInsetsDirectional.fromSTEB(32, 0, 32, 8);
 
 class DisplayOption {
   final String title;
-  final String subtitle;
+  final String? subtitle;
 
   DisplayOption(this.title, {this.subtitle});
 }
 
-class SlowMotionSetting extends StatelessWidget {
+class ToggleSetting extends StatelessWidget {
+  final String text;
+  final bool value;
+  final Function(bool) onChanged;
+
+  const ToggleSetting({
+    super.key,
+    required this.text,
+    required this.value,
+    required this.onChanged,
+  });
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final options = GalleryOptions.of(context);
 
     return Semantics(
       container: true,
@@ -44,9 +52,9 @@ class SlowMotionSetting extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        GalleryLocalizations.of(context).settingsSlowMotion,
-                        style: textTheme.subtitle1.apply(
+                      SelectableText(
+                        text,
+                        style: textTheme.titleMedium!.apply(
                           color: colorScheme.onSurface,
                         ),
                       ),
@@ -58,11 +66,8 @@ class SlowMotionSetting extends StatelessWidget {
                 padding: const EdgeInsetsDirectional.only(end: 8),
                 child: Switch(
                   activeColor: colorScheme.primary,
-                  value: options.timeDilation != 1.0,
-                  onChanged: (isOn) => GalleryOptions.update(
-                    context,
-                    options.copyWith(timeDilation: isOn ? 5.0 : 1.0),
-                  ),
+                  value: value,
+                  onChanged: onChanged,
                 ),
               ),
             ],
@@ -74,15 +79,15 @@ class SlowMotionSetting extends StatelessWidget {
 }
 
 class SettingsListItem<T> extends StatefulWidget {
-  SettingsListItem({
-    Key key,
-    @required this.optionsMap,
-    @required this.title,
-    @required this.selectedOption,
-    @required this.onOptionChanged,
-    @required this.onTapSetting,
-    @required this.isExpanded,
-  }) : super(key: key);
+  const SettingsListItem({
+    super.key,
+    required this.optionsMap,
+    required this.title,
+    required this.selectedOption,
+    required this.onOptionChanged,
+    required this.onTapSetting,
+    required this.isExpanded,
+  });
 
   final LinkedHashMap<T, DisplayOption> optionsMap;
   final String title;
@@ -92,26 +97,26 @@ class SettingsListItem<T> extends StatefulWidget {
   final bool isExpanded;
 
   @override
-  _SettingsListItemState createState() => _SettingsListItemState<T>();
+  State<SettingsListItem<T?>> createState() => _SettingsListItemState<T?>();
 }
 
-class _SettingsListItemState<T> extends State<SettingsListItem<T>>
+class _SettingsListItemState<T> extends State<SettingsListItem<T?>>
     with SingleTickerProviderStateMixin {
   static final Animatable<double> _easeInTween =
       CurveTween(curve: Curves.easeIn);
   static const _expandDuration = Duration(milliseconds: 150);
-  AnimationController _controller;
-  Animation<double> _childrenHeightFactor;
-  Animation<double> _headerChevronRotation;
-  Animation<double> _headerSubtitleHeight;
-  Animation<EdgeInsetsGeometry> _headerMargin;
-  Animation<EdgeInsetsGeometry> _headerPadding;
-  Animation<EdgeInsetsGeometry> _childrenPadding;
-  Animation<BorderRadius> _headerBorderRadius;
+  late AnimationController _controller;
+  late Animation<double> _childrenHeightFactor;
+  late Animation<double> _headerChevronRotation;
+  late Animation<double> _headerSubtitleHeight;
+  late Animation<EdgeInsetsGeometry> _headerMargin;
+  late Animation<EdgeInsetsGeometry> _headerPadding;
+  late Animation<EdgeInsetsGeometry> _childrenPadding;
+  late Animation<BorderRadius?> _headerBorderRadius;
 
   // For ease of use. Correspond to the keys and values of `widget.optionsMap`.
-  Iterable<T> _options;
-  Iterable<DisplayOption> _displayOptions;
+  late Iterable<T?> _options;
+  late Iterable<DisplayOption> _displayOptions;
 
   @override
   void initState() {
@@ -165,14 +170,14 @@ class _SettingsListItemState<T> extends State<SettingsListItem<T>>
     }
   }
 
-  Widget _buildHeaderWithChildren(BuildContext context, Widget child) {
+  Widget _buildHeaderWithChildren(BuildContext context, Widget? child) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         _CategoryHeader(
           margin: _headerMargin.value,
           padding: _headerPadding.value,
-          borderRadius: _headerBorderRadius.value,
+          borderRadius: _headerBorderRadius.value!,
           subtitleHeight: _headerSubtitleHeight,
           chevronRotation: _headerChevronRotation,
           title: widget.title,
@@ -216,21 +221,21 @@ class _SettingsListItemState<T> extends State<SettingsListItem<T>>
           itemCount: widget.isExpanded ? _options.length : 0,
           itemBuilder: (context, index) {
             final displayOption = _displayOptions.elementAt(index);
-            return RadioListTile<T>(
+            return RadioListTile<T?>(
               value: _options.elementAt(index),
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     displayOption.title,
-                    style: theme.textTheme.bodyText1.copyWith(
+                    style: theme.textTheme.bodyLarge!.copyWith(
                       color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                   if (displayOption.subtitle != null)
                     Text(
-                      displayOption.subtitle,
-                      style: theme.textTheme.bodyText1.copyWith(
+                      displayOption.subtitle!,
+                      style: theme.textTheme.bodyLarge!.copyWith(
                         fontSize: 12,
                         color: Theme.of(context)
                             .colorScheme
@@ -254,25 +259,24 @@ class _SettingsListItemState<T> extends State<SettingsListItem<T>>
 
 class _CategoryHeader extends StatelessWidget {
   const _CategoryHeader({
-    Key key,
     this.margin,
-    this.padding,
-    this.borderRadius,
-    this.subtitleHeight,
-    this.chevronRotation,
-    this.title,
-    this.subtitle,
+    required this.padding,
+    required this.borderRadius,
+    required this.subtitleHeight,
+    required this.chevronRotation,
+    required this.title,
+    required this.subtitle,
     this.onTap,
-  }) : super(key: key);
+  });
 
-  final EdgeInsetsGeometry margin;
+  final EdgeInsetsGeometry? margin;
   final EdgeInsetsGeometry padding;
   final BorderRadiusGeometry borderRadius;
   final String title;
   final String subtitle;
   final Animation<double> subtitleHeight;
   final Animation<double> chevronRotation;
-  final GestureTapCallback onTap;
+  final GestureTapCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +302,7 @@ class _CategoryHeader extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: textTheme.subtitle1.apply(
+                        style: textTheme.titleMedium!.apply(
                           color: colorScheme.onSurface,
                         ),
                       ),
@@ -308,7 +312,7 @@ class _CategoryHeader extends StatelessWidget {
                           subtitle,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: textTheme.overline.apply(
+                          style: textTheme.labelSmall!.apply(
                             color: colorScheme.primary,
                           ),
                         ),

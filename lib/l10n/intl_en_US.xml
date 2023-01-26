@@ -14,6 +14,26 @@
     description="A description about how to view the source code for this app."
     >To see the source code for this app, please visit the {repoLink}.</string>
   <string
+    name="deselect"
+    description="Deselect a (selectable) item"
+    >Deselect</string>
+  <string
+    name="notSelected"
+    description="Indicates the status of a (selectable) item not being selected"
+    >Not selected</string>
+  <string
+    name="select"
+    description="Select a (selectable) item"
+    >Select</string>
+  <string
+    name="selectable"
+    description="Indicates the associated piece of UI is selectable by long pressing it"
+    >Selectable (long press)</string>
+  <string
+    name="selected"
+    description="Indicates status of a (selectable) item being selected"
+    >Selected</string>
+  <string
     name="signIn"
     description="Sign in label to sign into website."
     >SIGN IN</string>
@@ -42,14 +62,6 @@
     description="Semantic label for back button to exit a study and return to the gallery home page."
     >Back to Gallery</string>
   <string
-    name="cardsDemoTappable"
-    description="The user can tap this button"
-    >Tappable</string>
-  <string
-    name="cardsDemoSelectable"
-    description="If the user taps and hold this card. The card will toggled between on and off."
-    >Selectable (long press)</string>
-  <string
     name="cardsDemoExplore"
     description="Click to see more about the content in the cards demo."
     >Explore</string>
@@ -61,6 +73,10 @@
     name="cardsDemoShareSemantics"
     description="Semantics label for Share. Label tells user to share the destinationName to the user. Example Share Tamil"
     >Share {destinationName}</string>
+  <string
+    name="cardsDemoTappable"
+    description="The user can tap this button"
+    >Tappable</string>
   <string
     name="cardsDemoTravelDestinationTitle1"
     description="The top 10 cities that you can visit in Tamil Nadu"
@@ -121,6 +137,10 @@
     name="rallyDescription"
     description="Study description for Rally."
     >A personal finance app</string>
+  <string
+    name="replyDescription"
+    description="Study description for Reply."
+    >An efficient, focused email app</string>
   <string
     name="rallyAccountDataChecking"
     description="Name for account made up by user."
@@ -328,15 +348,15 @@
   <string
     name="rallyAlertsMessageHeadsUpShopping"
     description="Alert message shown when for example, user has used more than 90% of their shopping budget."
-    >Heads up, you’ve used up {percent} of your Shopping budget for this month.</string>
+    >Heads up, you&apos;ve used up {percent} of your Shopping budget for this month.</string>
   <string
     name="rallyAlertsMessageSpentOnRestaurants"
     description="Alert message shown when for example, user has spent $120 on Restaurants this week."
-    >You’ve spent {amount} on Restaurants this week.</string>
+    >You&apos;ve spent {amount} on Restaurants this week.</string>
   <string
     name="rallyAlertsMessageATMFees"
     description="Alert message shown when for example, the user has spent $24 in ATM fees this month."
-    >You’ve spent {amount} in ATM fees this month</string>
+    >You&apos;ve spent {amount} in ATM fees this month</string>
   <string
     name="rallyAlertsMessageCheckingAccount"
     description="Alert message shown when for example, the checking account is 1% higher than last month."
@@ -510,6 +530,18 @@
     description="Title for attribution (TOASTER is a proper name and should remain in English)."
     >Designed by TOASTER in London</string>
   <string
+    name="demoAppBarTitle"
+    description="Title for the material App bar component demo."
+    >App bar</string>
+  <string
+    name="demoAppBarSubtitle"
+    description="Subtitle for the material App bar component demo."
+    >Displays information and actions relating to the current screen</string>
+  <string
+    name="demoAppBarDescription"
+    description="Description for the material App bar component demo."
+    >The App bar provides content and actions related to the current screen. It&apos;s used for branding, screen titles, navigation, and actions</string>
+  <string
     name="demoBottomAppBarTitle"
     description="Title for the material bottom app bar component demo."
     >Bottom app bar</string>
@@ -584,31 +616,31 @@
   <string
     name="demoButtonSubtitle"
     description="Subtitle for the material buttons component demo."
-    >Flat, raised, outline, and more</string>
+    >Text, elevated, outlined, and more</string>
   <string
-    name="demoFlatButtonTitle"
-    description="Title for the flat button component demo."
-    >Flat Button</string>
+    name="demoTextButtonTitle"
+    description="Title for the text button component demo."
+    >Text Button</string>
   <string
-    name="demoFlatButtonDescription"
-    description="Description for the flat button component demo."
-    >A flat button displays an ink splash on press but does not lift. Use flat buttons on toolbars, in dialogs and inline with padding</string>
+    name="demoTextButtonDescription"
+    description="Description for the text button component demo."
+    >A text button displays an ink splash on press but does not lift. Use text buttons on toolbars, in dialogs and inline with padding</string>
   <string
-    name="demoRaisedButtonTitle"
-    description="Title for the raised button component demo."
-    >Raised Button</string>
+    name="demoElevatedButtonTitle"
+    description="Title for the elevated button component demo."
+    >Elevated Button</string>
   <string
-    name="demoRaisedButtonDescription"
-    description="Description for the raised button component demo."
-    >Raised buttons add dimension to mostly flat layouts. They emphasize functions on busy or wide spaces.</string>
+    name="demoElevatedButtonDescription"
+    description="Description for the elevated button component demo."
+    >Elevated buttons add dimension to mostly flat layouts. They emphasize functions on busy or wide spaces.</string>
   <string
-    name="demoOutlineButtonTitle"
-    description="Title for the outline button component demo."
-    >Outline Button</string>
+    name="demoOutlinedButtonTitle"
+    description="Title for the outlined button component demo."
+    >Outlined Button</string>
   <string
-    name="demoOutlineButtonDescription"
-    description="Description for the outline button component demo."
-    >Outline buttons become opaque and elevate when pressed. They are often paired with raised buttons to indicate an alternative, secondary action.</string>
+    name="demoOutlinedButtonDescription"
+    description="Description for the outlined button component demo."
+    >Outlined buttons become opaque and elevate when pressed. They are often paired with raised buttons to indicate an alternative, secondary action.</string>
   <string
     name="demoToggleButtonTitle"
     description="Title for the toggle buttons component demo."
@@ -688,7 +720,7 @@
   <string
     name="demoDataTableDescription"
     description="Description for the material data table component demo."
-    >Data tables display information in a grid-like format of rows and columns. They organize information in a way that’s easy to scan, so that users can look for patterns and insights.</string>
+    >Data tables display information in a grid-like format of rows and columns. They organize information in a way that&apos;s easy to scan, so that users can look for patterns and insights.</string>
   <string
     name="dataTableHeader"
     description="Header for the data table component demo about nutrition."
@@ -801,6 +833,22 @@
     name="demoSimpleDialogDescription"
     description="Description for the simple dialog component demo."
     >A simple dialog offers the user a choice between several options. A simple dialog has an optional title that is displayed above the choices.</string>
+  <string
+    name="demoDividerTitle"
+    description="Title for the divider component demo."
+    >Divider</string>
+  <string
+    name="demoDividerSubtitle"
+    description="Subtitle for the divider component demo."
+    >A divider is a thin line that groups content in lists and layouts.</string>
+  <string
+    name="demoDividerDescription"
+    description="Description for the divider component demo."
+    >Dividers can be used in lists, drawers, and elsewhere to separate content.</string>
+  <string
+    name="demoVerticalDividerTitle"
+    description="Title for the vertical divider component demo."
+    >Vertical Divider</string>
   <string
     name="demoGridListsTitle"
     description="Title for the grid lists component demo."
@@ -978,6 +1026,62 @@
     description="A text to show what value was checked."
     >Checked: {value}</string>
   <string
+    name="demoNavigationDrawerTitle"
+    description="Title for the material drawer component demo."
+    >Navigation Drawer</string>
+  <string
+    name="demoNavigationDrawerSubtitle"
+    description="Subtitle for the material drawer component demo."
+    >Displaying a drawer within appbar</string>
+  <string
+    name="demoNavigationDrawerDescription"
+    description="Description for the material drawer component demo."
+    >A Material Design panel that slides in horizontally from the edge of the screen to show navigation links in an application.</string>
+  <string
+    name="demoNavigationDrawerUserName"
+    description="Demo username for navigation drawer."
+    >User Name</string>
+  <string
+    name="demoNavigationDrawerUserEmail"
+    description="Demo email for navigation drawer."
+    >user.name@example.com</string>
+  <string
+    name="demoNavigationDrawerToPageOne"
+    description="Drawer Item One."
+    >Item One</string>
+  <string
+    name="demoNavigationDrawerToPageTwo"
+    description="Drawer Item Two."
+    >Item Two</string>
+  <string
+    name="demoNavigationDrawerText"
+    description="Description to open navigation drawer."
+    >Swipe from the edge or tap the upper-left icon to see the drawer</string>
+  <string
+    name="demoNavigationRailTitle"
+    description="Title for the material Navigation Rail component demo."
+    >Navigation Rail</string>
+  <string
+    name="demoNavigationRailSubtitle"
+    description="Subtitle for the material Navigation Rail component demo."
+    >Displaying a Navigation Rail within an app</string>
+  <string
+    name="demoNavigationRailDescription"
+    description="Description for the material Navigation Rail component demo."
+    >A material widget that is meant to be displayed at the left or right of an app to navigate between a small number of views, typically between three and five.</string>
+  <string
+    name="demoNavigationRailFirst"
+    description="Navigation Rail destination first label."
+    >First</string>
+  <string
+    name="demoNavigationRailSecond"
+    description="Navigation Rail destination second label."
+    >Second</string>
+  <string
+    name="demoNavigationRailThird"
+    description="Navigation Rail destination Third label."
+    >Third</string>
+  <string
     name="demoMenuAnItemWithASimpleMenu"
     description="Label next to a button that opens a simple menu. A menu displays a list of choices on a temporary surface. Used as an example in a demo."
     >An item with a simple menu</string>
@@ -1017,6 +1121,30 @@
     name="demoCupertinoButtonsDescription"
     description="Description for the cupertino buttons component demo."
     >An iOS-style button. It takes in text and/or an icon that fades out and in on touch. May optionally have a background.</string>
+  <string
+    name="demoCupertinoContextMenuTitle"
+    description="Title for the cupertino context menu component demo."
+    >Context Menu</string>
+  <string
+    name="demoCupertinoContextMenuSubtitle"
+    description="Subtitle for the cupertino context menu component demo."
+    >iOS-style context menu</string>
+  <string
+    name="demoCupertinoContextMenuDescription"
+    description="Description for the cupertino context menu component demo."
+    >An iOS-style full screen contextual menu that appears when an element is long-pressed.</string>
+  <string
+    name="demoCupertinoContextMenuActionOne"
+    description="Context menu list item one"
+    >Action one</string>
+  <string
+    name="demoCupertinoContextMenuActionTwo"
+    description="Context menu list item two"
+    >Action two</string>
+  <string
+    name="demoCupertinoContextMenuActionText"
+    description="Context menu text."
+    >Tap and hold the Flutter logo to see the context menu.</string>
   <string
     name="demoCupertinoAlertsTitle"
     description="Title for the cupertino alerts component demo."
@@ -1067,20 +1195,24 @@
     >An iOS-styled navigation bar. The navigation bar is a toolbar that minimally consists of a page title, in the middle of the toolbar.</string>
   <string
     name="demoCupertinoPickerTitle"
-    description="Title for the cupertino date and time pickers component demo."
+    description="Title for the cupertino pickers component demo."
     >Pickers</string>
   <string
     name="demoCupertinoPickerSubtitle"
     description="Subtitle for the cupertino pickers component demo."
-    >iOS-style date and time pickers</string>
+    >iOS-style pickers</string>
   <string
     name="demoCupertinoPickerDescription"
     description="Description for the cupertino pickers component demo."
-    >An iOS-style picker widget that can be used to select dates, times, or both date and time.</string>
+    >An iOS-style picker widget that can be used to select strings, dates, times, or both date and time.</string>
   <string
     name="demoCupertinoPickerTimer"
     description="Label to open a countdown timer picker."
     >Timer</string>
+  <string
+    name="demoCupertinoPicker"
+    description="Label to open an iOS picker."
+    >Picker</string>
   <string
     name="demoCupertinoPickerDate"
     description="Label to open a date picker."
@@ -1185,6 +1317,34 @@
     name="demoCupertinoTextFieldPIN"
     description="The placeholder for a text field where a user would enter their PIN number."
     >PIN</string>
+  <string
+    name="demoCupertinoSearchTextFieldTitle"
+    description="Title for the cupertino search text field demo."
+    >Search text field</string>
+  <string
+    name="demoCupertinoSearchTextFieldSubtitle"
+    description="Subtitle for the cupertino search text field demo."
+    >iOS-style search text field</string>
+  <string
+    name="demoCupertinoSearchTextFieldDescription"
+    description="Description for the cupertino search text field demo."
+    >A search text field that lets the user search by entering text, and that can offer and filter suggestions.</string>
+  <string
+    name="demoCupertinoSearchTextFieldPlaceholder"
+    description="The placeholder for a search text field demo."
+    >Enter some text</string>
+  <string
+    name="demoCupertinoScrollbarTitle"
+    description="Title for the cupertino scrollbar demo."
+    >Scrollbar</string>
+  <string
+    name="demoCupertinoScrollbarSubtitle"
+    description="Subtitle for the cupertino scrollbar demo."
+    >iOS-style scrollbar</string>
+  <string
+    name="demoCupertinoScrollbarDescription"
+    description="Description for the cupertino scrollbar demo."
+    >A scrollbar that wraps the given child</string>
   <string
     name="demoMotionTitle"
     description="Title for the motion demo."
@@ -1650,6 +1810,14 @@
     description="Description for time picker demo."
     >Shows a dialog containing a Material Design time picker.</string>
   <string
+    name="demoDateRangePickerTitle"
+    description="Title for date range picker demo."
+    >Date Range Picker</string>
+  <string
+    name="demoDateRangePickerDescription"
+    description="Description for date range picker demo."
+    >Shows a dialog containing a Material Design date range picker.</string>
+  <string
     name="demoPickersShowPicker"
     description="Button text to show the date or time picker in the demo."
     >SHOW PICKER</string>
@@ -1684,7 +1852,7 @@
   <string
     name="demoSnackbarsDescription"
     description="Description for snackbars demo."
-    >Snackbars inform users of a process that an app has performed or will perform. They appear temporarily, towards the bottom of the screen. They shouldn’t interrupt the user experience, and they don’t require user input to disappear.</string>
+    >Snackbars inform users of a process that an app has performed or will perform. They appear temporarily, towards the bottom of the screen. They shouldn&apos;t interrupt the user experience, and they don&apos;t require user input to disappear.</string>
   <string
     name="demoSnackbarsButtonLabel"
     description="Label for button to show a snackbar."
@@ -1699,7 +1867,7 @@
     >ACTION</string>
   <string
     name="demoSnackbarsAction"
-    description="Text that appears when you press on a snackbars’ action."
+    description="Text that appears when you press on a snackbars&apos; action."
     >You pressed the snackbar action.</string>
   <string
     name="demoSelectionControlsTitle"
@@ -1732,7 +1900,7 @@
   <string
     name="demoSelectionControlsSwitchDescription"
     description="Description for the switches (selection controls) demo."
-    >On/off switches toggle the state of a single settings option. The option that the switch controls, as well as the state it’s in, should be made clear from the corresponding inline label.</string>
+    >On/off switches toggle the state of a single settings option. The option that the switch controls, as well as the state it&apos;s in, should be made clear from the corresponding inline label.</string>
   <string
     name="demoBottomTextFieldsTitle"
     description="Title for text fields demo."
@@ -1929,6 +2097,18 @@
     name="chipBiking"
     description="A chip component to that indicates a biking selection."
     >Biking</string>
+  <string
+    name="demo"
+    description="Used in the title of the demos."
+    >Demo</string>
+  <string
+    name="bottomAppBar"
+    description="Used as semantic label for a BottomAppBar."
+    >Bottom app bar</string>
+  <string
+    name="loading"
+    description="Indicates the loading process."
+    >Loading</string>
   <string
     name="dialogDiscardTitle"
     description="Alert dialog message to discard draft."
@@ -2953,4 +3133,84 @@
     name="fortnightlyHeadlineBees"
     description="Headline for a news article about bees."
     >Farmland Bees In Short Supply</string>
+  <string
+    name="replyInboxLabel"
+    description="Text label for Inbox destination."
+    >Inbox</string>
+  <string
+    name="replyStarredLabel"
+    description="Text label for Starred destination."
+    >Starred</string>
+  <string
+    name="replySentLabel"
+    description="Text label for Sent destination."
+    >Sent</string>
+  <string
+    name="replyTrashLabel"
+    description="Text label for Trash destination."
+    >Trash</string>
+  <string
+    name="replySpamLabel"
+    description="Text label for Spam destination."
+    >Spam</string>
+  <string
+    name="replyDraftsLabel"
+    description="Text label for Drafts destination."
+    >Drafts</string>
+  <string
+    name="demoTwoPaneFoldableLabel"
+    description="Option title for TwoPane demo on foldable devices."
+    >Foldable</string>
+  <string
+    name="demoTwoPaneFoldableDescription"
+    description="Description for the foldable option configuration on the TwoPane demo."
+    >This is how TwoPane behaves on a foldable device.</string>
+  <string
+    name="demoTwoPaneSmallScreenLabel"
+    description="Option title for TwoPane demo in small screen mode. Counterpart of the foldable option."
+    >Small Screen</string>
+  <string
+    name="demoTwoPaneSmallScreenDescription"
+    description="Description for the small screen option configuration on the TwoPane demo."
+    >This is how TwoPane behaves on a small screen device.</string>
+  <string
+    name="demoTwoPaneTabletLabel"
+    description="Option title for TwoPane demo in tablet or desktop mode."
+    >Tablet / Desktop</string>
+  <string
+    name="demoTwoPaneTabletDescription"
+    description="Description for the tablet / desktop option configuration on the TwoPane demo."
+    >This is how TwoPane behaves on a larger screen like a tablet or desktop.</string>
+  <string
+    name="demoTwoPaneTitle"
+    description="Title for the TwoPane widget demo."
+    >TwoPane</string>
+  <string
+    name="demoTwoPaneSubtitle"
+    description="Subtitle for the TwoPane widget demo."
+    >Responsive layouts on foldable, large, and small screens</string>
+  <string
+    name="splashSelectDemo"
+    description="Tip for user, visible on the right side of the splash screen when Gallery runs on a foldable device."
+    >Select a demo</string>
+  <string
+    name="demoTwoPaneList"
+    description="Title of one of the panes in the TwoPane demo. It sits on top of a list of items."
+    >List</string>
+  <string
+    name="demoTwoPaneDetails"
+    description="Title of one of the panes in the TwoPane demo, which shows details of the currently selected item."
+    >Details</string>
+  <string
+    name="demoTwoPaneSelectItem"
+    description="Tip for user, visible on the right side of the TwoPane widget demo in the foldable configuration."
+    >Select an item</string>
+  <string
+    name="demoTwoPaneItem"
+    description="Generic item placeholder visible in the TwoPane widget demo."
+    >Item {value}</string>
+  <string
+    name="demoTwoPaneItemDetails"
+    description="Generic item description or details visible in the TwoPane widget demo."
+    >Item {value} details</string>
 </resources>

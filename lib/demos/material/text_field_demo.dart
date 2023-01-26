@@ -3,23 +3,20 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-
 import 'package:flutter/services.dart';
-import 'package:flutter/gestures.dart' show DragStartBehavior;
-
-import 'package:gallery/l10n/gallery_localizations.dart';
+import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 
 // BEGIN textFieldDemo
 
 class TextFieldDemo extends StatelessWidget {
-  const TextFieldDemo();
+  const TextFieldDemo({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(GalleryLocalizations.of(context).demoTextFieldTitle),
+        title: Text(GalleryLocalizations.of(context)!.demoTextFieldTitle),
       ),
       body: const TextFormFieldDemo(),
     );
@@ -27,21 +24,23 @@ class TextFieldDemo extends StatelessWidget {
 }
 
 class TextFormFieldDemo extends StatefulWidget {
-  const TextFormFieldDemo({Key key}) : super(key: key);
+  const TextFormFieldDemo({super.key});
 
   @override
   TextFormFieldDemoState createState() => TextFormFieldDemoState();
 }
 
 class PersonData {
-  String name = '';
-  String phoneNumber = '';
-  String email = '';
+  String? name = '';
+  String? phoneNumber = '';
+  String? email = '';
   String password = '';
 }
 
 class PasswordField extends StatefulWidget {
   const PasswordField({
+    super.key,
+    this.restorationId,
     this.fieldKey,
     this.hintText,
     this.labelText,
@@ -49,29 +48,42 @@ class PasswordField extends StatefulWidget {
     this.onSaved,
     this.validator,
     this.onFieldSubmitted,
+    this.focusNode,
+    this.textInputAction,
   });
 
-  final Key fieldKey;
-  final String hintText;
-  final String labelText;
-  final String helperText;
-  final FormFieldSetter<String> onSaved;
-  final FormFieldValidator<String> validator;
-  final ValueChanged<String> onFieldSubmitted;
+  final String? restorationId;
+  final Key? fieldKey;
+  final String? hintText;
+  final String? labelText;
+  final String? helperText;
+  final FormFieldSetter<String>? onSaved;
+  final FormFieldValidator<String>? validator;
+  final ValueChanged<String>? onFieldSubmitted;
+  final FocusNode? focusNode;
+  final TextInputAction? textInputAction;
 
   @override
-  _PasswordFieldState createState() => _PasswordFieldState();
+  State<PasswordField> createState() => _PasswordFieldState();
 }
 
-class _PasswordFieldState extends State<PasswordField> {
-  bool _obscureText = true;
+class _PasswordFieldState extends State<PasswordField> with RestorationMixin {
+  final RestorableBool _obscureText = RestorableBool(true);
+
+  @override
+  String? get restorationId => widget.restorationId;
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_obscureText, 'obscure_text');
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       key: widget.fieldKey,
-      obscureText: _obscureText,
-      cursorColor: Theme.of(context).cursorColor,
+      restorationId: 'password_text_field',
+      obscureText: _obscureText.value,
       maxLength: 8,
       onSaved: widget.onSaved,
       validator: widget.validator,
@@ -81,19 +93,19 @@ class _PasswordFieldState extends State<PasswordField> {
         hintText: widget.hintText,
         labelText: widget.labelText,
         helperText: widget.helperText,
-        suffixIcon: GestureDetector(
-          dragStartBehavior: DragStartBehavior.down,
-          onTap: () {
+        suffixIcon: IconButton(
+          onPressed: () {
             setState(() {
-              _obscureText = !_obscureText;
+              _obscureText.value = !_obscureText.value;
             });
           },
-          child: Icon(
-            _obscureText ? Icons.visibility : Icons.visibility_off,
-            semanticLabel: _obscureText
-                ? GalleryLocalizations.of(context)
+          hoverColor: Colors.transparent,
+          icon: Icon(
+            _obscureText.value ? Icons.visibility : Icons.visibility_off,
+            semanticLabel: _obscureText.value
+                ? GalleryLocalizations.of(context)!
                     .demoTextFieldShowPasswordLabel
-                : GalleryLocalizations.of(context)
+                : GalleryLocalizations.of(context)!
                     .demoTextFieldHidePasswordLabel,
           ),
         ),
@@ -102,19 +114,49 @@ class _PasswordFieldState extends State<PasswordField> {
   }
 }
 
-class TextFormFieldDemoState extends State<TextFormFieldDemo> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
+class TextFormFieldDemoState extends State<TextFormFieldDemo>
+    with RestorationMixin {
   PersonData person = PersonData();
 
+  late FocusNode _phoneNumber, _email, _lifeStory, _password, _retypePassword;
+
+  @override
+  void initState() {
+    super.initState();
+    _phoneNumber = FocusNode();
+    _email = FocusNode();
+    _lifeStory = FocusNode();
+    _password = FocusNode();
+    _retypePassword = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _phoneNumber.dispose();
+    _email.dispose();
+    _lifeStory.dispose();
+    _password.dispose();
+    _retypePassword.dispose();
+    super.dispose();
+  }
+
   void showInSnackBar(String value) {
-    _scaffoldKey.currentState.hideCurrentSnackBar();
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(value),
     ));
   }
 
-  AutovalidateMode _autoValidateMode = AutovalidateMode.disabled;
+  @override
+  String get restorationId => 'text_field_demo';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_autoValidateModeIndex, 'autovalidate_mode');
+  }
+
+  final RestorableInt _autoValidateModeIndex =
+      RestorableInt(AutovalidateMode.disabled.index);
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<FormFieldState<String>> _passwordFieldKey =
@@ -123,195 +165,208 @@ class TextFormFieldDemoState extends State<TextFormFieldDemo> {
       _UsNumberTextInputFormatter();
 
   void _handleSubmitted() {
-    final form = _formKey.currentState;
+    final form = _formKey.currentState!;
     if (!form.validate()) {
-      _autoValidateMode =
-          AutovalidateMode.always; // Start validating on every change.
+      _autoValidateModeIndex.value =
+          AutovalidateMode.always.index; // Start validating on every change.
       showInSnackBar(
-        GalleryLocalizations.of(context).demoTextFieldFormErrors,
+        GalleryLocalizations.of(context)!.demoTextFieldFormErrors,
       );
     } else {
       form.save();
-      showInSnackBar(GalleryLocalizations.of(context)
-          .demoTextFieldNameHasPhoneNumber(person.name, person.phoneNumber));
+      showInSnackBar(GalleryLocalizations.of(context)!
+          .demoTextFieldNameHasPhoneNumber(person.name!, person.phoneNumber!));
     }
   }
 
-  String _validateName(String value) {
-    if (value.isEmpty) {
-      return GalleryLocalizations.of(context).demoTextFieldNameRequired;
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return GalleryLocalizations.of(context)!.demoTextFieldNameRequired;
     }
     final nameExp = RegExp(r'^[A-Za-z ]+$');
     if (!nameExp.hasMatch(value)) {
-      return GalleryLocalizations.of(context)
+      return GalleryLocalizations.of(context)!
           .demoTextFieldOnlyAlphabeticalChars;
     }
     return null;
   }
 
-  String _validatePhoneNumber(String value) {
+  String? _validatePhoneNumber(String? value) {
     final phoneExp = RegExp(r'^\(\d\d\d\) \d\d\d\-\d\d\d\d$');
-    if (!phoneExp.hasMatch(value)) {
-      return GalleryLocalizations.of(context).demoTextFieldEnterUSPhoneNumber;
+    if (!phoneExp.hasMatch(value!)) {
+      return GalleryLocalizations.of(context)!.demoTextFieldEnterUSPhoneNumber;
     }
     return null;
   }
 
-  String _validatePassword(String value) {
-    final passwordField = _passwordFieldKey.currentState;
-    if (passwordField.value == null || passwordField.value.isEmpty) {
-      return GalleryLocalizations.of(context).demoTextFieldEnterPassword;
+  String? _validatePassword(String? value) {
+    final passwordField = _passwordFieldKey.currentState!;
+    if (passwordField.value == null || passwordField.value!.isEmpty) {
+      return GalleryLocalizations.of(context)!.demoTextFieldEnterPassword;
     }
     if (passwordField.value != value) {
-      return GalleryLocalizations.of(context).demoTextFieldPasswordsDoNotMatch;
+      return GalleryLocalizations.of(context)!.demoTextFieldPasswordsDoNotMatch;
     }
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    final cursorColor = Theme.of(context).cursorColor;
     const sizedBoxSpace = SizedBox(height: 24);
+    final localizations = GalleryLocalizations.of(context)!;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      body: Form(
-        key: _formKey,
-        autovalidateMode: _autoValidateMode,
-        child: Scrollbar(
-          child: SingleChildScrollView(
-            dragStartBehavior: DragStartBehavior.down,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                sizedBoxSpace,
-                TextFormField(
-                  textCapitalization: TextCapitalization.words,
-                  cursorColor: cursorColor,
-                  decoration: InputDecoration(
-                    filled: true,
-                    icon: const Icon(Icons.person),
-                    hintText: GalleryLocalizations.of(context)
-                        .demoTextFieldWhatDoPeopleCallYou,
-                    labelText:
-                        GalleryLocalizations.of(context).demoTextFieldNameField,
-                  ),
-                  onSaved: (value) {
-                    person.name = value;
-                  },
-                  validator: _validateName,
+    return Form(
+      key: _formKey,
+      autovalidateMode: AutovalidateMode.values[_autoValidateModeIndex.value],
+      child: Scrollbar(
+        child: SingleChildScrollView(
+          restorationId: 'text_field_demo_scroll_view',
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            children: [
+              sizedBoxSpace,
+              TextFormField(
+                restorationId: 'name_field',
+                textInputAction: TextInputAction.next,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  filled: true,
+                  icon: const Icon(Icons.person),
+                  hintText: localizations.demoTextFieldWhatDoPeopleCallYou,
+                  labelText: localizations.demoTextFieldNameField,
                 ),
-                sizedBoxSpace,
-                TextFormField(
-                  cursorColor: cursorColor,
-                  decoration: InputDecoration(
-                    filled: true,
-                    icon: const Icon(Icons.phone),
-                    hintText: GalleryLocalizations.of(context)
-                        .demoTextFieldWhereCanWeReachYou,
-                    labelText: GalleryLocalizations.of(context)
-                        .demoTextFieldPhoneNumber,
-                    prefixText: '+1 ',
-                  ),
-                  keyboardType: TextInputType.phone,
-                  onSaved: (value) {
-                    person.phoneNumber = value;
-                  },
-                  maxLength: 14,
-                  maxLengthEnforced: false,
-                  validator: _validatePhoneNumber,
-                  // TextInputFormatters are applied in sequence.
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly,
-                    // Fit the validating format.
-                    _phoneNumberFormatter,
-                  ],
+                onSaved: (value) {
+                  person.name = value;
+                  _phoneNumber.requestFocus();
+                },
+                validator: _validateName,
+              ),
+              sizedBoxSpace,
+              TextFormField(
+                restorationId: 'phone_number_field',
+                textInputAction: TextInputAction.next,
+                focusNode: _phoneNumber,
+                decoration: InputDecoration(
+                  filled: true,
+                  icon: const Icon(Icons.phone),
+                  hintText: localizations.demoTextFieldWhereCanWeReachYou,
+                  labelText: localizations.demoTextFieldPhoneNumber,
+                  prefixText: '+1 ',
                 ),
-                sizedBoxSpace,
-                TextFormField(
-                  cursorColor: cursorColor,
-                  decoration: InputDecoration(
-                    filled: true,
-                    icon: const Icon(Icons.email),
-                    hintText: GalleryLocalizations.of(context)
-                        .demoTextFieldYourEmailAddress,
-                    labelText:
-                        GalleryLocalizations.of(context).demoTextFieldEmail,
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  onSaved: (value) {
-                    person.email = value;
-                  },
+                keyboardType: TextInputType.phone,
+                onSaved: (value) {
+                  person.phoneNumber = value;
+                  _email.requestFocus();
+                },
+                maxLength: 14,
+                maxLengthEnforcement: MaxLengthEnforcement.none,
+                validator: _validatePhoneNumber,
+                // TextInputFormatters are applied in sequence.
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly,
+                  // Fit the validating format.
+                  _phoneNumberFormatter,
+                ],
+              ),
+              sizedBoxSpace,
+              TextFormField(
+                restorationId: 'email_field',
+                textInputAction: TextInputAction.next,
+                focusNode: _email,
+                decoration: InputDecoration(
+                  filled: true,
+                  icon: const Icon(Icons.email),
+                  hintText: localizations.demoTextFieldYourEmailAddress,
+                  labelText: localizations.demoTextFieldEmail,
                 ),
-                sizedBoxSpace,
-                TextFormField(
-                  cursorColor: cursorColor,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    hintText: GalleryLocalizations.of(context)
-                        .demoTextFieldTellUsAboutYourself,
-                    helperText: GalleryLocalizations.of(context)
-                        .demoTextFieldKeepItShort,
-                    labelText:
-                        GalleryLocalizations.of(context).demoTextFieldLifeStory,
-                  ),
-                  maxLines: 3,
+                keyboardType: TextInputType.emailAddress,
+                onSaved: (value) {
+                  person.email = value;
+                  _lifeStory.requestFocus();
+                },
+              ),
+              sizedBoxSpace,
+              // Disabled text field
+              TextFormField(
+                enabled: false,
+                restorationId: 'disabled_email_field',
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                  filled: true,
+                  icon: const Icon(Icons.email),
+                  hintText: localizations.demoTextFieldYourEmailAddress,
+                  labelText: localizations.demoTextFieldEmail,
                 ),
-                sizedBoxSpace,
-                TextFormField(
-                  cursorColor: cursorColor,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText:
-                        GalleryLocalizations.of(context).demoTextFieldSalary,
-                    suffixText:
-                        GalleryLocalizations.of(context).demoTextFieldUSD,
-                  ),
-                  maxLines: 1,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              sizedBoxSpace,
+              TextFormField(
+                restorationId: 'life_story_field',
+                focusNode: _lifeStory,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  hintText: localizations.demoTextFieldTellUsAboutYourself,
+                  helperText: localizations.demoTextFieldKeepItShort,
+                  labelText: localizations.demoTextFieldLifeStory,
                 ),
-                sizedBoxSpace,
-                PasswordField(
-                  fieldKey: _passwordFieldKey,
-                  helperText:
-                      GalleryLocalizations.of(context).demoTextFieldNoMoreThan,
-                  labelText:
-                      GalleryLocalizations.of(context).demoTextFieldPassword,
-                  onFieldSubmitted: (value) {
-                    setState(() {
-                      person.password = value;
-                    });
-                  },
+                maxLines: 3,
+              ),
+              sizedBoxSpace,
+              TextFormField(
+                restorationId: 'salary_field',
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: localizations.demoTextFieldSalary,
+                  suffixText: localizations.demoTextFieldUSD,
                 ),
-                sizedBoxSpace,
-                TextFormField(
-                  cursorColor: cursorColor,
-                  decoration: InputDecoration(
-                    filled: true,
-                    labelText: GalleryLocalizations.of(context)
-                        .demoTextFieldRetypePassword,
-                  ),
-                  maxLength: 8,
-                  obscureText: true,
-                  validator: _validatePassword,
+                maxLines: 1,
+              ),
+              sizedBoxSpace,
+              PasswordField(
+                restorationId: 'password_field',
+                textInputAction: TextInputAction.next,
+                focusNode: _password,
+                fieldKey: _passwordFieldKey,
+                helperText: localizations.demoTextFieldNoMoreThan,
+                labelText: localizations.demoTextFieldPassword,
+                onFieldSubmitted: (value) {
+                  setState(() {
+                    person.password = value;
+                    _retypePassword.requestFocus();
+                  });
+                },
+              ),
+              sizedBoxSpace,
+              TextFormField(
+                restorationId: 'retype_password_field',
+                focusNode: _retypePassword,
+                decoration: InputDecoration(
+                  filled: true,
+                  labelText: localizations.demoTextFieldRetypePassword,
                 ),
-                sizedBoxSpace,
-                Center(
-                  child: RaisedButton(
-                    child: Text(
-                        GalleryLocalizations.of(context).demoTextFieldSubmit),
-                    onPressed: _handleSubmitted,
-                  ),
+                maxLength: 8,
+                obscureText: true,
+                validator: _validatePassword,
+                onFieldSubmitted: (value) {
+                  _handleSubmitted();
+                },
+              ),
+              sizedBoxSpace,
+              Center(
+                child: ElevatedButton(
+                  onPressed: _handleSubmitted,
+                  child: Text(localizations.demoTextFieldSubmit),
                 ),
-                sizedBoxSpace,
-                Text(
-                  GalleryLocalizations.of(context).demoTextFieldRequiredField,
-                  style: Theme.of(context).textTheme.caption,
-                ),
-                sizedBoxSpace,
-              ],
-            ),
+              ),
+              sizedBoxSpace,
+              Text(
+                localizations.demoTextFieldRequiredField,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              sizedBoxSpace,
+            ],
           ),
         ),
       ),
@@ -335,15 +390,15 @@ class _UsNumberTextInputFormatter extends TextInputFormatter {
       if (newValue.selection.end >= 1) selectionIndex++;
     }
     if (newTextLength >= 4) {
-      newText.write(newValue.text.substring(0, usedSubstringIndex = 3) + ') ');
+      newText.write('${newValue.text.substring(0, usedSubstringIndex = 3)}) ');
       if (newValue.selection.end >= 3) selectionIndex += 2;
     }
     if (newTextLength >= 7) {
-      newText.write(newValue.text.substring(3, usedSubstringIndex = 6) + '-');
+      newText.write('${newValue.text.substring(3, usedSubstringIndex = 6)}-');
       if (newValue.selection.end >= 6) selectionIndex++;
     }
     if (newTextLength >= 11) {
-      newText.write(newValue.text.substring(6, usedSubstringIndex = 10) + ' ');
+      newText.write('${newValue.text.substring(6, usedSubstringIndex = 10)} ');
       if (newValue.selection.end >= 10) selectionIndex++;
     }
     // Dump the rest.
