@@ -4,46 +4,140 @@ A new Flutter project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
+- Showcase for `material`, `cupertino`, and other widgets
+- [Adaptive layout](lib/layout/adaptive.dart) for mobile and desktop
+- State restoration support
+- Settings to text scaling, text direction, locale, theme, and more...
+- Demo for `animations`
+- Foldable support and demo for `dual_screen`
+- Deferred loading
+- CI/CD
+- ...and much more!
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Supported Platforms
+
+Flutter Gallery has been built to support multiple platforms.
+These include:
+
+- Android ([Google Play Store](https://play.google.com/store/apps/details?id=io.flutter.demo.gallery), [.apk][latest release])
+- iOS (locally)
+- web ([gallery.flutter.dev](https://gallery.flutter.dev/))
+- macOS ([.zip][latest release])
+- Linux ([.tar.gz][latest release])
+- Windows ([.zip][latest release])
+
+## Running
+
+One can run the gallery locally for any of these platforms. For desktop platforms,
+please see the [Flutter docs](https://docs.flutter.dev/desktop) for the latest
+requirements.
+
+```bash
+cd gallery/
+flutter pub get
+flutter run
+```
+
+<details>
+<summary>Troubleshooting</summary>
+
+### Flutter `master` channel
+
+The Flutter Gallery targets Flutter's `master` channel. As such, it can take advantage
+of new SDK features that haven't landed in the stable channel.
+
+If you'd like to run the Flutter Gallery, you may have to switch to the `master` channel
+first:
 
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
+When you're done, use this command to return to the safety of the `stable`
+channel:
 
 
-### Run commands:-
+</details>
 
-1. To build local container:
+## Development
 
-docker build -t hello-world .
+<details>
+  <summary>Generating localizations</summary>
 
-2. To run local container:
+If this is the first time building the Flutter Gallery, the localized
+code will not be present in the project directory. However, after running
+the application for the first time, a synthetic package will be generated
+containing the app's localizations through importing
+`package:flutter_gen/gen_l10n/`.
 
-docker run --rm -it -p 8083:8080 hello-world
+```bash
+flutter pub get
+flutter pub run grinder l10n
+```
 
-3. Browse at http://<MACHINE_IP>:8083
+See separate [README](lib/l10n/README.md) for more details.
 
-4. If using CI (drone/circleci/github), run container from shared registry & then browse:
+</details>
 
-docker pull registry.hub.docker.com/harmeetg/gallery:<ci_used>
-docker run --rm -it -p 8083:8080 registry.hub.docker.com/harmeetg/gallery:<ci_used>
+<details>
+  <summary>Generating highlighted code segments</summary>
+
+```bash
+flutter pub get
+flutter pub run grinder update-code-segments
+```
+
+See separate [README](tool/codeviewer_cli/README.md) for
+more details.
+
+</details>
+
+<details>
+  <summary>Including a new splash animation</summary>
 
 
 
+3. Update the map `_effectDurations` in
+[splash.dart](lib/pages/splash.dart) to include the number of the
+new `.gif` as well as its estimated duration. The duration is used to
+determine how long to display the splash animation at launch.
+</details>
 
+## Releasing
 
+<details>
+  <summary>for flutter-hackers members</summary>
 
-### Flutter
-## To build
-bash _ops/build.sh
+The process is largely automated and easy to set in motion.
 
-# For IOS
-export DART_DEFINES=
-export APPLE_ID=
-flutter run
+First things first, bump the `pubspec.yaml` version number. This can be in a PR making a change or a separate PR.
+Use [semantic versioning](https://semver.org/) to determine
+which part to increment. The version number after the `+` should also be incremented. For example `1.2.3+010203`
+with a patch should become `1.2.4+010204`.
+
+Then, use the following workflows. It is strongly recommended to use the staging/beta environments when available, before deploying to production.
+
+- [Deploy to Play Store](https://github.com/flutter/gallery/actions/workflows/release_deploy_play_store.yml): Uses Fastlane to create a [beta](https://play.google.com/console/u/0/developers/7661132837216938445/app/4974617875198505129/tracks/open-testing) (freely available on the [Play Store](https://play.google.com/apps/testing/io.flutter.demo.gallery)), promote an existing beta to production, or publish straight to [production](https://play.google.com/console/u/0/developers/7661132837216938445/app/4974617875198505129/tracks/production) ([Play Store](https://play.google.com/store/apps/details?id=io.flutter.demo.gallery)).
+  > **Note**
+  > Once an .aab is released with a particular version number, it can't be replaced. The version number must be incremented again.
+- [Deploy to web](https://github.com/flutter/gallery/actions/workflows/release_deploy_web.yml): Deploys a web build to the Firebase-hosted [staging](https://gallery-flutter-staging.web.app) or [production](https://gallery.flutter.dev) site.
+- [Draft GitHub release](https://github.com/flutter/gallery/actions/workflows/release_draft_github_release.yml): Drafts a GitHub release, including automatically generated release notes and packaged builds for Android, macOS, Linux, and Windows.
+  > **Note**
+  > The release draft is private until published. Upon being published, the specified version tag will be created.
+
+For posterity, information about doing these things locally is available at [go/flutter-gallery-manual-deployment](http://go/flutter-gallery-manual-deployment).
+
+</details>
+
+## Tests
+
+The gallery has its own set of unit, golden, and integration tests.
+
+In addition, Flutter itself uses the gallery in tests. To enable breaking changes, the gallery version is pinned in two places:
+
+- `flutter analyze`: https://github.com/flutter/tests/blob/master/registry/flutter_gallery.test
+- DeviceLab tests: https://github.com/flutter/flutter/blob/master/dev/devicelab/lib/versions/gallery.dart
+
+[latest release]: https://github.com/flutter/gallery/releases/latest
