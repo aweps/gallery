@@ -51,13 +51,18 @@ of new SDK features that haven't landed in the stable channel.
 If you'd like to run the Flutter Gallery, you may have to switch to the `master` channel
 first:
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter channel master
+flutter upgrade
+```
 
 When you're done, use this command to return to the safety of the `stable`
 channel:
 
+```bash
+flutter channel stable
+flutter upgrade
+```
 
 </details>
 
@@ -97,7 +102,11 @@ more details.
 <details>
   <summary>Including a new splash animation</summary>
 
+The Flutter Gallery targets Flutter's `master` channel. As such, it can take advantage
+of new SDK features that haven't landed in the stable channel.
 
+If you'd like to run the Flutter Gallery, you may have to switch to the `master` channel
+first:
 
 3. Update the map `_effectDurations` in
 [splash.dart](lib/pages/splash.dart) to include the number of the
