@@ -102,11 +102,14 @@ more details.
 <details>
   <summary>Including a new splash animation</summary>
 
-The Flutter Gallery targets Flutter's `master` channel. As such, it can take advantage
-of new SDK features that haven't landed in the stable channel.
+1. Convert your animation to a `.gif` file.
+   Ideally, use a background color of `0xFF030303` to ensure the animation
+   blends into the background of the app.
 
-If you'd like to run the Flutter Gallery, you may have to switch to the `master` channel
-first:
+2. Add your new `.gif` file to the assets directory under
+   `assets/splash_effects`. Ensure the name follows the format
+   `splash_effect_$num.gif`. The number should be the next number after the
+   current largest number in the repository.
 
 3. Update the map `_effectDurations` in
 [splash.dart](lib/pages/splash.dart) to include the number of the
