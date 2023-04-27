@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   build_docker:
     docker:
-      - image: docker
+      - image: cimg/base:2023.04
     environment:
       REGISTRY_ENDPOINT: registry.hub.docker.com
       REGISTRY_REPO: harmeetg/gallery
