@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add reaction
-        uses: peter-evans/create-or-update-comment@5adcb0bb0f9fb3f95ef05400558bdb3f329ee808
+        uses: peter-evans/create-or-update-comment@ca08ebd5dc95aa0cd97021e9708fcd6b87138c9b #v3.0.1
         with:
           token: ${{ secrets.PA_TOKEN }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
@@ -19,7 +19,7 @@ jobs:
         run: echo "run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $GITHUB_OUTPUT
 
       - name: Create comment
-        uses: peter-evans/create-or-update-comment@5adcb0bb0f9fb3f95ef05400558bdb3f329ee808
+        uses: peter-evans/create-or-update-comment@ca08ebd5dc95aa0cd97021e9708fcd6b87138c9b #v3.0.1
         with:
           token: ${{ secrets.PA_TOKEN }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
