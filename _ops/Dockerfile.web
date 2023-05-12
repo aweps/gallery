@@ -10,4 +10,4 @@ COPY Caddyfile /etc/
 
 EXPOSE 80 443
 WORKDIR /srv/www
-ENTRYPOINT ["/usr/bin/caddy","run","-config","/etc/Caddyfile"]
+ENTRYPOINT ["/usr/bin/caddy","run","--config","/etc/Caddyfile"]

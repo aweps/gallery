@@ -15,7 +15,7 @@ if ! type pod; then
   sudo gem install cocoapods
 fi
 
-FLUTTER_VER=1.17.2
+FLUTTER_VER=3.7.12
 
 if [[ ! -d ~/flutter ]]; then
 
