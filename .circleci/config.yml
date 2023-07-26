@@ -16,12 +16,7 @@ jobs:
           docker_layer_caching: false
 
       # build and push Docker image
-      - run: |
-          docker login ${REGISTRY_ENDPOINT} --username ${REGISTRY_USERNAME} --password ${REGISTRY_PASSWORD}
-          docker build --rm=true --pull=true -t ${REGISTRY_ENDPOINT}/${REGISTRY_REPO} -f Dockerfile ./
-          TAG=${CIRCLE_SHA1:0:7} && docker tag ${REGISTRY_ENDPOINT}/${REGISTRY_REPO} ${REGISTRY_ENDPOINT}/${REGISTRY_REPO}:${TAG} && docker push ${REGISTRY_ENDPOINT}/${REGISTRY_REPO}:${TAG}
-          TAG=${CIRCLE_SHA1} && docker tag ${REGISTRY_ENDPOINT}/${REGISTRY_REPO} ${REGISTRY_ENDPOINT}/${REGISTRY_REPO}:${TAG} && docker push ${REGISTRY_ENDPOINT}/${REGISTRY_REPO}:${TAG}
-          TAG=circleci && docker tag ${REGISTRY_ENDPOINT}/${REGISTRY_REPO} ${REGISTRY_ENDPOINT}/${REGISTRY_REPO}:${TAG} && docker push ${REGISTRY_ENDPOINT}/${REGISTRY_REPO}:${TAG}
+      - run: /bin/bash ./ci.build.sh
 
 workflows:
   version: 2.1

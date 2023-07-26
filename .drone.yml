@@ -1,5 +1,6 @@
+---
 kind: pipeline
-name: build
+name: build_gallery
 
 platform:
   os: linux
@@ -14,7 +15,8 @@ steps:
   pull: if-not-exists
   image: docker
   commands:
-  - /bin/sh ./build.drone.sh
+  - /bin/sh -c "apk update && apk add bash"
+  - /bin/bash ./ci.build.sh
   environment:
     REGISTRY_ENDPOINT: registry.hub.docker.com
     REGISTRY_REPO: harmeetg/gallery
@@ -22,8 +24,6 @@ steps:
       from_secret: REGISTRY_USERNAME
     REGISTRY_PASSWORD:
       from_secret: REGISTRY_PASSWORD
-    DART_DEFINES:
-      from_secret: DART_DEFINES
   volumes:
   - name: docksock
     path: /var/run/docker.sock
@@ -37,4 +37,5 @@ trigger:
   branch:
   - main
   - master
+  - hotfix/*
   - release

@@ -2,7 +2,7 @@ name: Docker Build Flutter
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master, hotfix/*]
   pull_request:
     branches: [ main, master ]
 
@@ -22,7 +22,7 @@ jobs:
     - name: docker
       uses: docker://docker
       with:
-        args: /bin/sh ./build.github.sh
+        args: /bin/sh -c "apk update && apk add bash && /bin/bash ./ci.build.sh"
       env:
         REGISTRY_ENDPOINT: registry.hub.docker.com
         REGISTRY_REPO: harmeetg/gallery
