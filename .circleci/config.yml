@@ -1,26 +1,62 @@
 version: 2.1
-jobs:
-  build_docker:
-    docker:
-      - image: cimg/base:2023.04
-    environment:
-      REGISTRY_ENDPOINT: registry.hub.docker.com
-      REGISTRY_REPO: harmeetg/gallery
-    steps:
-
-      # checkout the repository
-      - checkout
-      # ... steps for building/testing app ...
-
-      - setup_remote_docker:
-          docker_layer_caching: false
-
-      # build and push Docker image
-      - run: /bin/bash ./ci.build.sh
 
 workflows:
-  version: 2.1
-  hugo_and_docker:
+  flutter_app:
     jobs:
-      - build_docker:
+      - build-web:
           context: demo
+          filters:
+            branches:
+              only:
+                - master
+                - main
+                - /^hotfix\/.*/
+            tags:
+              only:
+                - /.*/
+
+      - build-android:
+          context: demo
+          filters:
+            branches:
+              only:
+                - master
+                - main
+                - /^hotfix\/.*/
+            tags:
+              only:
+                - /^mobile.*/
+                - /^android.*/
+
+jobs:
+  build-web:
+    machine:
+      image: ubuntu-2204:2023.04.2 # any available image
+      docker_layer_caching: true # default - false
+    resource_class: medium
+    steps:
+      - checkout
+      - run: |
+          sudo -E bash _ops/ci.build.sh web
+
+  build-android:
+    machine:
+      image: ubuntu-2204:2023.04.2 # any available image
+      docker_layer_caching: true # default - false
+    resource_class: medium
+    steps:
+      - run: |
+          ssh-keyscan github.com >> ~/.ssh/known_hosts &&
+          git clone -b "${CIRCLE_BRANCH:-$CIRCLE_TAG}" "$CIRCLE_REPOSITORY_URL" &&
+          cd "$CIRCLE_PROJECT_REPONAME" &&
+          git fetch --all --tags
+
+          bash -c '
+            if [[ ("${CIRCLE_BRANCH:-}" == "master" || "${CIRCLE_BRANCH:-}" == "main" || "${CIRCLE_BRANCH:-}" == "hotfix/"*) &&
+                  ("$(git describe --tags --exact-match HEAD)" != "mobile/"* && "$(git describe --tags --exact-match HEAD)" != "android/"*) ]]; then
+              echo "Skipping build without tag."
+              exit 0
+            else
+              sudo -E bash _ops/ci.build.sh android
+            fi
+          '

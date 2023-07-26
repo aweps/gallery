@@ -90,8 +90,12 @@ build/
 android/google-play-service-account.json
 **/flutter*.log
 **/android/.idea/
-**/fastlane/report.xml
 **/Runner.ipa
 **/Runner.app.dSYM*
 **/ios/Flutter/DartDefines.xcconfig
 **/ios/Flutter/.last_build_id
+
+.env.temp
+.secrets.*
+.cicd/
+keystore.jks

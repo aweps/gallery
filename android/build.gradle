@@ -1,12 +1,15 @@
 buildscript {
-    ext.kotlin_version = '1.4.10'
+    ext.gradle_version = '7.4.2'
+    ext.kotlin_version = '1.8.20'
     repositories {
         google()
-        jcenter()
+        jcenter { url "https://jcenter.bintray.com/" }
+        maven { url 'https://repo1.maven.org/maven2' }
+        maven { url 'https://maven.google.com' }
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.2'
+        classpath "com.android.tools.build:gradle:$gradle_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -14,7 +17,9 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        jcenter { url "https://jcenter.bintray.com/" }
+        maven { url 'https://repo1.maven.org/maven2' }
+        maven { url 'https://maven.google.com' }
     }
 }
 
@@ -26,6 +31,6 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-task clean(type: Delete) {
+tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

@@ -19,14 +19,13 @@ RUN DEBIAN_FRONTEND=noninteractive \
 
 ENV FLUTTER_HOME=/usr/local/flutter
 ENV FLUTTER_ROOT=$FLUTTER_HOME
-ENV FLUTTER_VER=3.7.12
+ENV FLUTTER_VER=3.10.0
 ENV PATH ${PATH}:${FLUTTER_HOME}/bin:${FLUTTER_HOME}/bin/cache/dart-sdk/bin
 
 RUN git clone https://github.com/flutter/flutter.git ${FLUTTER_HOME} && \
     cd ${FLUTTER_HOME} && git checkout ${FLUTTER_VER}
 
-RUN flutter channel stable
-RUN flutter upgrade
+#RUN flutter channel stable && flutter upgrade --force
 RUN flutter config --enable-web
 RUN yes | flutter doctor --android-licenses
 RUN flutter doctor -v

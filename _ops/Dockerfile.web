@@ -6,7 +6,7 @@ RUN curl --silent -o - "https://caddyserver.com/api/download?os=linux&arch=amd64
 RUN chmod 0755 /usr/bin/caddy
 
 COPY build/web /srv/www/
-COPY Caddyfile /etc/
+COPY _ops/Caddyfile /etc/
 
 EXPOSE 80 443
 WORKDIR /srv/www
