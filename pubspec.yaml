@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
   adaptive_breakpoints: ^0.1.1
   animations: ^2.0.2
   collection: ^1.16.0
@@ -30,7 +32,12 @@ dependencies:
   shrine_images: ^2.0.1
   transparent_image: ^2.0.1
   url_launcher: ^6.1.2
+  url_launcher_web: ^2.0.18
   vector_math: ^2.1.2
+  # https://pub.dartlang.org/packages/shared_preferences/
+  shared_preferences: ^2.0.0 
+  # https://pub:dev/packages/shared_preferences_web
+  shared_preferences_web: ^2.0.0
 
 dev_dependencies:
   flutter_test:
