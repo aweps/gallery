@@ -89,11 +89,5 @@ lib/generated_plugin_registrant.dart
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
-
-android/google-play-service-account.json
-**/flutter*.log
-**/android/.idea/
-**/fastlane/report.xml
-**/Runner.ipa
-**/Runner.app.dSYM*
-**/ios/Flutter/DartDefines.xcconfig
+**/google-services.json
+**/GoogleService-Info.plist

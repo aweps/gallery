@@ -20,6 +20,16 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto:400" rel="stylesheet" media="all">
   <link href="https://fonts.googleapis.com/css?family=Google+Sans:700" rel="stylesheet" media="all">
 
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBB5H8CECM"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-HBB5H8CECM');
+  </script>
+
   <!-- Renderer specifier -->
   <script>
     let searchParams = new URLSearchParams(window.location.search);
@@ -32,16 +42,6 @@
   </script>
 
   <script src="flutter.js" defer></script>
-
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-V5HG5ZQTYX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'G-V5HG5ZQTYX');
-  </script>
 </head>
 
 <body>
@@ -185,6 +185,28 @@
     initCookieNotice();
   </script>
 
+  <!-- Background -->
+  <style>
+    body.light {
+      background-color: #E6EBEB;
+    }
+
+    body.dark {
+      background-color: #241E30;
+    }
+  </style>
+  <script>
+    var queryParams = new URLSearchParams(window.location.search);
+
+    // Set the theme from the URL param, with fallback to user preference if no theme is
+    // specified.
+    var theme = queryParams.get("brightness");
+    theme ||= window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+    document.body.classList.add(theme);
+  </script>
+
   <!-- Loading indicator -->
   <div id="loading">
     <style>
@@ -235,7 +257,7 @@
         }
 
         to {
-          transform: scale(10)
+          transform: scale(0.01)
         }
       }
     </style>
