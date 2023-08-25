@@ -11,6 +11,7 @@
 .firebase/
 .flutter-plugins-dependencies
 
+
 # IntelliJ related
 *.iml
 *.ipr
@@ -22,6 +23,7 @@
 # is commented out by default.
 #.vscode/
 
+# Symbolication related
 app.*.symbols
 
 # Obfuscation related
@@ -74,6 +76,7 @@ lib/generated_plugin_registrant.dart
 **/ios/Flutter/.last_build_id
 **/ios/Flutter/App.framework
 **/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
 **/ios/Flutter/Generated.xcconfig
 **/ios/Flutter/app.flx
 **/ios/Flutter/app.zip
@@ -89,16 +92,20 @@ lib/generated_plugin_registrant.dart
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
+**/google-services.json
+**/GoogleService-Info.plist
+
+# End of https://www.toptal.com/developers/gitignore/api/flutter
 
 android/google-play-service-account.json
 **/flutter*.log
 **/android/.idea/
-**/fastlane/report.xml
 **/Runner.ipa
 **/Runner.app.dSYM*
 **/ios/Flutter/DartDefines.xcconfig
+**/ios/Flutter/.last_build_id
 
-_ops/.env.temp
-_ops/.secrets.local
-_ops/.secrets.dev
-_ops/.secrets.prod
+.env.temp
+.secrets.*
+.cicd/
+keystore.jks

@@ -1,0 +1,42 @@
+name: Auto bump version of Flutter App
+
+on:
+  schedule:
+    - cron: "30 5 2 * *"
+  workflow_dispatch:
+    inputs:
+      PREFIX:
+        required: true
+        default: "mobile"
+      SUFFIX:
+        required: true
+        default: "beta"
+      DEBUG:
+        required: true
+        default: "false"
+      WAIT_ON_ERROR:
+        required: true
+        default: "true"
+
+jobs:
+  bump:
+    name: Bump version
+    runs-on: ubuntu-latest
+    env:
+      PREFIX: ${{ github.event.inputs.PREFIX }}
+      SUFFIX: ${{ github.event.inputs.SUFFIX }}
+      DEBUG: ${{ github.event.inputs.DEBUG }}
+      WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PA_TOKEN }}
+
+      - name: bump
+        run: |
+          if [[ "${GITHUB_EVENT_NAME:-}" == "schedule" ]]; then MSG_PREFIX="Monthly Build: "; fi
+          /bin/bash bump ${PREFIX:-mobile} ${SUFFIX:-beta}
+
