@@ -61,7 +61,7 @@ android {
 
     defaultConfig {
         applicationId "com.webkrux"
-	applicationIdSuffix "${dartEnvironmentVariables.APP_SUFFIX}"
+	    applicationIdSuffix "${dartEnvironmentVariables.APP_SUFFIX}"
         minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
