@@ -38,7 +38,46 @@ wild.
 
 ![Flutter Gallery](https://user-images.githubusercontent.com/6655696/73928238-0d7fcc80-48d3-11ea-8a7e-ea7dc5d6e713.png)
 
-## Running Flutter Gallery on Flutter's master channel
+## Features
+
+- Showcase for `material`, `cupertino`, and other widgets
+- [Adaptive layout](lib/layout/adaptive.dart) for mobile and desktop
+- State restoration support
+- Settings to text scaling, text direction, locale, theme, and more...
+- Demo for `animations`
+- Foldable support and demo for `dual_screen`
+- Deferred loading
+- CI/CD
+- ...and much more!
+
+## Supported Platforms
+
+Flutter Gallery has been built to support multiple platforms.
+These include:
+
+- Android ([Google Play Store](https://play.google.com/store/apps/details?id=com.webkrux.gallery), [.apk][latest release])
+- iOS (locally)
+- web ([gallery.flutter.dev](https://gallery.flutter.dev/))
+- macOS ([.zip][latest release])
+- Linux ([.tar.gz][latest release])
+- Windows ([.zip][latest release], [.msix](https://www.microsoft.com/store/productId/9PDWCTDFC7QQ))
+
+## Running
+
+One can run the gallery locally for any of these platforms. For desktop platforms,
+please see the [Flutter docs](https://docs.flutter.dev/desktop) for the latest
+requirements.
+
+```bash
+cd gallery/
+flutter pub get
+flutter run
+```
+
+<details>
+<summary>Troubleshooting</summary>
+
+### Flutter `master` channel
 
 The Flutter Gallery targets Flutter's master channel. As such, it can take advantage
 of new SDK features that haven't landed in the stable channel.
@@ -154,3 +193,45 @@ flutter pub run grinder update-code-segments
     * On a Windows machine, create and upload the Windows build by running `flutter build windows`
        and zipping the contents of `build/windows/release`.
     * Publish the release.
+
+### Run commands:-
+
+1. To build local container:
+
+docker build -t hello-world .
+
+2. To run local container:
+
+docker run --rm -it -p 8080:8080 hello-world
+
+3. Browse at http://<MACHINE_IP>:8080
+
+4. If using CI (drone/circleci/github), run container from shared registry & then browse:
+
+docker pull registry.hub.docker.com/dockerdig/gallery-dev:<ci_used>
+docker run --rm -it -p 8080:8080 registry.hub.docker.com/dockerdig/gallery-dev:<ci_used>
+
+
+
+
+
+
+### Flutter
+## To build/run for various
+bash runner
+
+# For IOS on MacOS (non-docker)
+bash runner clean (to clean all generated files)
+bash runner ios-build (to build, must run this flutter build before building/running in xcode)
+bash runner ios-run (to run in simulator)
+
+# For Android
+bash runner android-build
+bash runner android-run (to run in simulator)
+
+# Use _ops/.env.temp to override _ops/.env properties in local
+# Set USE_DOCKER=false for native MacOS dev
+
+# To bump version - this increases version in pubspec.yaml and ensures incremental builds & deployments with appstore
+bash _ops/utils/bump.sh
+# Tags are used to control ops deployment to testflight/appstore 
