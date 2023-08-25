@@ -29,7 +29,7 @@ INCREMENT=1
 # For Flutter aps
 if [ -f pubspec.yaml ]; then
 	# Find and increment the version number.
-	perl -i -pe "s/^(version:\s+\d+\.\d+\.)(\d+)(\+)(\d+)$/\$1.(\$2+$INCREMENT).\$3.($COMMITS+1)/e" pubspec.yaml
+	perl -i -pe "s/^(version:\s+\d+\.\d+\.)(\d+)(\+)(\d+)/\$1.(\$2+$INCREMENT).\$3.($COMMITS+1)/e" pubspec.yaml
 
 	# Commit and tag this change.
 	version=`grep 'version: ' pubspec.yaml | sed 's/version: //'`
