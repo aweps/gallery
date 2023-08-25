@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -Eeuo pipefail
 if [ "$(echo "${DEBUG:-}" | tr '[:upper:]' '[:lower:]')" = "true" ]; then set -x; fi
@@ -9,12 +9,11 @@ source _ops/utils/env.sh
 # Ensure Flutter on non-docker host
 if [[ "$OSTYPE" == "darwin"* ]]; then
 	source _ops/install.flutter.macos.sh
+else
+	echo "Cannot run simulator in Docker. Need Macos"
+	exit 1
 fi
 
-flutter pub get
-flutter doctor -v
-
-dart analyze ./ --fatal-infos --fatal-warnings
-
+# Run app on device
 if [[ "${DEBUG:-}" == "true" ]]; then VERBOSE_FLAG="-v"; fi
-flutter test ${VERBOSE_FLAG:-} --no-pub ${DART_DEFINES:-}
+flutter run ${VERBOSE_FLAG:-} --${1:-debug} --no-pub ${DART_DEFINES:-}

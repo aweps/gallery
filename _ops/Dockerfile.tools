@@ -1,10 +1,12 @@
-FROM cirrusci/flutter:1.17.2-web as builder
+FROM ghcr.io/cirruslabs/android-sdk:33 AS build-env
 
 USER root
 
 RUN apt-get update && \
-    apt-get install -y gpg-agent && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y curl git wget unzip libgconf-2-4 gdb libstdc++6 libglu1-mesa fonts-droid-fallback lib32stdc++6 python3 gpg-agent
+
+# Install Linux clang dev tools
+RUN apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
 
 # Install Google Chrome
 RUN DEBIAN_FRONTEND=noninteractive \
@@ -15,6 +17,15 @@ RUN DEBIAN_FRONTEND=noninteractive \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-# Upgrade to support web
-RUN flutter channel master && flutter upgrade
-RUN flutter config --enable-web && flutter doctor
+ENV FLUTTER_HOME=/usr/local/flutter
+ENV FLUTTER_ROOT=$FLUTTER_HOME
+ENV FLUTTER_VER=3.10.0
+ENV PATH ${PATH}:${FLUTTER_HOME}/bin:${FLUTTER_HOME}/bin/cache/dart-sdk/bin
+
+RUN git clone https://github.com/flutter/flutter.git ${FLUTTER_HOME} && \
+    cd ${FLUTTER_HOME} && git checkout ${FLUTTER_VER}
+
+#RUN flutter channel stable && flutter upgrade --force
+RUN flutter config --enable-web
+RUN yes | flutter doctor --android-licenses
+RUN flutter doctor -v

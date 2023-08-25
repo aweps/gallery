@@ -1,0 +1,3 @@
+FROM scratch
+
+COPY build/ios/archive/Runner.xcarchive /srv/ios/Runner.xcarchive
