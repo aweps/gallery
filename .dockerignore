@@ -1,0 +1,4 @@
+.cicd
+.git*
+.vscode
+Dockerfile*

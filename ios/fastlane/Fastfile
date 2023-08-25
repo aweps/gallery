@@ -1,0 +1,81 @@
+default_platform(:ios)
+
+# Default temporary keychain password and name, if not included from environment
+TEMP_KEYCHAIN_NAME_DEFAULT = "fastlane_flutter"
+TEMP_KEYCHAN_PASSWORD_DEFAULT = "temppassword"
+
+# Remove the temporary keychain, if it exists
+def delete_temp_keychain(name)
+  delete_keychain(
+    name: name
+  ) if File.exist? File.expand_path("~/Library/Keychains/#{name}-db")
+end
+
+# Create the temporary keychain with name and password
+def create_temp_keychain(name, password)
+  create_keychain(
+    name: name,
+    password: password,
+    unlock: false,
+    timeout: false
+  )
+end
+
+# Ensure we have a fresh, empty temporary keychain
+def ensure_temp_keychain(name, password)
+  delete_temp_keychain(name)
+  create_temp_keychain(name, password)
+end
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    # Ensure that your git status is not dirty
+	# ensure_git_status_clean
+
+	# Increment the build number (not the version number)
+	# Providing the xcodeproj is optional
+	increment_build_number
+
+	keychain_name = ENV['TEMP_KEYCHAIN_NAME'] || TEMP_KEYCHAIN_NAME_DEFAULT
+	keychain_password = ENV['TEMP_KEYCHAIN_PASSWORD'] || TEMP_KEYCHAN_PASSWORD_DEFAULT
+	ensure_temp_keychain(keychain_name, keychain_password)
+
+	match(
+		type: "appstore",
+		readonly: is_ci,
+		keychain_name: keychain_name,
+		keychain_password: keychain_password
+	)
+
+	build_ios_app(
+		workspace: "Runner.xcworkspace",
+		scheme: "Runner",
+		export_method: "app-store"
+	)
+
+	upload_to_testflight(
+		beta_app_feedback_email: ENV["APPLE_ID"],
+		beta_app_description: "Beta version of gallery",
+		demo_account_required: false,
+		notify_external_testers: true,
+		changelog: "Launch & Explore movie listings"
+	)
+
+	delete_temp_keychain(keychain_name)
+
+	# Commit the version bump
+	commit_version_bump(
+		force: true,
+		xcodeproj: "Runner.xcodeproj"
+	)
+
+	# Add a git tag for this build. This will automatically
+	# use an appropriate git tag name
+	add_git_tag
+
+	# Push the new commit and tag back to your git remote
+	push_to_git_remote
+
+  end
+end
