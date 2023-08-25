@@ -48,6 +48,18 @@ void main() async {
   runApp(const GalleryApp());
 }
 
+
+class EnvironmentConfig {
+  static const APP_NAME = String.fromEnvironment(
+    'APP_NAME',
+    defaultValue: 'Missing DartDefine'
+  );
+  static const APP_SUFFIX = String.fromEnvironment(
+    'APP_SUFFIX',
+    defaultValue: 'Missing DartDefine'
+  );
+}
+
 class GalleryApp extends StatelessWidget {
   const GalleryApp({
     super.key,

@@ -73,6 +73,6 @@ class DefaultFirebaseOptions {
     projectId: 'gallery-flutter-dev',
     databaseURL: 'https://gallery-flutter-dev.firebaseio.com',
     storageBucket: 'gallery-flutter-dev.appspot.com',
-    iosBundleId: 'io.flutter.demo.gallery',
+    iosBundleId: 'com.webkrux.gallery',
   );
 }

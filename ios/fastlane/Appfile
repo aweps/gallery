@@ -1,4 +1,0 @@
-team_id("JDTCBWB77A") # Developer Portal Team ID
-app_identifier "com.webkrux.demo.gallery" # The bundle identifier of your app
-apple_id ENV["APPLE_ID"] || "default@company.com" # Your Apple email address
-

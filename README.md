@@ -25,7 +25,7 @@ wild.
 Flutter Gallery has been built to support multiple platforms.
 These include:
 
-- Android ([Google Play Store](https://play.google.com/store/apps/details?id=io.flutter.demo.gallery), [.apk][latest release])
+- Android ([Google Play Store](https://play.google.com/store/apps/details?id=com.webkrux.gallery), [.apk][latest release])
 - iOS (locally)
 - web ([gallery.flutter.dev](https://gallery.flutter.dev/))
 - macOS ([.zip][latest release])
@@ -135,7 +135,7 @@ with a patch should become `1.2.4+010204`.
 
 1. Run GitHub workflow.
 - [Deploy to web](https://github.com/flutter/gallery/actions/workflows/release_deploy_web.yml): Deploys a web build to the Firebase-hosted [staging](https://gallery-flutter-staging.web.app) or [production](https://gallery.flutter.dev) site.
-- [Deploy to Play Store](https://github.com/flutter/gallery/actions/workflows/release_deploy_play_store.yml): Uses Fastlane to create a [beta](https://play.google.com/console/u/0/developers/7661132837216938445/app/4974617875198505129/tracks/open-testing) (freely available on the [Play Store](https://play.google.com/apps/testing/io.flutter.demo.gallery)) or promote an existing beta to [production](https://play.google.com/console/u/0/developers/7661132837216938445/app/4974617875198505129/tracks/production) ([Play Store](https://play.google.com/store/apps/details?id=io.flutter.demo.gallery)).
+- [Deploy to Play Store](https://github.com/flutter/gallery/actions/workflows/release_deploy_play_store.yml): Uses Fastlane to create a [beta](https://play.google.com/console/u/0/developers/7661132837216938445/app/4974617875198505129/tracks/open-testing) (freely available on the [Play Store](https://play.google.com/apps/testing/com.webkrux.gallery)) or promote an existing beta to [production](https://play.google.com/console/u/0/developers/7661132837216938445/app/4974617875198505129/tracks/production) ([Play Store](https://play.google.com/store/apps/details?id=com.webkrux.gallery)).
   > **Note**
   > Once an .aab is created with a particular version number, it can't be replaced. The pubspec version number must be incremented again.
 
@@ -163,3 +163,45 @@ In addition, Flutter itself uses the gallery in tests. To enable breaking change
 - DeviceLab tests: https://github.com/flutter/flutter/blob/master/dev/devicelab/lib/versions/gallery.dart
 
 [latest release]: https://github.com/flutter/gallery/releases/latest
+
+### Run commands:-
+
+1. To build local container:
+
+docker build -t hello-world .
+
+2. To run local container:
+
+docker run --rm -it -p 8080:8080 hello-world
+
+3. Browse at http://<MACHINE_IP>:8080
+
+4. If using CI (drone/circleci/github), run container from shared registry & then browse:
+
+docker pull registry.hub.docker.com/dockerdig/gallery-dev:<ci_used>
+docker run --rm -it -p 8080:8080 registry.hub.docker.com/dockerdig/gallery-dev:<ci_used>
+
+
+
+
+
+
+### Flutter
+## To build/run for various
+bash runner
+
+# For IOS on MacOS (non-docker)
+bash runner clean (to clean all generated files)
+bash runner ios-build (to build, must run this flutter build before building/running in xcode)
+bash runner ios-run (to run in simulator)
+
+# For Android
+bash runner android-build
+bash runner android-run (to run in simulator)
+
+# Use _ops/.env.temp to override _ops/.env properties in local
+# Set USE_DOCKER=false for native MacOS dev
+
+# To bump version - this increases version in pubspec.yaml and ensures incremental builds & deployments with appstore
+bash _ops/utils/bump.sh
+# Tags are used to control ops deployment to testflight/appstore 
