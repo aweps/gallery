@@ -1,0 +1,64 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "gallery:build:ios",
+        "type": "shell",
+        "command": "bash runner ios-build",
+        "group": {
+            "kind": "build",
+            "isDefault": false
+        }
+      },
+      {
+        "label": "gallery:run:ios",
+        "type": "shell",
+        "command": "bash runner ios-run"
+      },
+      {
+        "label": "gallery:build:android",
+        "type": "shell",
+        "command": "bash runner android-build",
+        "group": {
+            "kind": "build",
+            "isDefault": false
+        }
+      },
+      {
+        "label": "gallery:run:android",
+        "type": "shell",
+        "command": "bash runner android-run"
+      },
+      {
+        "label": "gallery:build:web",
+        "type": "shell",
+        "command": "bash runner web-build",
+        "group": {
+            "kind": "build",
+            "isDefault": false
+        }
+      },
+      {
+        "label": "gallery:run:web",
+        "type": "shell",
+        "command": "bash runner web-run"
+      },
+      {
+        "label": "gallery:test",
+        "type": "shell",
+        "command": "bash runner test",
+        "group": {
+            "kind": "test",
+            "isDefault": true
+        }
+      },
+      {
+        "label": "gallery:clean",
+        "type": "shell",
+        "command": "bash runner clean"
+      }
+    ]
+  }
+

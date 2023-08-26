@@ -1,3 +1,11 @@
+// Copyright 2019 The Flutter team. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'package:dual_screen/dual_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
@@ -8,21 +16,47 @@ import 'package:gallery/pages/backdrop.dart';
 import 'package:gallery/pages/splash.dart';
 import 'package:gallery/routes.dart';
 import 'package:gallery/themes/gallery_theme_data.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'firebase_options.dart';
+import 'layout/adaptive.dart';
 
 export 'package:gallery/data/demos.dart' show pumpDeferredLibraries;
 
-void main() {
-  runApp(GalleryApp());
+void main() async {
+  GoogleFonts.config.allowRuntimeFetching = false;
+  await GetStorage.init();
+
+  if (defaultTargetPlatform != TargetPlatform.linux &&
+      defaultTargetPlatform != TargetPlatform.windows &&
+      defaultTargetPlatform != TargetPlatform.macOS) {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    FlutterError.onError = (errorDetails) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+    };
+    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  }
+
+  runApp(const GalleryApp());
 }
+
 
 class EnvironmentConfig {
   static const APP_NAME = String.fromEnvironment(
-    'TMDB_KEY',
-    defaultValue: 'export DART_DEFINES=TMDB_KEY=value,LOOKER=123'
+    'APP_NAME',
+    defaultValue: 'Missing DartDefine'
   );
   static const APP_SUFFIX = String.fromEnvironment(
-      'LOOKER'
+    'APP_SUFFIX',
+    defaultValue: 'Missing DartDefine'
   );
 }
 
@@ -51,6 +85,7 @@ class GalleryApp extends StatelessWidget {
       child: Builder(
         builder: (context) {
           final options = GalleryOptions.of(context);
+          final hasHinge = MediaQuery.of(context).hinge?.bounds != null;
           return MaterialApp(
             restorationScopeId: 'rootGallery',
             title: 'Flutter Gallery',
@@ -73,7 +108,8 @@ class GalleryApp extends StatelessWidget {
               deviceLocale = locales?.first;
               return basicLocaleListResolution(locales, supportedLocales);
             },
-            onGenerateRoute: RouteConfiguration.onGenerateRoute,
+            onGenerateRoute: (settings) =>
+                RouteConfiguration.onGenerateRoute(settings, hasHinge),
           );
         },
       ),
@@ -89,17 +125,11 @@ class RootPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+    return ApplyTextOptions(
+      child: SplashPage(
+        child: Backdrop(
+          isDesktop: isDisplayDesktop(context),
+        ),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it

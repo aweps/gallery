@@ -21,12 +21,12 @@ A new Flutter project.
 Flutter Gallery has been built to support multiple platforms.
 These include:
 
-- Android ([Google Play Store](https://play.google.com/store/apps/details?id=io.flutter.demo.gallery), [.apk][latest release])
+- Android ([Google Play Store](https://play.google.com/store/apps/details?id=com.webkrux.gallery), [.apk][latest release])
 - iOS (locally)
 - web ([gallery.flutter.dev](https://gallery.flutter.dev/))
 - macOS ([.zip][latest release])
 - Linux ([.tar.gz][latest release])
-- Windows ([.zip][latest release])
+- Windows ([.zip][latest release], [.msix](https://www.microsoft.com/store/productId/9PDWCTDFC7QQ))
 
 ## Running
 
@@ -119,27 +119,33 @@ determine how long to display the splash animation at launch.
 
 ## Releasing
 
-<details>
-  <summary>for flutter-hackers members</summary>
+*must be a `flutter-hackers` member*
 
-The process is largely automated and easy to set in motion.
+A set of GitHub workflows are available to help with releasing the Flutter Gallery, one per releasing platform.
 
-First things first, bump the `pubspec.yaml` version number. This can be in a PR making a change or a separate PR.
+1. For Android, download the relevant [Firebase configuration file](https://firebase.corp.google.com/u/0/project/gallery-flutter-dev/settings/general) (e.g. `google-services.json`).
+1. Bump the `pubspec.yaml` version number. This can be in a PR making a change or a separate PR.
 Use [semantic versioning](https://semver.org/) to determine
-which part to increment. The version number after the `+` should also be incremented. For example `1.2.3+010203`
+which part to increment. **The version number after the `+` should also be incremented**. For example `1.2.3+010203`
 with a patch should become `1.2.4+010204`.
 
-Then, use the following workflows. It is strongly recommended to use the staging/beta environments when available, before deploying to production.
-
-- [Deploy to Play Store](https://github.com/flutter/gallery/actions/workflows/release_deploy_play_store.yml): Uses Fastlane to create a [beta](https://play.google.com/console/u/0/developers/7661132837216938445/app/4974617875198505129/tracks/open-testing) (freely available on the [Play Store](https://play.google.com/apps/testing/io.flutter.demo.gallery)), promote an existing beta to production, or publish straight to [production](https://play.google.com/console/u/0/developers/7661132837216938445/app/4974617875198505129/tracks/production) ([Play Store](https://play.google.com/store/apps/details?id=io.flutter.demo.gallery)).
-  > **Note**
-  > Once an .aab is released with a particular version number, it can't be replaced. The version number must be incremented again.
+1. Run GitHub workflow.
 - [Deploy to web](https://github.com/flutter/gallery/actions/workflows/release_deploy_web.yml): Deploys a web build to the Firebase-hosted [staging](https://gallery-flutter-staging.web.app) or [production](https://gallery.flutter.dev) site.
-- [Draft GitHub release](https://github.com/flutter/gallery/actions/workflows/release_draft_github_release.yml): Drafts a GitHub release, including automatically generated release notes and packaged builds for Android, macOS, Linux, and Windows.
+- [Deploy to Play Store](https://github.com/flutter/gallery/actions/workflows/release_deploy_play_store.yml): Uses Fastlane to create a [beta](https://play.google.com/console/u/0/developers/7661132837216938445/app/4974617875198505129/tracks/open-testing) (freely available on the [Play Store](https://play.google.com/apps/testing/com.webkrux.gallery)) or promote an existing beta to [production](https://play.google.com/console/u/0/developers/7661132837216938445/app/4974617875198505129/tracks/production) ([Play Store](https://play.google.com/store/apps/details?id=com.webkrux.gallery)).
   > **Note**
-  > The release draft is private until published. Upon being published, the specified version tag will be created.
+  > Once an .aab is created with a particular version number, it can't be replaced. The pubspec version number must be incremented again.
 
-For posterity, information about doing these things locally is available at [go/flutter-gallery-manual-deployment](http://go/flutter-gallery-manual-deployment).
+- [Draft GitHub release](https://github.com/flutter/gallery/actions/workflows/release_draft_github_release.yml): Drafts a GitHub release, including packaged builds for Android, macOS, Linux, and Windows. Release notes can be automatically generated. The release draft is private until published. Upon being published, the specified version tag will be created.
+- [Publish on Windows Store](): Releasing to the Windows Store.
+  > **Note**
+  > This repository is not currently set up to publish new versions of [the current Windows Store listing](https://www.microsoft.com/store/productId/9PDWCTDFC7QQ). Requires running `msstore init` within the repository and setting repository/environment secrets .
+  > See the instructions in the [documentation](https://docs.flutter.dev/deployment/windows#github-actions-cicd) for more information.
+
+<details>
+  <summary>Escape hatch</summary>
+
+If the above GitHub workflows aren't functional (#759), releasing can be done semi-manually. Since this requires obtaining environment secrets, this can only be done by a Googler. See go/flutter-gallery-manual-deployment.
+
 
 </details>
 
@@ -153,3 +159,45 @@ In addition, Flutter itself uses the gallery in tests. To enable breaking change
 - DeviceLab tests: https://github.com/flutter/flutter/blob/master/dev/devicelab/lib/versions/gallery.dart
 
 [latest release]: https://github.com/flutter/gallery/releases/latest
+
+### Run commands:-
+
+1. To build local container:
+
+docker build -t hello-world .
+
+2. To run local container:
+
+docker run --rm -it -p 8080:8080 hello-world
+
+3. Browse at http://<MACHINE_IP>:8080
+
+4. If using CI (drone/circleci/github), run container from shared registry & then browse:
+
+docker pull registry.hub.docker.com/dockerdig/gallery-dev:<ci_used>
+docker run --rm -it -p 8080:8080 registry.hub.docker.com/dockerdig/gallery-dev:<ci_used>
+
+
+
+
+
+
+### Flutter
+## To build/run for various
+bash runner
+
+# For IOS on MacOS (non-docker)
+bash runner clean (to clean all generated files)
+bash runner ios-build (to build, must run this flutter build before building/running in xcode)
+bash runner ios-run (to run in simulator)
+
+# For Android
+bash runner android-build
+bash runner android-run (to run in simulator)
+
+# Use _ops/.env.temp to override _ops/.env properties in local
+# Set USE_DOCKER=false for native MacOS dev
+
+# To bump version - this increases version in pubspec.yaml and ensures incremental builds & deployments with appstore
+bash _ops/utils/bump.sh
+# Tags are used to control ops deployment to testflight/appstore 
