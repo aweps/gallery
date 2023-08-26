@@ -89,6 +89,15 @@ android {
 
     signingConfigs {
         release {
+            storeFile file("../../_ops/keystore.jks")
+            storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            keyAlias 'upload'
+            keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+        }
+    }
+
+    signingConfigs {
+        release {
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
             storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
