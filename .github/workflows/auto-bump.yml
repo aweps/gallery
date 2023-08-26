@@ -39,4 +39,7 @@ jobs:
         run: |
           if [[ "${GITHUB_EVENT_NAME:-}" == "schedule" ]]; then MSG_PREFIX="Monthly Build: "; fi
           /bin/bash bump ${PREFIX:-mobile} ${SUFFIX:-beta}
+        env:
+          SECRETS_B64_DEV: ${{ secrets.SECRETS_B64_DEV }}
+          SECRETS_B64_PROD: ${{ secrets.SECRETS_B64_PROD }}
 
