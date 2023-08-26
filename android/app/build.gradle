@@ -41,12 +41,6 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
-def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-}
-
 android {
     namespace "com.webkrux.gallery"
     compileSdkVersion flutter.compileSdkVersion
@@ -86,6 +80,15 @@ android {
 
     signingConfigs {
         release {
+            storeFile file("../../_ops/keystore.jks")
+            storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            keyAlias 'upload'
+            keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+        }
+    }
+
+    signingConfigs {
+        release {
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
             storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
@@ -98,9 +101,8 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.release
-            minifyEnabled true
-            shrinkResources true
-            }
+            minifyEnabled false
+            shrinkResources false
         }
     }
 }

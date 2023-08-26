@@ -53,10 +53,6 @@ class _BackdropState extends State<Backdrop> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _iconController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
     _settingsPageFocusNode = FocusNode();
     _isSettingsOpenNotifier = ValueNotifier(false);
     _settingsPage = widget.settingsPage ??
