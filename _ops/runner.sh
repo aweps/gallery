@@ -84,7 +84,7 @@ elif [[ "${1:-}" == "web-run" ]]; then
 		docker build --rm=true --pull=true -t ${APP_SLUG} -f _ops/Dockerfile.web .
 		docker stop ${APP_SLUG} || :
 		docker run --rm --name ${APP_SLUG} -p 8083:8080 -d ${APP_SLUG}
-		echo "Done! - Check in browser - http://<MACHINE_IP>:8080"
+		echo "Done! - Check in browser - http://<MACHINE_IP>:8083"
 	else
 		echo "Missing Docker or Docker use disabled via USE_DOCKER in env file"
 		exit 1

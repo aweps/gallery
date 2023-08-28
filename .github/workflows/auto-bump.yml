@@ -42,4 +42,3 @@ jobs:
         env:
           SECRETS_B64_DEV: ${{ secrets.SECRETS_B64_DEV }}
           SECRETS_B64_PROD: ${{ secrets.SECRETS_B64_PROD }}
-
