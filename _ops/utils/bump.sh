@@ -23,7 +23,7 @@ elif [[ "${SUFFIX:-}" != "" ]]; then
 fi
 
 # Count commits
-COMMITS=$(git rev-list HEAD --count)
+COMMITS=$(git rev-list --count --all)
 INCREMENT=1
 
 # For Flutter aps
