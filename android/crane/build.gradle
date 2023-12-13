@@ -11,7 +11,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "io.flutter.demo.gallery.crane"
+    namespace "com.webkrux.gallery.crane"
     compileSdkVersion 31
 
     compileOptions {

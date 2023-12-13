@@ -1,38 +1,235 @@
-name: Docker
+name: Build Flutter App
 
 on:
   push:
-    branches: [ master ]
+    branches: [main, master, hotfix/*]
+    # Pattern matched against refs/tags
+    tags:
+      - "**" # Push events to every tag including hierarchical tags like v1.0/beta
   pull_request:
-    branches: [ master ]
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      DEBUG:
+        required: true
+        default: "false"
+      WAIT_ON_ERROR:
+        required: true
+        default: "true"
 
 jobs:
-
-  build:
-    name: Build
+  filter:
+    name: Filter builds
     if: |
-      !contains(github.event.head_commit.message, 'ci skip')
-      && !contains(github.event.pull_request.title, 'ci skip')
+      !contains(github.event.head_commit.message, 'ci skip') &&
+      !contains(github.event.pull_request.title, 'ci skip') &&
+      !github.event.pull_request.head.repo.fork
+
     runs-on: ubuntu-latest
+    outputs:
+      skip-ios: "${{ steps.check.outputs.skip-ios }}"
+      skip-android: "${{ steps.check.outputs.skip-android }}"
     steps:
+      - name: Check out code
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
+        with:
+          fetch-depth: 0
 
-    - name: Check out code
-      uses: actions/checkout@v2
+      - name: gate-check
+        id: check
+        run: |
+          set -x
+          # Allow specialized builds on only tagged builds or master builds. For master, check associated tag to allow specific builds. This check happens in the filter job.
+          # Add: Test for tag existance to allow master-only tag-less ios/android builds
+          if [[ "$GITHUB_REF" == "refs/heads/master" || "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_REF" == "refs/heads/hotfix/"* ]] && [[ "$(git describe --tags --exact-match HEAD)" != "mobile/"* ]] && [[ "$(git describe --tags --exact-match HEAD)" != "ios/"* ]]; then
+            echo "skip-ios=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip-ios=false" >> $GITHUB_OUTPUT
+          fi
+          if [[ "$GITHUB_REF" == "refs/heads/master" || "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_REF" == "refs/heads/hotfix/"* ]] && [[ "$(git describe --tags --exact-match HEAD)" != "mobile/"* ]] && [[ "$(git describe --tags --exact-match HEAD)" != "android/"* ]]; then
+            echo "skip-android=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip-android=false" >> $GITHUB_OUTPUT
+          fi
 
-    - name: docker
-      uses: docker://docker
-      with:
-        args: /bin/sh ./build.github.sh
-      env:
-        REGISTRY_ENDPOINT: registry.hub.docker.com
-        REGISTRY_REPO: harmeetg/gallery
-        REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-        REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-        GITHUB_PR_SHA: ${{ github.event.pull_request.head.sha }}
-        DART_DEFINES: ${{ secrets.DART_DEFINES }}
+  build-web:
+    name: Build & package builds for Web
+    if: |
+      always() &&
+      !contains(github.event.head_commit.message, 'ci skip') &&
+      !contains(github.event.pull_request.title, 'ci skip') &&
+      !github.event.pull_request.head.repo.fork
+
+    runs-on: ubuntu-latest
+    env:
+      DEBUG: ${{ github.event.inputs.DEBUG }}
+      WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
+
+      - name: Expose GitHub Runtime for docker buildx to use gha cache
+        uses: crazy-max/ghaction-github-runtime@056b8ec6661ce03a987ab8643a0edc346ae63fe3 #v2.2.0
+
+      - name: docker
+        uses: docker://docker
+        with:
+          args: /bin/sh -c "apk update && apk add bash && /bin/bash _ops/ci.build.sh web"
+        env:
+          SECRETS_B64_DEV: ${{ secrets.SECRETS_B64_DEV }}
+          SECRETS_B64_PROD: ${{ secrets.SECRETS_B64_PROD }}
+          GITHUB_PR_SHA: ${{ github.event.pull_request.head.sha }}
+
+  build-android:
+    needs:
+      - filter
+
+    name: Build & package builds for Android
+    if: |
+      always() &&
+      !contains(github.event.head_commit.message, 'ci skip') &&
+      !contains(github.event.pull_request.title, 'ci skip') &&
+      !github.event.pull_request.head.repo.fork &&
+      (startsWith(github.ref, 'refs/tags/android') || startsWith(github.ref, 'refs/tags/mobile') || startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/hotfix/')) &&
+      needs.filter.outputs.skip-android == 'false'
+
+    runs-on: ubuntu-latest
+    env:
+      DEBUG: ${{ github.event.inputs.DEBUG }}
+      WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
+
+      - name: Expose GitHub Runtime for docker buildx to use gha cache
+        uses: crazy-max/ghaction-github-runtime@056b8ec6661ce03a987ab8643a0edc346ae63fe3 #v2.2.0
+
+      - name: docker
+        uses: docker://docker
+        with:
+          args: /bin/sh -c "apk update && apk add bash && /bin/bash _ops/ci.build.sh android"
+        env:
+          SECRETS_B64_DEV: ${{ secrets.SECRETS_B64_DEV }}
+          SECRETS_B64_PROD: ${{ secrets.SECRETS_B64_PROD }}
+          GITHUB_PR_SHA: ${{ github.event.pull_request.head.sha }}
+
+  build-ios:
+    needs:
+      - filter
+
+    name: Build ios archive
+    if: |
+      !contains(github.event.head_commit.message, 'ci skip') &&
+      !contains(github.event.pull_request.title, 'ci skip') &&
+      !github.event.pull_request.head.repo.fork &&
+      (startsWith(github.ref, 'refs/tags/ios') || startsWith(github.ref, 'refs/tags/mobile') || startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/hotfix/')) &&
+      needs.filter.outputs.skip-ios == 'false'
+
+    runs-on: macos-latest
+    env:
+      DEBUG: ${{ github.event.inputs.DEBUG }}
+      WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
+      FLUTTER_VER: 3.13.1
+    steps:
+      - name: Check out code
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
+
+      - name: Restore Flutter archive
+        id: flutter-cache
+        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 #v3.3.1
+        with:
+          key: flutter-archive-${{ env.FLUTTER_VER }}
+          path: |
+            ~/Flutter/flutter_macos_${{ env.FLUTTER_VER }}-stable.zip
+
+      - name: Restore Flutter dependencies
+        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 #v3.3.1
+        with:
+          path: ~/Flutter/flutter
+          key: ${{ runner.OS }}-flutter-install-cache-${{ env.FLUTTER_VER }}
+
+      - name: build
+        run: /bin/bash runner ios-build release
+        env:
+          SECRETS_B64_DEV: ${{ secrets.SECRETS_B64_DEV }}
+          SECRETS_B64_PROD: ${{ secrets.SECRETS_B64_PROD }}
+          GITHUB_PR_SHA: ${{ github.event.pull_request.head.sha }}
+
+      - name: Cache Flutter archive
+        if: steps.flutter-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 #v3.3.1
+        with:
+          key: flutter-archive-${{ env.FLUTTER_VER }}
+          path: |
+            ~/Flutter/flutter_macos_${{ env.FLUTTER_VER }}-stable.zip
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 #v3.3.1
+        with:
+          path: ~/Flutter/flutter
+          key: ${{ runner.OS }}-flutter-install-cache-${{ env.FLUTTER_VER }}
+
+      - name: Cache ios archive
+        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 #v3.3.1
+        with:
+          key: ios-archive-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.head_ref || github.ref_name }}-${{ github.run_attempt }}
+          path: |
+            ./build/ios/archive/Runner.xcarchive
+
+  package-ios:
+    needs:
+      - build-ios
+
+    name: Package ios archive
+    if: |
+      !contains(github.event.head_commit.message, 'ci skip') &&
+      !contains(github.event.pull_request.title, 'ci skip') &&
+      !github.event.pull_request.head.repo.fork &&
+      (startsWith(github.ref, 'refs/tags/ios') || startsWith(github.ref, 'refs/tags/mobile') || startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/hotfix/')) &&
+      needs.filter.outputs.skip-ios == 'false'
+
+    runs-on: ubuntu-latest
+    env:
+      DEBUG: ${{ github.event.inputs.DEBUG }}
+      WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
+
+      - name: Restore Cache ios archive
+        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 #v3.3.1
+        with:
+          key: ios-archive-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.head_ref || github.ref_name }}-${{ github.run_attempt }}
+          restore-keys: |
+            ios-archive-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.head_ref || github.ref_name }}-
+          path: |
+            ./build/ios/archive/Runner.xcarchive
+          fail-on-cache-miss: true
+
+      - name: Expose GitHub Runtime for docker buildx to use gha cache
+        uses: crazy-max/ghaction-github-runtime@056b8ec6661ce03a987ab8643a0edc346ae63fe3 #v2.2.0
+
+      - name: docker
+        uses: docker://docker
+        with:
+          args: /bin/sh -c "apk update && apk add bash && /bin/bash _ops/ci.build.sh ios"
+        env:
+          SECRETS_B64_DEV: ${{ secrets.SECRETS_B64_DEV }}
+          SECRETS_B64_PROD: ${{ secrets.SECRETS_B64_PROD }}
+          GITHUB_PR_SHA: ${{ github.event.pull_request.head.sha }}
 
   dispatch:
-    needs: build
+    # using always() in this condition causes the job to not be skipped, sort of GA bug, always() check shldn't be needed
+    if: |
+      startsWith(github.ref, 'refs/tags/') &&
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    needs:
+      - build-web
+      - build-android
+      - build-ios
+      - package-ios
     strategy:
       matrix:
         repo: ["slaystack/xops"]
@@ -40,14 +237,12 @@ jobs:
     name: Dispatch
     runs-on: ubuntu-latest
     steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@26b39ed245ab8f31526069329e112ab2fb224588 #v2.1.1
+        with:
+          token: ${{ secrets.PA_TOKEN }}
+          repository: ${{ matrix.repo }}
+          event-type: ops_update
+          client-payload: '{ "app" : "gallery","dependency_type" : "core","github": ${{ tojson(github) }}}'
 
-     - name: Repository Dispatch
-       uses: peter-evans/repository-dispatch@1708dda5703a768a0fb0ef6a7a03a0c3805ebc59
-       with:
-         token: ${{ secrets.PA_TOKEN }}
-         repository: ${{ matrix.repo }}
-         event-type: ops_update
-         client-payload: '{ "app" : "gallery","dependency" : "core","github": ${{ tojson(github) }}}'
-
- #curl -vs --request POST   --url https://api.github.com/repos/slaystack/xops/dispatches   --header "authorization: token ${PA_TOKEN}"   --header 'Accept: application/vnd.github.everest-preview+json'   --header 'content-type: application/json'   --data '{"event_type": "ops_update","client_payload": {"app" : "demo","dependency" : "demo","github" : {"ref": "refs/heads/master","sha": "5e06ae0aa5caa5b4a18adaed27021f0a1cb86e8f","repository": "aweps/demo"}}}'
-
+  #curl -vs --request POST   --url https://api.github.com/repos/slaystack/xops/dispatches   --header "authorization: token ${PA_TOKEN}"   --header 'Accept: application/vnd.github.everest-preview+json'   --header 'content-type: application/json'   --data '{"event_type": "ops_update","client_payload": {"app" : "gallery","dependency" : "core","github" : {"ref": "refs/heads/master","sha": "5e06ae0aa5caa5b4a18adaed27021f0a1cb86e8f","repository": "aweps/flumo"}}}'

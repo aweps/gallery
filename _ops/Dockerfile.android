@@ -1,0 +1,3 @@
+FROM scratch
+
+COPY build/app/outputs/bundle/release/app-release.aab /srv/android/

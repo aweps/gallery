@@ -1,45 +1,53 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -Eeuo pipefail
+if [ "$(echo "${DEBUG:-}" | tr '[:upper:]' '[:lower:]')" = "true" ]; then set -x; fi
 
-mkdir -p ~/.pub-cache
+# Load ENV
+source _ops/utils/env.sh
 
-# Build tools
-if type docker; then
-	(cd _ops && docker build --rm=true --pull=true -t flutter_tools -f Dockerfile.tools .)
+# Ensure Flutter on non-docker host
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	source _ops/install.flutter.macos.sh
 fi
 
-#Build App with tools
-if [[ "${1:-}" == "test" ]]; then
-	docker run -e DART_DEFINES -v ~/.pub-cache:/pub-cache -e PUB_CACHE=/pub-cache -v `pwd`:/src -w /src --rm flutter_tools bash _ops/run.tests.sh
+if [[ "${1:-}" == "web" ]]; then
 
-elif [[ "${1:-}" == "web" ]]; then
-	docker run -e DART_DEFINES -v ~/.pub-cache:/pub-cache -e PUB_CACHE=/pub-cache -v `pwd`:/src -w /src --rm flutter_tools bash _ops/build.web.sh
+	export PATH="$PATH:$PUB_CACHE/bin"
+	#flutter pub global activate webdev
 
-	#Run web
-	docker build --rm=true --pull=true -t gallery -f _ops/Dockerfile.web .
-	docker stop gallery || :
-	docker run --rm --name gallery -p 8083:8080 -d gallery
-	echo "Done! - Check in browser - http://<MACHINE_IP>:8083"
+	# Build application
+	flutter pub get
+	flutter doctor -v
+	if [[ "${DEBUG:-}" == "true" ]]; then VERBOSE_FLAG="-v"; fi
+	flutter build ${VERBOSE_FLAG:-} web --no-pub --base-href ${2} --${3:-release} ${DART_DEFINES:-}
 
 elif [[ "${1:-}" == "android" ]]; then
-	if type docker; then
-		docker run -e DART_DEFINES -v ~/.pub-cache:/pub-cache -e PUB_CACHE=/pub-cache -v `pwd`:/src -w /src --rm flutter_tools bash _ops/build.android.sh
-	else
-		PUB_CACHE=~/.pub-cache bash _ops/build.android.mac.sh
-	fi
+
+	pushd ${GITHUB_WORKSPACE:-.}
+	flutter pub get
+	flutter doctor -v
+	if [[ "${DEBUG:-}" == "true" ]]; then VERBOSE_FLAG="-v"; fi
+	flutter build ${VERBOSE_FLAG:-} appbundle --no-pub --${2:-debug} ${DART_DEFINES:-}
+	popd
 
 elif [[ "${1:-}" == "ios" ]]; then
-	bash _ops/build.ios.sh
 
-elif [[ "${1:-}" == "clean" ]]; then
-	if type docker; then
-		docker run -e DART_DEFINES -v ~/.pub-cache:/pub-cache -e PUB_CACHE=/pub-cache -v `pwd`:/src -w /src --rm flutter_tools bash _ops/clean.sh
-	else
-		PUB_CACHE=~/.pub-cache bash _ops/clean.sh
+	if [[ "$OSTYPE" != "darwin"* ]]; then
+		echo "Need Macos"
+		exit 1
 	fi
 
+	pushd ${GITHUB_WORKSPACE:-.}
+	flutter pub get
+	flutter doctor -v
+	if [[ "${DEBUG:-}" == "true" ]]; then VERBOSE_FLAG="-v"; fi
+	flutter build ${VERBOSE_FLAG:-} ipa --no-pub --${2:-debug} --no-codesign ${DART_DEFINES:-}
+	# "flutter build ios" is used for local application instead of archive above. Maybe useful in future.
+	# Currently, we build xcarchive/ipa to distribute. And "flutter run" to build & run in simulator
+	rm -rf ios/Runner.xcarchive && \cp -rf ./build/ios/archive/Runner.xcarchive ios/
+	popd
+
 else
-	echo "---"
-	echo "Usage:- bash build.sh (web|android|ios|test|clean)"
+    echo "Usage: bash _ops/build.sh web|ios|android"
 fi
