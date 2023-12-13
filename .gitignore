@@ -108,3 +108,4 @@ android/google-play-service-account.json
 .secrets.*
 .cicd/
 keystore.jks
+ios/fastlane/report.xml
