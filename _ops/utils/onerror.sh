@@ -12,6 +12,7 @@ function __errhelper__() {
     echo "--> Reproduce error: NSDEBUG=true bash $0 ${__script_arguments__:-}"
     echo "#####################################################"
 }
+
 function __stacktrace__() {
     set +e
     local frame=1 LINE SUB FILE
@@ -26,6 +27,7 @@ function __stacktrace__() {
 
     rm "$temp_file"  # Clean up the temporary file
 }
+
 function __install_tmate_linux__()
 {
     # Install tmate
@@ -42,6 +44,7 @@ function __install_tmate_linux__()
     ln -fs /usr/local/bin/tmate /usr/bin/tmate
     popd
 }
+
 function __ensure_tmate__() {
 
     if [ $(type /usr/bin/tmate >/dev/null 2>&1; echo $?) = 0 ]; then
@@ -56,19 +59,15 @@ function __ensure_tmate__() {
 
     if [ "$_OS_" = "Darwin" ]; then # Add macOS-specific commands or logic here
         bash -c "su $CURRENT_USER -c 'brew install tmate'" &>/dev/null
-
-    elif [ "$_OS_" = "Linux" ] && [ -f "/etc/centos-release" ]; then # Add CentOS-specific commands or logic here
-        yum -y install wget curl perl &>/dev/null
-        __install_tmate_linux__ &>/dev/null
-
-    elif [ "$_OS_" = "Linux" ] && [ -f "/etc/alpine-release" ]; then # Add Alpine-specific commands or logic here
-        apk add --no-cache wget curl perl &>/dev/null
-        __install_tmate_linux__ &>/dev/null
-
-    elif [ "$_OS_" = "Linux" ] && [ -f "/etc/lsb-release" ]; then
-        distro=$(grep "DISTRIB_ID" /etc/lsb-release | awk -F "=" '{print $2}')
-        if [ "$distro" = "Ubuntu" ]; then # Add Ubuntu-specific commands or logic here
-            apt install wget curl perl &>/dev/null
+    elif [ "$_OS_" = "Linux" ]; then
+        if [ -f "/etc/centos-release" ]; then
+            yum -y install wget curl perl &>/dev/null
+            __install_tmate_linux__ &>/dev/null
+        elif [ -f "/etc/debian_version" ]; then
+            apt update && apt install -y wget curl perl &>/dev/null
+            __install_tmate_linux__ &>/dev/null
+        elif [ -f "/etc/alpine-release" ]; then
+            apk add --no-cache wget curl perl &>/dev/null
             __install_tmate_linux__ &>/dev/null
         else
             echo "Unknown Linux distribution" && exit 1
@@ -77,6 +76,7 @@ function __ensure_tmate__() {
         echo "Unknown or unsupported operating system" && exit 1
     fi
 }
+
 function __exit_handler__() {
     local error_line_number=$1
     local last_status_code=$2
@@ -88,7 +88,6 @@ function __exit_handler__() {
     fi
     #111 status for ctrl-c
     if [[ ! -f /tmp/tm-stop && "$last_status_code" != "0" && "$last_status_code" != "111" && "${NSDEBUG:-}" != "true" && "${DEBUG:-}" == "true" && ${WAIT_ON_ERROR:-} == "true" ]]; then
-
         export NSDEBUG=true && touch /tmp/tm-hol
         export CURRENT_USER=`whoami`
         # Get the operating system name
@@ -106,7 +105,6 @@ function __exit_handler__() {
 
         # Configure tmate
         if [[ "${TMATE_HOST:-}" != "" ]]; then
-
             cat > ~/.tmate.conf <<-EOF
 set -g tmate-server-host ${TMATE_HOST}
 set -g tmate-server-port ${TMATE_PORT}
