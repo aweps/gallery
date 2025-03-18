@@ -64,7 +64,7 @@ function __ensure_tmate__() {
             yum -y install wget curl perl &>/dev/null
             __install_tmate_linux__ &>/dev/null
         elif [ -f "/etc/debian_version" ]; then
-            apt update && apt install -y wget curl perl &>/dev/null
+            apt update &>/dev/null && apt install -y wget curl perl &>/dev/null
             __install_tmate_linux__ &>/dev/null
         elif [ -f "/etc/alpine-release" ]; then
             apk add --no-cache wget curl perl &>/dev/null
@@ -84,7 +84,7 @@ function __exit_handler__() {
     local stacktrace="$(__stacktrace__)"
 
     if [ "$(echo "${DEBUG:-}" | tr '[:upper:]' '[:lower:]')" = "true" ]; then
-        echo -e "${last_status_code}::${NSDEBUG:-null}::${DEBUG:-null}::${WAIT_ON_ERROR:-null}"
+        [ -w /proc/$$/fd/1 ] && echo "${last_status_code}::${NSDEBUG:-null}::${DEBUG:-null}::${WAIT_ON_ERROR:-null}"
     fi
     #111 status for ctrl-c
     if [[ ! -f /tmp/tm-stop && "$last_status_code" != "0" && "$last_status_code" != "111" && "${NSDEBUG:-}" != "true" && "${DEBUG:-}" == "true" && ${WAIT_ON_ERROR:-} == "true" ]]; then
@@ -140,7 +140,7 @@ EOF
 }
 # trap ctrl-c and call __ctrl_c__()
 function __ctrl_c__() {
-    ps ax | grep "tmate -F" | grep -v grep | head -n1 | awk '{print $1;}' | xargs kill || :
+    ps ax | grep "tmate -F" | grep -v grep | head -n1 | awk '{print $1;}' | sudo xargs kill || :
     exec 3>&1- || :
     if [ -f /tmp/tm-step ]; then exit 112; else exit 111; fi
 }
