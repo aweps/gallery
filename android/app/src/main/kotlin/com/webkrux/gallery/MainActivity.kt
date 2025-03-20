@@ -1,6 +1,6 @@
 package com.webkrux.gallery
 
-import io.flutter.embedding.android.FlutterActivity
+import com.webkrux.embedding.android.FlutterActivity
 
 class MainActivity: FlutterActivity() {
 }
