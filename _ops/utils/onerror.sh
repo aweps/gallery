@@ -56,19 +56,15 @@ function __ensure_tmate__() {
 
     if [ "$_OS_" = "Darwin" ]; then # Add macOS-specific commands or logic here
         bash -c "su $CURRENT_USER -c 'brew install tmate'" &>/dev/null
-
-    elif [ "$_OS_" = "Linux" ] && [ -f "/etc/centos-release" ]; then # Add CentOS-specific commands or logic here
-        yum -y install wget curl perl &>/dev/null
-        __install_tmate_linux__ &>/dev/null
-
-    elif [ "$_OS_" = "Linux" ] && [ -f "/etc/alpine-release" ]; then # Add Alpine-specific commands or logic here
-        apk add --no-cache wget curl perl &>/dev/null
-        __install_tmate_linux__ &>/dev/null
-
-    elif [ "$_OS_" = "Linux" ] && [ -f "/etc/lsb-release" ]; then
-        distro=$(grep "DISTRIB_ID" /etc/lsb-release | awk -F "=" '{print $2}')
-        if [ "$distro" = "Ubuntu" ]; then # Add Ubuntu-specific commands or logic here
-            apt install wget curl perl &>/dev/null
+    elif [ "$_OS_" = "Linux" ]; then
+        if [ -f "/etc/centos-release" ]; then
+            yum -y install wget curl perl &>/dev/null
+            __install_tmate_linux__ &>/dev/null
+        elif [ -f "/etc/debian_version" ]; then
+            apt update &>/dev/null && apt install -y wget curl perl &>/dev/null
+            __install_tmate_linux__ &>/dev/null
+        elif [ -f "/etc/alpine-release" ]; then
+            apk add --no-cache wget curl perl &>/dev/null
             __install_tmate_linux__ &>/dev/null
         else
             echo "Unknown Linux distribution" && exit 1
@@ -84,11 +80,10 @@ function __exit_handler__() {
     local stacktrace="$(__stacktrace__)"
 
     if [ "$(echo "${DEBUG:-}" | tr '[:upper:]' '[:lower:]')" = "true" ]; then
-        echo -e "${last_status_code}::${NSDEBUG:-null}::${DEBUG:-null}::${WAIT_ON_ERROR:-null}"
+        [ -w /proc/$$/fd/1 ] && echo "${last_status_code}::${NSDEBUG:-null}::${DEBUG:-null}::${WAIT_ON_ERROR:-null}"
     fi
     #111 status for ctrl-c
     if [[ ! -f /tmp/tm-stop && "$last_status_code" != "0" && "$last_status_code" != "111" && "${NSDEBUG:-}" != "true" && "${DEBUG:-}" == "true" && ${WAIT_ON_ERROR:-} == "true" ]]; then
-
         export NSDEBUG=true && touch /tmp/tm-hol
         export CURRENT_USER=`whoami`
         # Get the operating system name
@@ -106,7 +101,6 @@ function __exit_handler__() {
 
         # Configure tmate
         if [[ "${TMATE_HOST:-}" != "" ]]; then
-
             cat > ~/.tmate.conf <<-EOF
 set -g tmate-server-host ${TMATE_HOST}
 set -g tmate-server-port ${TMATE_PORT}
@@ -142,7 +136,7 @@ EOF
 }
 # trap ctrl-c and call __ctrl_c__()
 function __ctrl_c__() {
-    ps ax | grep "tmate -F" | grep -v grep | head -n1 | awk '{print $1;}' | xargs kill || :
+    ps ax | grep "tmate -F" | grep -v grep | head -n1 | awk '{print $1;}' | sudo xargs kill || :
     exec 3>&1- || :
     if [ -f /tmp/tm-step ]; then exit 112; else exit 111; fi
 }
