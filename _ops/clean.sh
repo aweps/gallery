@@ -17,7 +17,6 @@ flutter clean || :
 rm -rf .cicd
 rm -rf build
 rm -rf _ops/keystore.jks
-rm -rf ios/fastlane/report.xml
 rm -rf android/.gradle
 rm -rf ios/App.*
 rm -rf ios/Runner.xcarchive

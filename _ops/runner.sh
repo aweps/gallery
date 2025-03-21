@@ -109,8 +109,6 @@ elif [[ "${1:-}" == "ios-run" ]]; then
 elif [[ "${1:-}" == "clean" ]]; then
 	if type docker && [ $USE_DOCKER == true ]; then
 		docker run $vars $volumes --rm flutter_tools bash _ops/clean.sh
-		docker stop ${APP_SLUG} || :
-		docker rm ${APP_SLUG} || :
 	else
 		bash _ops/clean.sh
 	fi

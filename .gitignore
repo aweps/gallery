@@ -8,9 +8,6 @@
 .buildlog/
 .history
 .svn/
-.firebase/
-.flutter-plugins-dependencies
-
 
 # IntelliJ related
 *.iml
@@ -41,8 +38,6 @@ app.*.map.json
 .packages
 .pub-cache/
 .pub/
-/build/
-test_goldens/failures/
 build/
 
 # Android related
@@ -72,7 +67,6 @@ build/
 **/ios/**/profile
 **/ios/**/xcuserdata
 **/ios/.generated/
-**/ios/Flutter/.last_build_id
 **/ios/Flutter/App.framework
 **/ios/Flutter/Flutter.framework
 **/ios/Flutter/Flutter.podspec
@@ -91,9 +85,6 @@ build/
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
-**/google-services.json
-**/GoogleService-Info.plist
-
 # End of https://www.toptal.com/developers/gitignore/api/flutter
 
 android/google-play-service-account.json
@@ -108,4 +99,3 @@ android/google-play-service-account.json
 .secrets.*
 .cicd/
 keystore.jks
-ios/fastlane/report.xml
