@@ -136,14 +136,14 @@ jobs:
 
       - name: Restore Flutter archive
         id: flutter-cache
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 #v3.3.1
+        uses: actions/cache@2f8e54208210a422b2efd51efaa6bd6d7ca8920f #v3.4.3
         with:
           key: flutter-archive-${{ env.FLUTTER_VER }}
           path: |
             ~/Flutter/flutter_macos_${{ env.FLUTTER_VER }}-stable.zip
 
       - name: Restore Flutter dependencies
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 #v3.3.1
+        uses: actions/cache@2f8e54208210a422b2efd51efaa6bd6d7ca8920f #v3.4.3
         with:
           path: ~/Flutter/flutter
           key: ${{ runner.OS }}-flutter-install-cache-${{ env.FLUTTER_VER }}
@@ -157,20 +157,20 @@ jobs:
 
       - name: Cache Flutter archive
         if: steps.flutter-cache.outputs.cache-hit != 'true'
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 #v3.3.1
+        uses: actions/cache@2f8e54208210a422b2efd51efaa6bd6d7ca8920f #v3.4.3
         with:
           key: flutter-archive-${{ env.FLUTTER_VER }}
           path: |
             ~/Flutter/flutter_macos_${{ env.FLUTTER_VER }}-stable.zip
 
       - name: Cache Flutter dependencies
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 #v3.3.1
+        uses: actions/cache@2f8e54208210a422b2efd51efaa6bd6d7ca8920f #v3.4.3
         with:
           path: ~/Flutter/flutter
           key: ${{ runner.OS }}-flutter-install-cache-${{ env.FLUTTER_VER }}
 
       - name: Cache ios archive
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 #v3.3.1
+        uses: actions/cache@2f8e54208210a422b2efd51efaa6bd6d7ca8920f #v3.4.3
         with:
           key: ios-archive-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.head_ref || github.ref_name }}-${{ github.run_attempt }}
           path: |
@@ -197,7 +197,7 @@ jobs:
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
 
       - name: Restore Cache ios archive
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 #v3.3.1
+        uses: actions/cache@2f8e54208210a422b2efd51efaa6bd6d7ca8920f #v3.4.3
         with:
           key: ios-archive-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.head_ref || github.ref_name }}-${{ github.run_attempt }}
           restore-keys: |
