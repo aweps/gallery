@@ -12,6 +12,7 @@ function __errhelper__() {
     echo "--> Reproduce error: NSDEBUG=true bash $0 ${__script_arguments__:-}"
     echo "#####################################################"
 }
+
 function __stacktrace__() {
     set +e
     local frame=1 LINE SUB FILE
@@ -26,6 +27,7 @@ function __stacktrace__() {
 
     rm "$temp_file"  # Clean up the temporary file
 }
+
 function __install_tmate_linux__()
 {
     # Install tmate
@@ -42,6 +44,7 @@ function __install_tmate_linux__()
     ln -fs /usr/local/bin/tmate /usr/bin/tmate
     popd
 }
+
 function __ensure_tmate__() {
 
     if [ $(type /usr/bin/tmate >/dev/null 2>&1; echo $?) = 0 ]; then
@@ -73,6 +76,7 @@ function __ensure_tmate__() {
         echo "Unknown or unsupported operating system" && exit 1
     fi
 }
+
 function __exit_handler__() {
     local error_line_number=$1
     local last_status_code=$2
