@@ -6,7 +6,7 @@ if [ "$(echo "${DEBUG:-}" | tr '[:upper:]' '[:lower:]')" = "true" ]; then set -x
 # Load ENV
 source _ops/utils/env.sh
 
-# Check if this script is running on Macos 
+# Check if this script is running on Macos
 if [[ "$OSTYPE" == "darwin"* ]]; then
 	# Ensure Flutter on non-docker host
 	source _ops/install.flutter.macos.sh
@@ -16,7 +16,9 @@ else
 		echo "Need to run under docker under linux. set USE_DOCKER"
 		exit 1
 	fi
-	flutter precache --android
+	if command -v flutter &> /dev/null; then
+		flutter precache --android
+	fi	
 fi
 
 if [[ "${1:-}" == "web" ]]; then
