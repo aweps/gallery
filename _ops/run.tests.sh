@@ -6,9 +6,16 @@ if [ "$(echo "${DEBUG:-}" | tr '[:upper:]' '[:lower:]')" = "true" ]; then set -x
 # Load ENV
 source _ops/utils/env.sh
 
-# Ensure Flutter on non-docker host
+# Check if this script is running on Macos 
 if [[ "$OSTYPE" == "darwin"* ]]; then
+	# Ensure Flutter on non-docker host
 	source _ops/install.flutter.macos.sh
+else
+	# Check if not running under docker
+	if [[ "${USE_DOCKER:-}" != "true" ]]; then
+		echo "Need to run under docker under linux. set USE_DOCKER"
+		exit 1
+	fi
 fi
 
 flutter pub get

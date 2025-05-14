@@ -1,31 +1,90 @@
-FROM ghcr.io/cirruslabs/android-sdk:33 AS build-env
+FROM --platform=$BUILDPLATFORM ubuntu:24.04 AS build-env
 
-USER root
+ARG TARGETPLATFORM
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && \
-    apt-get install -y curl git wget unzip libgconf-2-4 gdb libstdc++6 libglu1-mesa fonts-droid-fallback lib32stdc++6 python3 gpg-agent
-
-# Install Linux clang dev tools
-RUN apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
-
-# Install Google Chrome
-RUN DEBIAN_FRONTEND=noninteractive \
- && echo 'deb http://dl.google.com/linux/chrome/deb stable main' >> /etc/apt/sources.list.d/google-chrome.list \
- && curl -fL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
- && apt-get update \
- && apt-get install --no-install-recommends -y -q google-chrome-stable \
- && apt-get clean \
+# Install base packages
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    ca-certificates \
+    git \
+    wget \
+    unzip \
+    gdb \
+    libglu1-mesa \
+    fonts-noto \
+    python3 \
+    gpg-agent \
+    clang \
+    cmake \
+    ninja-build \
+    pkg-config \
+    libgtk-3-dev \
+    liblzma-dev \
+    openjdk-17-jdk \
  && rm -rf /var/lib/apt/lists/*
 
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+    apt-get update && apt-get install -y \
+    lib32stdc++6 \
+    && rm -rf /var/lib/apt/lists/*; \
+else \
+    echo "Skipping lib32stdc++6 on non-amd64 build platform"; \
+fi
+
+# Install browser based on arch
+RUN case "$(uname -m)" in \
+      x86_64) \
+        curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg && \
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
+        apt-get update && apt-get install -y google-chrome-stable; \
+        ln -s /usr/bin/google-chrome /usr/bin/chrome; \
+        ;; \
+      aarch64) \
+        apt-get update && apt-get install -y chromium-browser; \
+        ln -s /usr/bin/chromium-browser /usr/bin/chrome; \
+        ;; \
+    esac \
+ && rm -rf /var/lib/apt/lists/*
+
+ # Make Chrome path discoverable to Flutter
+ENV CHROME_EXECUTABLE=/usr/bin/chrome
+
+# Set Android SDK path
+ENV ANDROID_HOME=/root/Library/Android/sdk
+ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+
+# Install Android SDK cmdline-tools (latest)
+RUN mkdir -p $ANDROID_HOME/cmdline-tools \
+ && curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o /tmp/tools.zip \
+ && unzip /tmp/tools.zip -d /tmp/cmdline-tools \
+ && mv /tmp/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest \
+ && rm -rf /tmp/tools.zip /tmp/cmdline-tools
+
+RUN yes | sdkmanager --licenses \
+ && sdkmanager \
+     "platform-tools" \
+     "platforms;android-35" \
+     "build-tools;35.0.0" \
+     "ndk;27.0.12077973"
+
+# Install Flutter
 ENV FLUTTER_HOME=/usr/local/flutter
 ENV FLUTTER_ROOT=$FLUTTER_HOME
-ENV FLUTTER_VER=3.13.1
-ENV PATH ${PATH}:${FLUTTER_HOME}/bin:${FLUTTER_HOME}/bin/cache/dart-sdk/bin
+ENV FLUTTER_GIT_URL=https://github.com/flutter/flutter.git
+ENV FLUTTER_VER=3.29.2
+ENV PATH=${PATH}:${FLUTTER_HOME}/bin:${FLUTTER_HOME}/bin/cache/dart-sdk/bin
 
-RUN git clone https://github.com/flutter/flutter.git ${FLUTTER_HOME} && \
-    cd ${FLUTTER_HOME} && git checkout ${FLUTTER_VER}
+RUN git clone ${FLUTTER_GIT_URL} ${FLUTTER_HOME}
 
-#RUN flutter channel stable && flutter upgrade --force
-RUN flutter config --enable-web
-RUN yes | flutter doctor --android-licenses
-RUN flutter doctor -v
+RUN cd ${FLUTTER_HOME} && git checkout ${FLUTTER_VER} \
+ && flutter config --enable-web \
+ && yes | flutter doctor --android-licenses
+
+RUN flutter precache --android --force \
+ && flutter doctor -v
+
+
+
+
