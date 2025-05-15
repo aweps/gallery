@@ -125,12 +125,18 @@ jobs:
       (startsWith(github.ref, 'refs/tags/ios') || startsWith(github.ref, 'refs/tags/mobile') || startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/hotfix/')) &&
       needs.filter.outputs.skip-ios == 'false'
 
-    runs-on: macos-latest
+    runs-on: macos-15
     env:
       DEBUG: ${{ github.event.inputs.DEBUG }}
       WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
       FLUTTER_VER: 3.13.1
     steps:
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode.app #Xcode_16.3.app
+
+      - name: Verify Xcode version
+        run: xcodebuild -version
+
       - name: Check out code
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
 
