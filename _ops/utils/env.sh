@@ -107,8 +107,9 @@ fi
 # Load local env
 if [[ "$GIT_BRANCH_REF" == "local" ]]; then
     if [[ `git config user.name` != "" ]]; then
+        export GIT_USER=$(git config user.name)
         echo "TARGET_USR=u$((git config user.name || :) | md5sum | cut -f1 -d' ' | fold -w8 | head -n1)" >> $ENV_FILE2
-    else
+    elif [[ "${GIT_USER:-}" == "" ]]; then
         set +x
         echo 'Missing git user. Set using :- git config --global user.name "John Doe"'
         exit

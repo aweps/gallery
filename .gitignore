@@ -5,15 +5,15 @@
 *.swp
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
-.firebase/
-.flutter-plugins-dependencies
-
+.swiftpm/
+migrate_working_dir/
 
 # IntelliJ related
-*.iml
+#*.iml
 *.ipr
 *.iws
 .idea/
@@ -35,16 +35,25 @@ app.*.map.json
 ### Flutter ###
 # Flutter/Dart/Pub related
 **/doc/api/
+**/ios/Flutter/.last_build_id
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
 .packages
 .pub-cache/
 .pub/
-/build/
-test_goldens/failures/
 build/
 
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
 # Android related
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
@@ -53,7 +62,7 @@ build/
 **/android/gradlew.bat
 **/android/key.properties
 **/android/local.properties
-**/android/**/GeneratedPluginRegistrant.java
+**/android/**/GeneratedPluginRegistrant.*
 
 # iOS/XCode related
 **/ios/**/*.mode1v3
@@ -72,7 +81,6 @@ build/
 **/ios/**/profile
 **/ios/**/xcuserdata
 **/ios/.generated/
-**/ios/Flutter/.last_build_id
 **/ios/Flutter/App.framework
 **/ios/Flutter/Flutter.framework
 **/ios/Flutter/Flutter.podspec
@@ -83,6 +91,7 @@ build/
 **/ios/Flutter/flutter_export_environment.sh
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
+**/macos/**/GeneratedPluginRegistrant.*
 
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3
@@ -90,9 +99,6 @@ build/
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
-
-**/google-services.json
-**/GoogleService-Info.plist
 
 # End of https://www.toptal.com/developers/gitignore/api/flutter
 
@@ -108,4 +114,3 @@ android/google-play-service-account.json
 .secrets.*
 .cicd/
 keystore.jks
-ios/fastlane/report.xml

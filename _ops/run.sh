@@ -10,10 +10,21 @@ source _ops/utils/env.sh
 if [[ "$OSTYPE" == "darwin"* ]]; then
 	source _ops/install.flutter.macos.sh
 else
-	echo "Cannot run simulator in Docker. Need Macos"
-	exit 1
+	# Check if not running under docker
+	if [[ "${USE_DOCKER:-}" != "true" ]]; then
+		echo "Need to run under docker under linux. set USE_DOCKER"
+		exit 1
+	else
+		echo "Cannot run simulator inside Docker. Need Macos"
+		exit 1
+	fi
+fi	
+
+if [[ "${1:-}" == "android" ]]; then
+	# Add support for unique Application ID
+	export DART_DEFINES="${DART_DEFINES//=gallery/=gallery01}"
 fi
 
 # Run app on device
 if [[ "${DEBUG:-}" == "true" ]]; then VERBOSE_FLAG="-v"; fi
-flutter run ${VERBOSE_FLAG:-} --${1:-debug} --no-pub ${DART_DEFINES:-}
+flutter run ${VERBOSE_FLAG:-} --${2:-debug} --no-pub ${DART_DEFINES:-}

@@ -2,12 +2,13 @@
 FROM alpine:3.12.0
 
 RUN apk add --no-cache openssh-client tar curl
-RUN curl --silent -o - "https://caddyserver.com/api/download?os=linux&arch=amd64" > /usr/bin/caddy
-RUN chmod 0755 /usr/bin/caddy
+RUN curl -L "https://github.com/caddyserver/caddy/releases/download/v2.9.1/caddy_2.9.1_linux_amd64.tar.gz" \
+    | tar -xz -C /usr/local/bin/ --wildcards --no-anchored caddy && \
+    chmod +x /usr/local/bin/caddy
 
 COPY build/web /srv/www/
 COPY _ops/Caddyfile /etc/
 
 EXPOSE 80 443
 WORKDIR /srv/www
-ENTRYPOINT ["/usr/bin/caddy","run","--config","/etc/Caddyfile"]
+ENTRYPOINT ["/usr/local/bin/caddy","run","--config","/etc/Caddyfile"]

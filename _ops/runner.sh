@@ -10,6 +10,19 @@ source _ops/utils/env.sh
 if [[ "$OSTYPE" == "darwin"* ]] && [[ "${RUNNER_WORKSPACE:-}" != "" ]]; then
 	export USE_DOCKER=false
 fi
+# Check if docker is running
+if [ $USE_DOCKER == true ]; then
+	# check if docker installed
+	if ! type docker > /dev/null; then
+		echo "Docker is not installed but USE_DOCKER is set to true"
+		exit 1
+	fi
+	docker ps > /dev/null
+	if [ $? -ne 0 ]; then
+		echo "Docker is not running but USE_DOCKER is set to true"
+		exit 1
+	fi
+fi
 
 APP_SLUG=gallery
 mkdir -p $PUB_CACHE $GRADLE_CACHE
@@ -19,7 +32,7 @@ if type docker && [ $USE_DOCKER == true ]; then
 
 	# Shared vars
 	SRC_DIR=`pwd`
-	vars='-e DEBUG -e NSDEBUG -e WAIT_ON_ERROR -e SECRETS_B64 -e GIT_BRANCH_REF'
+	vars='-e DEBUG -e NSDEBUG -e WAIT_ON_ERROR -e SECRETS_B64 -e GIT_BRANCH_REF -e GIT_USER'
 
 	if [[ "${RUNNER_WORKSPACE:-}" != "" ]]; then
 		SRC_DIR=${RUNNER_WORKSPACE}/${APP_SLUG}
@@ -46,6 +59,8 @@ fi
 # Build tools
 if type docker && [ $USE_DOCKER == true ]; then
 
+	PLATFORM=linux/$(docker version --format '{{.Server.Arch}}')
+
 	# Build flutter_tool
 	pushd _ops
 	BUILDX_CMD="build"
@@ -53,21 +68,21 @@ if type docker && [ $USE_DOCKER == true ]; then
 		docker buildx inspect builder-main || docker buildx create --name builder-main --use --driver=docker-container
 		BUILDX_CMD="buildx build --load --cache-to type=gha,mode=max --cache-from type=gha --progress=plain"
 	fi
-	docker $BUILDX_CMD -t flutter_tools -f Dockerfile.tools .
+	docker $BUILDX_CMD --platform $PLATFORM -t flutter_tools -f Dockerfile.tools .
 	popd
 fi
 
 #Build App with tools
 if [[ "${1:-}" == "test" ]]; then
 	if type docker && [ $USE_DOCKER == true ]; then
-		docker run $vars $volumes --rm flutter_tools bash _ops/run.tests.sh
+		docker run --platform $PLATFORM $vars $volumes --rm flutter_tools bash _ops/run.tests.sh
 	else
 		bash _ops/run.tests.sh
 	fi
 
 elif [[ "${1:-}" == "web-build" ]]; then
 	if type docker && [ $USE_DOCKER == true ]; then
-		docker run $vars $volumes --rm flutter_tools bash _ops/build.sh web ${APP_ROOT:-}/ ${2:-}
+		docker run --platform $PLATFORM $vars $volumes --rm flutter_tools bash _ops/build.sh web ${APP_ROOT:-}/ ${2:-}
 
 		#Build web
 		docker build --rm=true --pull=true -t ${APP_SLUG}${3:-} -f _ops/Dockerfile.web .
@@ -78,12 +93,12 @@ elif [[ "${1:-}" == "web-build" ]]; then
 
 elif [[ "${1:-}" == "web-run" ]]; then
 	if type docker && [ $USE_DOCKER == true ]; then
-		docker run $vars $volumes --rm flutter_tools bash _ops/build.sh web ${APP_ROOT:-}/ ${2:-}
+		docker run --platform $PLATFORM $vars $volumes --rm flutter_tools bash _ops/build.sh web ${APP_ROOT:-}/ ${2:-}
 
 		#Run web
 		docker build --rm=true --pull=true -t ${APP_SLUG} -f _ops/Dockerfile.web .
 		docker stop ${APP_SLUG} || :
-		docker run --rm --name ${APP_SLUG} -p 8083:8080 -d ${APP_SLUG}
+		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p 8083:8080 -d ${APP_SLUG}
 		echo "Done! - Check in browser - http://<MACHINE_IP>:8083"
 	else
 		echo "Missing Docker or Docker use disabled via USE_DOCKER in env file"
@@ -92,25 +107,24 @@ elif [[ "${1:-}" == "web-run" ]]; then
 
 elif [[ "${1:-}" == "android-build" ]]; then
 	if type docker && [ $USE_DOCKER == true ]; then
-		docker run $vars $volumes --rm flutter_tools bash _ops/build.sh android ${2:-}
+		#TODO: This currently fails on Apple Silicon
+		docker run --platform $PLATFORM $vars $volumes --rm flutter_tools bash _ops/build.sh android ${2:-}
 	else
 		bash _ops/build.sh android ${2:-}
 	fi
 
 elif [[ "${1:-}" == "android-run" ]]; then
-	bash _ops/run.sh ${2:-}
+	bash _ops/run.sh android ${2:-}
 
 elif [[ "${1:-}" == "ios-build" ]]; then
 	bash _ops/build.sh ios ${2:-}
 
 elif [[ "${1:-}" == "ios-run" ]]; then
-	bash _ops/run.sh ${2:-}
+	bash _ops/run.sh ios ${2:-}
 
 elif [[ "${1:-}" == "clean" ]]; then
 	if type docker && [ $USE_DOCKER == true ]; then
-		docker run $vars $volumes --rm flutter_tools bash _ops/clean.sh
-		docker stop ${APP_SLUG} || :
-		docker rm ${APP_SLUG} || :
+		docker run --platform $PLATFORM $vars $volumes --rm flutter_tools bash _ops/clean.sh
 	else
 		bash _ops/clean.sh
 	fi
