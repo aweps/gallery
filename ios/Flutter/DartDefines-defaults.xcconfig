@@ -1,2 +1,3 @@
 APP_NAME=GalleryApp
+// If needed, updated application id herefor ios -> APP_SUFFIX=gallery01
 APP_SUFFIX=gallery
