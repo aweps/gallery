@@ -265,18 +265,68 @@ docker run --rm -it -p 8080:8080 registry.hub.docker.com/dockerdig/gallery-dev:<
 ## To build/run for various
 bash runner
 
-# For IOS on MacOS (non-docker)
-bash runner clean (to clean all generated files)
-bash runner ios-build (to build, must run this flutter build before building/running in xcode)
-bash runner ios-run (to run in simulator)
+### iOS (MacOS, Non-Docker)
 
-# For Android
-bash runner android-build
-bash runner android-run (to run in simulator)
+1. **Clean generated files:**
+   ```bash
+   bash runner clean
+   ```
 
-# Use _ops/.env.temp to override _ops/.env properties in local
-# Set USE_DOCKER=false for native MacOS dev
+2. **Build for iOS:**
+   ```bash
+   bash runner ios-build
+   ```
 
-# To bump version - this increases version in pubspec.yaml and ensures incremental builds & deployments with appstore
-bash _ops/utils/bump.sh
-# Tags are used to control ops deployment to testflight/appstore 
+3. **Run on iOS simulator:**
+   ```bash
+   bash runner ios-run
+   ```
+
+### Android
+
+1. **Build for Android:**
+   ```bash
+   bash runner android-build
+   ```
+
+2. **Run on Android simulator:**
+   ```bash
+   bash runner android-run
+   ```
+
+---
+
+## Additional Notes
+
+- Use `_ops/.env.temp` to override `_ops/.env` properties locally.
+- Set `USE_DOCKER=false` for native MacOS development.
+
+### Version Management
+
+- **Bump version:** Increment the version in `pubspec.yaml` for incremental builds and deployments:
+  ```bash
+  bash _ops/utils/bump.sh
+# Tags are used to control ops deployment to testflight/appstore
+  ```
+
+### Update Mac environment
+brew update
+brew upgrade
+brew install cocoapods
+which ruby && ruby -v
+# make sure ruby is brew version else,
+brew link ruby
+~/flutter/flutter/bin/flutter upgrade
+gem update
+# find Podfiles and update in those folders
+find ./ -type f -name Podfile
+pod update
+# find Gemfiles and bundle update in those folders
+find ./ -type f -name Gemfile
+bundle update
+### upgrade flutter
+export FLUTTER_HOME=$HOME/flutter/flutter/bin
+$FLUTTER_HOME/flutter upgrade
+### upgrade android
+export ANDROID_HOME=$HOME/Library/Android/sdk/cmdline-tools/latest/bin
+$ANDROID_HOME/sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;27.0.12077973"
