@@ -239,31 +239,47 @@ flutter pub run grinder update-code-segments
        and zipping the contents of `build/windows/release`.
     * Publish the release.
 
-### Run commands:-
-
-1. To build local container:
-
-docker build -t hello-world .
-
-2. To run local container:
-
-docker run --rm -it -p 8080:8080 hello-world
-
-3. Browse at http://<MACHINE_IP>:8080
-
-4. If using CI (drone/circleci/github), run container from shared registry & then browse:
-
-docker pull registry.hub.docker.com/dockerdig/gallery-dev:<ci_used>
-docker run --rm -it -p 8080:8080 registry.hub.docker.com/dockerdig/gallery-dev:<ci_used>
 
 
+## Run Commands
 
+### Local Development
 
+1. **Build the local container:**
+   ```bash
+   docker build -t hello-world .
+   ```
 
+2. **Run the local container:**
+   ```bash
+   docker run --rm -it -p 8083:8080 hello-world
+   ```
 
-### Flutter
-## To build/run for various
+3. **Access the application:**
+   Browse at `http://<MACHINE_IP>:8083`
+
+### CI/CD (Drone/CircleCI/GitHub)
+
+1. **Pull the container from the shared registry:**
+   ```bash
+   docker pull registry.hub.docker.com/dockerdig/gallery-dev:<ci_used>
+   ```
+
+2. **Run the container:**
+   ```bash
+   docker run --rm -it -p 8083:8080 registry.hub.docker.com/dockerdig/gallery-dev:<ci_used>
+   ```
+
+---
+
+## Flutter Commands
+
+### General
+
+Run the `runner` script for various tasks:
+```bash
 bash runner
+```
 
 ### iOS (MacOS, Non-Docker)
 
@@ -330,3 +346,4 @@ $FLUTTER_HOME/flutter upgrade
 ### upgrade android
 export ANDROID_HOME=$HOME/Library/Android/sdk/cmdline-tools/latest/bin
 $ANDROID_HOME/sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;27.0.12077973"
+
