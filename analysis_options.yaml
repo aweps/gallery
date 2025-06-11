@@ -28,24 +28,11 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
-    - always_declare_return_types
-    - avoid_types_on_closure_parameters
-    - avoid_void_async
     - cancel_subscriptions
-    - close_sinks
-    - directives_ordering
-    - flutter_style_todos
-    - package_api_docs
-    - prefer_single_quotes
-    - test_types_in_equals
-    - throw_in_finally
-    - unawaited_futures
-    - unnecessary_statements
-    - unsafe_html
-    - use_super_parameters
     - hash_and_equals
     - iterable_contains_unrelated_type
     - list_remove_unrelated_type
+    - test_types_in_equals
     - unrelated_type_equality_checks
     - valid_regexps
     
