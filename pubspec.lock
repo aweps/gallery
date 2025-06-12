@@ -134,7 +134,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "1d0763c38714ae93fbb1bb7e20b1a0214b14f929"
+      resolved-ref: "4e5b6a7192fc233afc0b3e54972df56a0bbd4d99"
       url: "https://github.com/genx7up/flutter-dualscreen"
     source: git
     version: "1.0.4"

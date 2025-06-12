@@ -1,5 +1,7 @@
-import java.util.Properties
 import java.io.FileInputStream
+import java.util.Base64
+import java.util.Properties
+import java.io.FileNotFoundException
 
 plugins {
     id("com.android.dynamic-feature")
@@ -38,8 +40,10 @@ android {
     defaultConfig {
         minSdk = 21
     }
+
 }
 
 dependencies {
     implementation(project(":app"))
 }
+
