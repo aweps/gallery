@@ -362,7 +362,8 @@ class _CraneAppBarState extends State<CraneAppBar> {
                     labelStyle: Theme.of(context).textTheme.labelLarge,
                     labelColor: cranePrimaryWhite,
                     physics: const BouncingScrollPhysics(),
-                    unselectedLabelColor: cranePrimaryWhite.withOpacity(.6),
+                    unselectedLabelColor:
+                        cranePrimaryWhite.withValues(alpha: .6),
                     onTap: (index) => widget.tabController.animateTo(
                       index,
                       duration: const Duration(milliseconds: 300),

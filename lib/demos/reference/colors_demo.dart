@@ -153,7 +153,7 @@ class _ColorItem extends StatelessWidget {
   final String prefix;
 
   String get _colorString =>
-      "#${color.value.toRadixString(16).padLeft(8, '0').toUpperCase()}";
+      "#${color.toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()}";
 
   @override
   Widget build(BuildContext context) {

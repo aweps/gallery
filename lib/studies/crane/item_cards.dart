@@ -79,7 +79,7 @@ class DestinationCard extends StatelessWidget {
 
     return HighlightFocus(
       debugLabel: 'DestinationCard: ${destination.destination}',
-      highlightColor: Colors.red.withOpacity(0.1),
+      highlightColor: Colors.red.withValues(alpha: 0.1),
       onPressed: () {},
       child: card,
     );
@@ -110,7 +110,7 @@ class _DestinationImage extends StatelessWidget {
           height: isDesktop ? null : mobileThumbnailSize,
           placeholder: LayoutBuilder(builder: (context, constraints) {
             return Container(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               width: constraints.maxWidth,
               height: constraints.maxWidth / destination.imageAspectRatio,
             );

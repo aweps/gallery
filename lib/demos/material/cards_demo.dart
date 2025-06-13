@@ -140,8 +140,10 @@ class TappableTravelDestinationItem extends StatelessWidget {
                 child: InkWell(
                   onTap: () {},
                   // Generally, material cards use onSurface with 12% opacity for the pressed state.
-                  splashColor:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                  splashColor: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.12),
                   // Generally, material cards do not have a highlight overlay.
                   highlightColor: Colors.transparent,
                   child: Semantics(
@@ -201,7 +203,7 @@ class SelectableTravelDestinationItem extends StatelessWidget {
                     onSelected();
                   },
                   // Generally, material cards use onSurface with 12% opacity for the pressed state.
-                  splashColor: colorScheme.onSurface.withOpacity(0.12),
+                  splashColor: colorScheme.onSurface.withValues(alpha: 0.12),
                   // Generally, material cards do not have a highlight overlay.
                   highlightColor: Colors.transparent,
                   child: Stack(
@@ -210,7 +212,7 @@ class SelectableTravelDestinationItem extends StatelessWidget {
                         color: isSelected
                             // Generally, material cards use primary with 8% opacity for the selected state.
                             // See: https://material.io/design/interaction/states.html#anatomy
-                            ? colorScheme.primary.withOpacity(0.08)
+                            ? colorScheme.primary.withValues(alpha: 0.08)
                             : Colors.transparent,
                       ),
                       Semantics(

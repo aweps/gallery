@@ -69,7 +69,7 @@ class HorizontalArticlePreview extends StatelessWidget {
         FadeInImagePlaceholder(
           image: AssetImage(data.imageUrl, package: 'flutter_gallery_assets'),
           placeholder: Container(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             width: 64 / (1 / data.imageAspectRatio),
             height: 64,
           ),
@@ -113,7 +113,7 @@ class VerticalArticlePreview extends StatelessWidget {
               ),
               placeholder: LayoutBuilder(builder: (context, constraints) {
                 return Container(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   width: constraints.maxWidth,
                   height: constraints.maxWidth / data.imageAspectRatio,
                 );
@@ -150,12 +150,12 @@ List<Widget> buildArticlePreviewItems(BuildContext context) {
   final localizations = GalleryLocalizations.of(context)!;
   Widget articleDivider = Container(
     margin: const EdgeInsets.symmetric(vertical: 16),
-    color: Colors.black.withOpacity(0.07),
+    color: Colors.black.withValues(alpha: 0.07),
     height: 1,
   );
   Widget sectionDivider = Container(
     margin: const EdgeInsets.symmetric(vertical: 16),
-    color: Colors.black.withOpacity(0.2),
+    color: Colors.black.withValues(alpha: 0.2),
     height: 1,
   );
   final textTheme = Theme.of(context).textTheme;
@@ -234,7 +234,7 @@ class HashtagBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final verticalDivider = Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.black.withOpacity(0.1),
+      color: Colors.black.withValues(alpha: 0.1),
       width: 1,
     );
     final textTheme = Theme.of(context).textTheme;
@@ -397,7 +397,7 @@ class StockItem extends StatelessWidget {
               child: SelectableText(
                 price,
                 style: textTheme.titleSmall!.copyWith(
-                  color: textTheme.titleSmall!.color!.withOpacity(0.75),
+                  color: textTheme.titleSmall!.color!.withValues(alpha: 0.75),
                 ),
               ),
             ),
@@ -415,7 +415,7 @@ class StockItem extends StatelessWidget {
               percentFormat.format(percent.abs() / 100),
               style: textTheme.bodySmall!.copyWith(
                 fontSize: 12,
-                color: textTheme.titleSmall!.color!.withOpacity(0.75),
+                color: textTheme.titleSmall!.color!.withValues(alpha: 0.75),
               ),
             ),
           ],
@@ -428,7 +428,7 @@ class StockItem extends StatelessWidget {
 List<Widget> buildStockItems(BuildContext context) {
   Widget articleDivider = Container(
     margin: const EdgeInsets.symmetric(vertical: 16),
-    color: Colors.black.withOpacity(0.07),
+    color: Colors.black.withValues(alpha: 0.07),
     height: 1,
   );
   const imageAspectRatio = 165 / 55;
@@ -443,7 +443,7 @@ List<Widget> buildStockItems(BuildContext context) {
         ),
         placeholder: LayoutBuilder(builder: (context, constraints) {
           return Container(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             width: constraints.maxWidth,
             height: constraints.maxWidth / imageAspectRatio,
           );
@@ -513,7 +513,7 @@ class VideoPreview extends StatelessWidget {
             ),
             placeholder: LayoutBuilder(builder: (context, constraints) {
               return Container(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 width: constraints.maxWidth,
                 height: constraints.maxWidth / data.imageAspectRatio,
               );
@@ -589,7 +589,7 @@ ThemeData buildTheme(BuildContext context) {
       bodyLarge: GoogleFonts.libreFranklin(
         fontWeight: FontWeight.w500,
         fontSize: 11,
-        color: Colors.black.withOpacity(0.5),
+        color: Colors.black.withValues(alpha: 0.5),
         textStyle: lightTextTheme.bodyLarge,
       ),
       // preview headlines

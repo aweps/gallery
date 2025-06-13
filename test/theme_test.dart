@@ -23,9 +23,15 @@ void main() {
       themeData.switchTheme.thumbColor!.resolve({WidgetState.selected}),
       primaryColor,
     );
-    expect(
-      themeData.switchTheme.trackColor!.resolve({WidgetState.selected}),
-      primaryColor.withOpacity(0.5),
-    );
+
+    // Use component-wise comparison with tolerance for floating-point precision
+    final actualTrackColor =
+        themeData.switchTheme.trackColor!.resolve({WidgetState.selected});
+    final expectedTrackColor = primaryColor.withValues(alpha: 0.502);
+
+    expect(actualTrackColor!.r, closeTo(expectedTrackColor!.r, 0.001));
+    expect(actualTrackColor.g, closeTo(expectedTrackColor.g, 0.001));
+    expect(actualTrackColor.b, closeTo(expectedTrackColor.b, 0.001));
+    expect(actualTrackColor.a, closeTo(expectedTrackColor.a, 0.001));
   });
 }

@@ -240,7 +240,7 @@ class _SettingsListItemState<T> extends State<SettingsListItem<T?>>
                         color: Theme.of(context)
                             .colorScheme
                             .onPrimary
-                            .withOpacity(0.8),
+                            .withValues(alpha: 0.8),
                       ),
                     ),
                 ],

@@ -225,8 +225,8 @@ class _BoardPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     void drawBoardPoint(BoardPoint? boardPoint) {
-      final color = boardPoint!.color.withOpacity(
-        board.selected == boardPoint ? 0.7 : 1,
+      final color = boardPoint!.color.withValues(
+        alpha: board.selected == boardPoint ? 0.7 : 1,
       );
       final vertices = board.getVerticesForBoardPoint(boardPoint, color);
       canvas.drawVertices(vertices, BlendMode.color, Paint());

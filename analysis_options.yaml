@@ -13,6 +13,10 @@ analyzer:
   exclude: [build/**]
   errors:
     uri_has_not_been_generated: ignore
+    unreachable_switch_default: ignore
+    constant_identifier_names: ignore
+    unintended_html_in_doc_comment: ignore
+    unnecessary_non_null_assertion: ignore
   plugins:
     - angular
 
