@@ -21,12 +21,12 @@ android {
     compileSdk = 31
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     // Note: applicationVariants is not available in sourceSets in Kotlin DSL.
@@ -39,6 +39,11 @@ android {
 
     defaultConfig {
         minSdk = 21
+    }
+    buildTypes {
+        getByName("release") {
+            manifestPlaceholders += mapOf("logManifestMerger" to "true")
+        }
     }
 
 }
