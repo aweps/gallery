@@ -531,7 +531,7 @@ class _DesktopCategoryItem extends StatelessWidget {
               Divider(
                 height: 2,
                 thickness: 2,
-                color: colorScheme.background,
+                color: colorScheme.surface,
               ),
               Flexible(
                 child: ListView.builder(
@@ -566,7 +566,7 @@ class _DesktopCategoryHeader extends StatelessWidget {
     return Material(
       // Makes integration tests possible.
       key: ValueKey('${category.name}CategoryHeader'),
-      color: colorScheme.onBackground,
+      color: colorScheme.onSurface,
       child: Row(
         children: [
           Padding(
