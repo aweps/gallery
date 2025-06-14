@@ -119,7 +119,7 @@ class _SubjectRowState extends State<_SubjectRow> {
               decoration: InputDecoration.collapsed(
                 hintText: 'Subject',
                 hintStyle: theme.textTheme.titleLarge!.copyWith(
-                  color: theme.colorScheme.primary.withOpacity(0.5),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.5),
                 ),
               ),
             ),

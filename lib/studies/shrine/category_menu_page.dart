@@ -59,7 +59,7 @@ class CategoryMenuPage extends StatelessWidget {
         .copyWith(fontSize: isDesktop ? 17 : 19);
 
     final unselectedCategoryTextStyle = selectedCategoryTextStyle.copyWith(
-        color: shrineBrown900.withOpacity(0.6));
+        color: shrineBrown900.withValues(alpha: 0.6));
 
     final indicatorHeight = (isDesktop ? 28 : 30) *
         GalleryOptions.of(context).textScaleFactor(context);
@@ -101,7 +101,7 @@ class CategoryMenuPage extends StatelessWidget {
 
     final logoutTextStyle = Theme.of(context).textTheme.bodyLarge!.copyWith(
           fontSize: isDesktop ? 17 : 19,
-          color: shrineBrown900.withOpacity(0.6),
+          color: shrineBrown900.withValues(alpha: 0.6),
         );
 
     if (isDesktop) {

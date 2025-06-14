@@ -323,7 +323,7 @@ class CategoryDemoItem extends StatelessWidget {
                       Text(
                         demo.subtitle,
                         style: textTheme.labelSmall!.apply(
-                          color: colorScheme.onSurface.withOpacity(0.5),
+                          color: colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
                       ),
                       const SizedBox(height: 20),

@@ -551,12 +551,13 @@ class _CustomSlidersState extends State<_CustomSliders> with RestorationMixin {
                   trackHeight: 2,
                   activeTrackColor: Colors.deepPurple,
                   inactiveTrackColor:
-                      theme.colorScheme.onSurface.withOpacity(0.5),
+                      theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   activeTickMarkColor:
-                      theme.colorScheme.onSurface.withOpacity(0.7),
+                      theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   inactiveTickMarkColor:
-                      theme.colorScheme.surface.withOpacity(0.7),
-                  overlayColor: theme.colorScheme.onSurface.withOpacity(0.12),
+                      theme.colorScheme.surface.withValues(alpha: 0.7),
+                  overlayColor:
+                      theme.colorScheme.onSurface.withValues(alpha: 0.12),
                   thumbColor: Colors.deepPurple,
                   valueIndicatorColor: Colors.deepPurpleAccent,
                   thumbShape: const _CustomThumbShape(),

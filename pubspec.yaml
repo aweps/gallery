@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 2.10.36+892 # See README.md for details on versioning.
+version: 2.10.40+900 # See README.md for details on versioning.
 
 environment:
   flutter: ^3.13.0
@@ -84,60 +84,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-  generate: true # Enables generation of localized strings from arb files
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
+  generate: true
   uses-material-design: true
-  deferred-components:
-    - name: crane
-      libraries:
-        # Only one library from the loading unit is necessary.
-        - package:gallery/studies/crane/app.dart
-      assets:
-        - packages/flutter_gallery_assets/crane/destinations/eat_0.jpg
-        - packages/flutter_gallery_assets/crane/destinations/eat_1.jpg
-        - packages/flutter_gallery_assets/crane/destinations/eat_2.jpg
-        - packages/flutter_gallery_assets/crane/destinations/eat_3.jpg
-        - packages/flutter_gallery_assets/crane/destinations/eat_4.jpg
-        - packages/flutter_gallery_assets/crane/destinations/eat_5.jpg
-        - packages/flutter_gallery_assets/crane/destinations/eat_6.jpg
-        - packages/flutter_gallery_assets/crane/destinations/eat_7.jpg
-        - packages/flutter_gallery_assets/crane/destinations/eat_8.jpg
-        - packages/flutter_gallery_assets/crane/destinations/eat_9.jpg
-        - packages/flutter_gallery_assets/crane/destinations/eat_10.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_0.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_1.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_2.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_3.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_4.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_5.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_6.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_7.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_8.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_9.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_10.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_11.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_12.jpg
-        - packages/flutter_gallery_assets/crane/destinations/fly_13.jpg
-        - packages/flutter_gallery_assets/crane/destinations/sleep_0.jpg
-        - packages/flutter_gallery_assets/crane/destinations/sleep_1.jpg
-        - packages/flutter_gallery_assets/crane/destinations/sleep_2.jpg
-        - packages/flutter_gallery_assets/crane/destinations/sleep_3.jpg
-        - packages/flutter_gallery_assets/crane/destinations/sleep_4.jpg
-        - packages/flutter_gallery_assets/crane/destinations/sleep_5.jpg
-        - packages/flutter_gallery_assets/crane/destinations/sleep_6.jpg
-        - packages/flutter_gallery_assets/crane/destinations/sleep_7.jpg
-        - packages/flutter_gallery_assets/crane/destinations/sleep_8.jpg
-        - packages/flutter_gallery_assets/crane/destinations/sleep_9.jpg
-        - packages/flutter_gallery_assets/crane/destinations/sleep_10.jpg
-        - packages/flutter_gallery_assets/crane/destinations/sleep_11.jpg
-        - packages/flutter_gallery_assets/crane/logo/logo.png
-        - packages/flutter_gallery_assets/fonts/google_fonts/Raleway-Medium.ttf
-        - packages/flutter_gallery_assets/fonts/google_fonts/Raleway-SemiBold.ttf
-        - packages/flutter_gallery_assets/fonts/google_fonts/Raleway-Regular.ttf
-        - packages/flutter_gallery_assets/fonts/google_fonts/Raleway-Light.ttf
   fonts:
     - family: GalleryIcons
       fonts:

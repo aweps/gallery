@@ -403,7 +403,7 @@ class _SettingsLink extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: colorScheme.onSecondary.withOpacity(0.5),
+              color: colorScheme.onSecondary.withValues(alpha: 0.5),
               size: 24,
             ),
             Flexible(

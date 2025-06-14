@@ -148,7 +148,7 @@ ThemeData _buildReplyLightTheme(BuildContext context) {
     bottomAppBarTheme: const BottomAppBarTheme(color: ReplyColors.blue700),
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: ReplyColors.blue700,
-      modalBackgroundColor: Colors.white.withOpacity(0.7),
+      modalBackgroundColor: Colors.white.withValues(alpha: 0.7),
     ),
     navigationRailTheme: NavigationRailThemeData(
       backgroundColor: ReplyColors.blue700,
@@ -195,7 +195,7 @@ ThemeData _buildReplyDarkTheme(BuildContext context) {
     ),
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: ReplyColors.darkDrawerBackground,
-      modalBackgroundColor: Colors.black.withOpacity(0.7),
+      modalBackgroundColor: Colors.black.withValues(alpha: 0.7),
     ),
     navigationRailTheme: NavigationRailThemeData(
       backgroundColor: ReplyColors.darkBottomAppBarBackground,
@@ -240,9 +240,9 @@ ChipThemeData _buildChipTheme(
   Brightness brightness,
 ) {
   return ChipThemeData(
-    backgroundColor: primaryColor.withOpacity(0.12),
-    disabledColor: primaryColor.withOpacity(0.87),
-    selectedColor: primaryColor.withOpacity(0.05),
+    backgroundColor: primaryColor.withValues(alpha: 0.12),
+    disabledColor: primaryColor.withValues(alpha: 0.87),
+    selectedColor: primaryColor.withValues(alpha: 0.05),
     secondarySelectedColor: chipBackground,
     padding: const EdgeInsets.all(4),
     shape: const StadiumBorder(),
