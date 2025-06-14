@@ -23,5 +23,3 @@ plugins {
 }
 
 include(":app")
-include(":crane") 
-
