@@ -68,7 +68,7 @@ if type docker && [ $USE_DOCKER == true ]; then
 		docker buildx inspect builder-main || docker buildx create --name builder-main --use --driver=docker-container
 		BUILDX_CMD="buildx build --load --cache-to type=gha,mode=max --cache-from type=gha --progress=plain"
 	fi
-	docker $BUILDX_CMD --platform $PLATFORM -t flutter_tools -f Dockerfile.tools .
+	docker $BUILDX_CMD --platform "$PLATFORM" --build-arg BUILDPLATFORM="$PLATFORM" -t flutter_tools -f Dockerfile.tools .
 	popd
 fi
 
