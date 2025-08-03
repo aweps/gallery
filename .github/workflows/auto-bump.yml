@@ -2,7 +2,7 @@ name: Auto bump version of Flutter App
 
 on:
   schedule:
-    - cron: "30 5 2 * *"
+    - cron: "30 5 * * 3"
   workflow_dispatch:
     inputs:
       PREFIX:
