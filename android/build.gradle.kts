@@ -3,29 +3,17 @@ allprojects {
         google()
         mavenCentral()
     }
-
-    afterEvaluate {
-        if (project.name == "dual_screen") {
-            extensions.findByName("android")?.let {
-                (it as com.android.build.gradle.LibraryExtension).compileSdk = 31
-            }
-        }
-    }
 }
 
-val newBuildDir = rootProject.layout.buildDirectory.dir("../../build").get()
+val newBuildDir: Directory = rootProject.layout.buildDirectory.dir("../../build").get()
 rootProject.layout.buildDirectory.value(newBuildDir)
 
 subprojects {
-    layout.buildDirectory.value(newBuildDir.dir(name))
-    evaluationDependsOn(":app")
-
-    configurations.all {
-        resolutionStrategy {
-            force("org.jetbrains.kotlin:kotlin-stdlib:1.8.22")
-            force("org.jetbrains.kotlin:kotlin-stdlib-common:1.8.22")
-        }
-    }
+    val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
+    project.layout.buildDirectory.value(newSubprojectBuildDir)
+}
+subprojects {
+    project.evaluationDependsOn(":app")
 }
 
 tasks.register<Delete>("clean") {

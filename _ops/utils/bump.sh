@@ -17,8 +17,7 @@ SUFFIX=${2:-${SUFFIX:-}}
 [ -n "$SUFFIX" ] && SUFFIX="-${SUFFIX}"
 
 # Count commits
-git fetch --unshallow || true
-COMMITS=$(( $(date +%y%m%d)*100 + $(git rev-list --count HEAD) ))
+COMMITS=$(git rev-list --count --all)
 INCREMENT=1
 
 # For Flutter apps
