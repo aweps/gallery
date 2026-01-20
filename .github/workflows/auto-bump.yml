@@ -4,7 +4,11 @@ on:
   schedule:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     - cron: "30 5 2 * *"
+=======
+    - cron: "30 5 * * 2"
+>>>>>>> Stashed changes
 =======
     - cron: "30 5 * * 2"
 >>>>>>> Stashed changes
