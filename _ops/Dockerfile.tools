@@ -91,13 +91,23 @@ RUN flutter precache --android --force \
 # which needs the amd64 dynamic loader + libs present — otherwise native builds
 # fail with: "rosetta error: failed to open elf at /lib64/ld-linux-x86-64.so.2".
 # Adding amd64 multiarch runtime libs makes those tools executable under Rosetta.
-# (No-op on amd64 hosts; requires Docker Desktop "Use Rosetta for x86/amd64".)
-RUN dpkg --add-architecture amd64 \
- && sed -i '/^Types: deb/a Architectures: arm64' /etc/apt/sources.list.d/ubuntu.sources \
- && printf 'Types: deb\nURIs: http://archive.ubuntu.com/ubuntu\nSuites: noble noble-updates noble-backports\nComponents: main universe\nArchitectures: amd64\nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg\n\nTypes: deb\nURIs: http://security.ubuntu.com/ubuntu\nSuites: noble-security\nComponents: main universe\nArchitectures: amd64\nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg\n' > /etc/apt/sources.list.d/amd64.sources \
- && apt-get update && apt-get install -y --no-install-recommends \
-    libc6:amd64 libstdc++6:amd64 zlib1g:amd64 \
- && rm -rf /var/lib/apt/lists/*
+# (Requires Docker Desktop "Use Rosetta for x86/amd64".)
+#
+# Guard on the image's native arch: this is ONLY needed on arm64. On a native
+# amd64 image the SDK tools are already the host arch, so nothing is emulated.
+# Running it there would be actively harmful — pinning the native apt repos to
+# `Architectures: arm64` makes `apt-get update` fetch arm64 indexes from the
+# amd64-only mirrors (archive/security.ubuntu.com), which 404 and fail the build.
+RUN if [ "$(dpkg --print-architecture)" = "arm64" ]; then \
+      dpkg --add-architecture amd64 \
+   && sed -i '/^Types: deb/a Architectures: arm64' /etc/apt/sources.list.d/ubuntu.sources \
+   && printf 'Types: deb\nURIs: http://archive.ubuntu.com/ubuntu\nSuites: noble noble-updates noble-backports\nComponents: main universe\nArchitectures: amd64\nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg\n\nTypes: deb\nURIs: http://security.ubuntu.com/ubuntu\nSuites: noble-security\nComponents: main universe\nArchitectures: amd64\nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg\n' > /etc/apt/sources.list.d/amd64.sources \
+   && apt-get update && apt-get install -y --no-install-recommends \
+      libc6:amd64 libstdc++6:amd64 zlib1g:amd64 \
+   && rm -rf /var/lib/apt/lists/*; \
+    else \
+      echo "Native amd64 image — skipping amd64/Rosetta multiarch setup"; \
+    fi
 
 
 
