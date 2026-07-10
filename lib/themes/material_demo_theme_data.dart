@@ -24,7 +24,7 @@ class MaterialDemoThemeData {
         color: _colorScheme.primary,
         iconTheme: IconThemeData(color: _colorScheme.onPrimary),
       ),
-      bottomAppBarTheme: BottomAppBarTheme(
+      bottomAppBarTheme: BottomAppBarThemeData(
         color: _colorScheme.primary,
       ),
       checkboxTheme: CheckboxThemeData(

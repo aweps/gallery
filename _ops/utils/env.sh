@@ -181,3 +181,29 @@ export APP_IDENTIFIER=${APP_IDENTIFIER}.${APP_SUFFIX:-gallery}
 if [[ "${ANDROID_KEYSTORE_B64:-}" != "" ]]; then
     echo $ANDROID_KEYSTORE_B64 | base64 -d > _ops/keystore.jks
 fi
+
+# Fail loudly if generated files were left behind by a *different* build
+# environment. Docker builds mount the repo at /src with the pub cache at
+# /root/.pub-cache, so files like .flutter-plugins-dependencies end up with
+# absolute paths that don't exist on the native host (and vice versa). Verbs
+# that run `flutter pub get` self-heal this, but `--no-pub` verbs (run.sh) fail
+# cryptically ("Plugin directory does not exist: /root/.pub-cache/..."). Call
+# this before such steps to turn that into a clear, actionable message.
+assert_no_stale_env() {
+    local dep_file=".flutter-plugins-dependencies"
+    [ -f "$dep_file" ] || return 0
+    local cur_cache="${PUB_CACHE:-$HOME/.pub-cache}"
+    # Any pub-cache path in the file that isn't under this env's cache is stale.
+    if grep -oE '/[^"]*\.pub-cache[^"]*' "$dep_file" 2>/dev/null | grep -qv "^${cur_cache}"; then
+        echo "==================================================================="
+        echo " ERROR: stale plugin paths from a different build environment."
+        echo ""
+        echo " $dep_file references a pub cache that does not exist here"
+        echo " (this environment uses: ${cur_cache})."
+        echo " You likely switched between Docker and native builds."
+        echo ""
+        echo " Fix:   flutter clean     (or  ./runner clean )    then re-run."
+        echo "==================================================================="
+        exit 1
+    fi
+}

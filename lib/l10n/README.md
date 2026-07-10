@@ -24,10 +24,11 @@ to be completed.
 
 ## Generating GalleryLocalizations
 
-Running the application for the first time should generate a synthetic package
-containing the app's localizations through importing
-`package:flutter_gen/gen_l10n/`. The code is generated will be generated in
-`.dart_tool/flutter_gen/gen_l10n/`.
+Running the application generates the app's localizations, imported via
+`package:gallery/l10n/`. The code is generated into `lib/l10n/` (the
+`gallery_localizations*.dart` files, which are git-ignored and regenerated on
+`flutter pub get`). Flutter removed the old synthetic `package:flutter_gen`
+package, so the generated files now live in the source tree.
 
 The generated localizations code is updated every time `flutter run`
 is called, and during hot reload and restart. This means that updates to

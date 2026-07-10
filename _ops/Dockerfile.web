@@ -1,8 +1,11 @@
 #Deploy SPA
 FROM alpine:3.12.0
 
+# TARGETARCH (amd64/arm64) is provided by BuildKit and matches Caddy's release
+# asset naming, so the image works on both CI (amd64) and Apple Silicon (arm64).
+ARG TARGETARCH
 RUN apk add --no-cache openssh-client tar curl
-RUN curl -L "https://github.com/caddyserver/caddy/releases/download/v2.9.1/caddy_2.9.1_linux_amd64.tar.gz" \
+RUN curl -L "https://github.com/caddyserver/caddy/releases/download/v2.9.1/caddy_2.9.1_linux_${TARGETARCH}.tar.gz" \
     | tar -xz -C /usr/local/bin/ --wildcards --no-anchored caddy && \
     chmod +x /usr/local/bin/caddy
 

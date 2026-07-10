@@ -15,13 +15,23 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
 	fi
 fi
 
-flutter clean || :
+# Clean Xcode/CocoaPods BEFORE `flutter clean` (macOS only — these fastlane
+# steps need Xcode/CocoaPods and are meaningless inside the Linux build
+# container, where fastlane isn't installed).
+# Flutter 3.44+ integrates plugins via Swift Package Manager, and `flutter clean`
+# deletes the ephemeral FlutterGeneratedPluginSwiftPackage that `xcclean` needs
+# to resolve the workspace. Run xcclean first, and only when that package exists,
+# to avoid the xcodebuild "package ... doesn't exist in file system" error (74).
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	(cd ios && fastlane run clean_cocoapods_cache) || :
+	if [ -d "ios/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" ]; then
+		(cd ios && fastlane run xcclean scheme:Runner) || :
+	fi
+	(cd ios && fastlane run clean_build_artifacts) || :
+	(cd android && fastlane run clean_build_artifacts) || :
+fi
 
-# Clean fastlane files
-(cd ios && fastlane run clean_cocoapods_cache) || :
-(cd ios && fastlane run xcclean scheme:Runner) || :
-(cd ios && fastlane run clean_build_artifacts) || :
-(cd android && fastlane run clean_build_artifacts) || :
+flutter clean || :
 
 rm -rf .cicd
 rm -rf build

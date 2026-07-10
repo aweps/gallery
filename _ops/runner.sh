@@ -98,8 +98,8 @@ elif [[ "${1:-}" == "web-run" ]]; then
 		#Run web
 		docker build --rm=true --pull=true -t ${APP_SLUG} -f _ops/Dockerfile.web .
 		docker stop ${APP_SLUG} || :
-		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p 8083:8080 -d ${APP_SLUG}
-		echo "Done! - Check in browser - http://<MACHINE_IP>:8083"
+		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p ${WEB_PORT:-8083}:8080 -d ${APP_SLUG}
+		echo "Done! - Check in browser - http://<MACHINE_IP>:${WEB_PORT:-8083}"
 	else
 		echo "Missing Docker or Docker use disabled via USE_DOCKER in env file"
 		exit 1
@@ -107,7 +107,8 @@ elif [[ "${1:-}" == "web-run" ]]; then
 
 elif [[ "${1:-}" == "android-build" ]]; then
 	if type docker && [ $USE_DOCKER == true ]; then
-		#TODO: This currently fails on Apple Silicon
+		# Apple Silicon: works via Rosetta — Dockerfile.tools installs amd64
+		# multiarch libs so the x86_64 Android SDK/NDK tools can execute.
 		docker run --platform $PLATFORM $vars $volumes --rm flutter_tools bash _ops/build.sh android ${2:-}
 	else
 		bash _ops/build.sh android ${2:-}

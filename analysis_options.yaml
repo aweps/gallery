@@ -10,7 +10,7 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
-  exclude: [build/**]
+  exclude: [build/**, lib/l10n/**]
   errors:
     uri_has_not_been_generated: ignore
     unreachable_switch_default: ignore

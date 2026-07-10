@@ -66,15 +66,15 @@ RUN mkdir -p $ANDROID_HOME/cmdline-tools \
 RUN yes | sdkmanager --licenses \
  && sdkmanager \
      "platform-tools" \
-     "platforms;android-35" \
-     "build-tools;35.0.0" \
+     "platforms;android-36" \
+     "build-tools;36.0.0" \
      "ndk;27.0.12077973"
 
 # Install Flutter
 ENV FLUTTER_HOME=/usr/local/flutter
 ENV FLUTTER_ROOT=$FLUTTER_HOME
 ENV FLUTTER_GIT_URL=https://github.com/flutter/flutter.git
-ENV FLUTTER_VER=3.29.3
+ENV FLUTTER_VER=3.44.6
 ENV PATH=${PATH}:${FLUTTER_HOME}/bin:${FLUTTER_HOME}/bin/cache/dart-sdk/bin
 
 RUN git clone ${FLUTTER_GIT_URL} ${FLUTTER_HOME}
@@ -85,6 +85,19 @@ RUN cd ${FLUTTER_HOME} && git checkout ${FLUTTER_VER} \
 
 RUN flutter precache --android --force \
  && flutter doctor -v
+
+# The Android SDK/NDK ship x86_64-only host tools (cmake, ninja, clang, aapt2,
+# adb). On an arm64 image (Apple Silicon) they run via Docker Desktop's Rosetta,
+# which needs the amd64 dynamic loader + libs present — otherwise native builds
+# fail with: "rosetta error: failed to open elf at /lib64/ld-linux-x86-64.so.2".
+# Adding amd64 multiarch runtime libs makes those tools executable under Rosetta.
+# (No-op on amd64 hosts; requires Docker Desktop "Use Rosetta for x86/amd64".)
+RUN dpkg --add-architecture amd64 \
+ && sed -i '/^Types: deb/a Architectures: arm64' /etc/apt/sources.list.d/ubuntu.sources \
+ && printf 'Types: deb\nURIs: http://archive.ubuntu.com/ubuntu\nSuites: noble noble-updates noble-backports\nComponents: main universe\nArchitectures: amd64\nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg\n\nTypes: deb\nURIs: http://security.ubuntu.com/ubuntu\nSuites: noble-security\nComponents: main universe\nArchitectures: amd64\nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg\n' > /etc/apt/sources.list.d/amd64.sources \
+ && apt-get update && apt-get install -y --no-install-recommends \
+    libc6:amd64 libstdc++6:amd64 zlib1g:amd64 \
+ && rm -rf /var/lib/apt/lists/*
 
 
 
