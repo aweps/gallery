@@ -79,6 +79,22 @@ jobs:
       - name: Expose GitHub Runtime for docker buildx to use gha cache
         uses: crazy-max/ghaction-github-runtime@056b8ec6661ce03a987ab8643a0edc346ae63fe3 #v2.2.0
 
+      - name: Free up runner disk space
+        # The flutter_tools toolchain image (Flutter 3.44 + Android SDK/NDK 27)
+        # is large; the docker build was failing with "no space left on device"
+        # on ubuntu-latest. Reclaim ~25GB of preinstalled toolchains the
+        # containerized build doesn't use.
+        run: |
+          sudo rm -rf \
+            /usr/share/dotnet \
+            /usr/local/lib/android \
+            /opt/ghc /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL \
+            /usr/share/swift \
+            /usr/local/share/powershell || true
+          sudo docker system prune -af || true
+          df -h /
+
       - name: docker
         uses: docker://docker
         with:
@@ -112,6 +128,22 @@ jobs:
       - name: Expose GitHub Runtime for docker buildx to use gha cache
         uses: crazy-max/ghaction-github-runtime@056b8ec6661ce03a987ab8643a0edc346ae63fe3 #v2.2.0
 
+      - name: Free up runner disk space
+        # The flutter_tools toolchain image (Flutter 3.44 + Android SDK/NDK 27)
+        # is large; the docker build was failing with "no space left on device"
+        # on ubuntu-latest. Reclaim ~25GB of preinstalled toolchains the
+        # containerized build doesn't use.
+        run: |
+          sudo rm -rf \
+            /usr/share/dotnet \
+            /usr/local/lib/android \
+            /opt/ghc /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL \
+            /usr/share/swift \
+            /usr/local/share/powershell || true
+          sudo docker system prune -af || true
+          df -h /
+
       - name: docker
         uses: docker://docker
         with:
@@ -137,16 +169,28 @@ jobs:
     env:
       DEBUG: ${{ github.event.inputs.DEBUG }}
       WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
-      FLUTTER_VER: 3.29.3
+      FLUTTER_VER: 3.44.6
     steps:
       - name: Print environment
         run: echo "Running on ${{ runner.os }} (${{ runner.arch }})"
-        
+
       - name: Select Xcode version
         run: sudo xcode-select -s /Applications/Xcode_16.3.app
 
       - name: Verify Xcode version
         run: xcodebuild -version
+
+      - name: Install iOS platform SDK
+        # Regression in the macos-15 runner image: the iOS platform SDK is no
+        # longer shipped for pinned Xcode versions, so `flutter build ipa`
+        # (destination generic/platform=iOS) fails with "iOS 18.4 is not
+        # installed" (actions/runner-images#12758, #12789). Install it on demand.
+        run: |
+          sudo xcodebuild -license accept || true
+          sudo xcodebuild -runFirstLaunch || true
+          sudo xcodebuild -downloadPlatform iOS
+          echo "----- installed SDKs -----"
+          xcodebuild -showsdks
 
       - name: Check out code
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2

@@ -31,7 +31,17 @@ if [ -f pubspec.yaml ]; then
     tag="${PREFIX:-}${version}${SUFFIX:-}+$((COMMITS+1))"
     git config user.name || git config user.name 'gitops-bot'
     git config user.email || git config user.email '52609384+gitops-bot@users.noreply.github.com'
-    git commit -m "${MSG_PREFIX:-}Bump version to $tag" pubspec.yaml
+    # Prefer a single commit. Locally, if HEAD hasn't been published to a remote
+    # branch yet (you've already committed your change), fold the version bump
+    # into it with --amend so the change + bump are one commit. In CI (GITHUB_REF
+    # set, auto-bump) HEAD is the already-pushed remote tip and must NOT be
+    # rewritten, so always create a new commit there.
+    git add pubspec.yaml
+    if [[ -z "${GITHUB_REF:-}" ]] && [ -z "$(git branch -r --contains HEAD 2>/dev/null)" ]; then
+        git commit --amend --no-edit
+    else
+        git commit -m "${MSG_PREFIX:-}Bump version to $tag"
+    fi
     git tag "$tag"
 
 # For generic repos
