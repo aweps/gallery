@@ -165,7 +165,7 @@ jobs:
       (startsWith(github.ref, 'refs/tags/ios') || startsWith(github.ref, 'refs/tags/mobile') || startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/hotfix/')) &&
       needs.filter.outputs.skip-ios == 'false'
 
-    runs-on: ${{ fromJson(github.event.inputs.SELF_HOSTED == 'true' && '["self-hosted", "macos-15"]' || '"macos-15"') }}
+    runs-on: ${{ fromJson(github.event.inputs.SELF_HOSTED == 'true' && '["self-hosted", "macos-26"]' || '"macos-26"') }}
     env:
       DEBUG: ${{ github.event.inputs.DEBUG }}
       WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
@@ -175,22 +175,25 @@ jobs:
         run: echo "Running on ${{ runner.os }} (${{ runner.arch }})"
 
       - name: Select Xcode version
-        run: sudo xcode-select -s /Applications/Xcode_16.3.app
+        # Apple requires apps to be built with the iOS 26 SDK (Xcode 26) for
+        # App Store Connect uploads. macos-26 ships Xcode 26 as the default at
+        # /Applications/Xcode.app, with the iOS 26 platform preinstalled.
+        run: sudo xcode-select -s /Applications/Xcode.app
 
       - name: Verify Xcode version
         run: xcodebuild -version
 
       - name: Install iOS platform SDK
-        # Regression in the macos-15 runner image: the iOS platform SDK is no
-        # longer shipped for pinned Xcode versions, so `flutter build ipa`
-        # (destination generic/platform=iOS) fails with "iOS 18.4 is not
-        # installed" (actions/runner-images#12758, #12789). Install it on demand.
+        # Best-effort only — must never fail the build. On macos-26 the iOS 26
+        # platform is preinstalled, so this is a no-op top-up; `-downloadPlatform`
+        # is flaky there and can abort with "Unable to connect to simulator"
+        # (exit 70), so every command is guarded (actions/runner-images#12758).
         run: |
           sudo xcodebuild -license accept || true
           sudo xcodebuild -runFirstLaunch || true
-          sudo xcodebuild -downloadPlatform iOS
+          sudo xcodebuild -downloadPlatform iOS || true
           echo "----- installed SDKs -----"
-          xcodebuild -showsdks
+          xcodebuild -showsdks || true
 
       - name: Check out code
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
