@@ -40,7 +40,7 @@ elif [[ "${1:-}" == "android" ]]; then
 	if [[ "${DEBUG:-}" == "true" ]]; then VERBOSE_FLAG="-v"; fi
 
 	# Add support for unique Application ID
-	export DART_DEFINES="${DART_DEFINES//=gallery/=gallery01}"
+	export DART_DEFINES="${DART_DEFINES//=gallery/=gallery02}"
 
 	flutter build ${VERBOSE_FLAG:-} appbundle --no-pub --${2:-debug} ${DART_DEFINES:-}
 	popd
