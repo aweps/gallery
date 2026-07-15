@@ -148,6 +148,22 @@ jobs:
       - name: Verify Xcode version
         run: xcodebuild -version
 
+<<<<<<< Updated upstream
+=======
+      - name: Install iOS platform SDK
+        # Best-effort only — must never fail the build. On macos-26 the iOS 26
+        # platform is preinstalled, so this is a no-op top-up; `-downloadPlatform`
+        # is flaky there and can abort with "Unable to connect to simulator"
+        # (exit 70), so every command is guarded. Kept as a safety net for the
+        # runner-images "iOS SDK not installed" regression (actions/runner-images#12758).
+        run: |
+          sudo xcodebuild -license accept || true
+          sudo xcodebuild -runFirstLaunch || true
+          sudo xcodebuild -downloadPlatform iOS || true
+          echo "----- installed SDKs -----"
+          xcodebuild -showsdks || true
+
+>>>>>>> Stashed changes
       - name: Check out code
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
 
