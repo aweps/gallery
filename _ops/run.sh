@@ -24,7 +24,10 @@ if [[ "${1:-}" == "android" ]]; then
 	# Add support for unique Application ID
 	export DART_DEFINES="${DART_DEFINES//=gallery/=gallery01}"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 	# Target the first booted Android device/emulator so `flutter run` is not
 	# ambiguous when macOS/Chrome/iOS devices are also connected.
 	# `|| :` so a non-zero pipe exit (e.g. no matches) doesn't trip `set -o pipefail`
