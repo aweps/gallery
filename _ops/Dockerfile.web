@@ -1,5 +1,7 @@
 #Deploy SPA
-FROM alpine:3.12.0
+FROM alpine:3.12.0@sha256:185518070891758909c9f839cf4ca393ee977ac378609f700f60a771a2dfe321
+
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
 RUN apk add --no-cache openssh-client tar curl
 RUN curl -L "https://github.com/caddyserver/caddy/releases/download/v2.9.1/caddy_2.9.1_linux_amd64.tar.gz" \

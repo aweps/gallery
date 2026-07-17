@@ -25,7 +25,10 @@ if [[ "${1:-}" == "android" ]]; then
 	export DART_DEFINES="${DART_DEFINES//=gallery/=gallery01}"
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 	# Target the first booted Android device/emulator so `flutter run` is not

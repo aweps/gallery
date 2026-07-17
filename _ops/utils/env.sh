@@ -74,7 +74,7 @@ ENV_FILE2="$DIR_CI/.env.$RANDOM"
 function exportVars()
 {
     set +x
-    source /dev/stdin <<<"$(grep -v '^#' $1 | sed -re "s/^([^=]+)=([^']+).*/\1='\2'/" | grep = | sed -re "s/^[^=]+=.*[^'=]$/\0'/" | sed -re "s/^[^=]+='$/\0'/" | sed -E -n 's/[^#]+/export &/ p')"
+    source /dev/stdin <<<"$(grep -v '^#' $1 | sed -re "s/^([^=]+)=([^']+).*/\1='\2'/" | grep '=' | sed -re "s/^[^=]+=.*[^'=]$/\0'/" | sed -re "s/^[^=]+='$/\0'/" | sed -E -n 's/[^#]+/export &/ p')"
     if [ "$(echo "${DEBUG:-}" | tr '[:upper:]' '[:lower:]')" = "true" ]; then set -x; fi
 
     ######## Restore control vars ########
@@ -108,7 +108,7 @@ fi
 if [[ "$GIT_BRANCH_REF" == "local" ]]; then
     if [[ `git config user.name` != "" ]]; then
         export GIT_USER=$(git config user.name)
-        echo "TARGET_USR=u$((git config user.name || :) | md5sum | cut -f1 -d' ' | fold -w8 | head -n1)" >> $ENV_FILE2
+        echo "TARGET_USR=u$( (git config user.name || :) | md5sum | cut -f1 -d' ' | fold -w8 | head -n1)" >> $ENV_FILE2
     elif [[ "${GIT_USER:-}" == "" ]]; then
         set +x
         echo 'Missing git user. Set using :- git config --global user.name "John Doe"'
