@@ -177,6 +177,7 @@ on:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     - cron: "30 5 2 * *"
 =======
     - cron: "30 5 * * 2"
@@ -703,6 +704,12 @@ on:
 =======
     - cron: "30 5 * * 2"
 >>>>>>> Stashed changes
+=======
+    # Monthly, staggered per app: minute/hour/day-of-month derived from the
+    # app name at render time so mono siblings don't all bump at once (and
+    # off-the-hour minutes dodge GitHub's top-of-hour scheduler congestion).
+    - cron: "21 9 10 * *"
+>>>>>>> Stashed changes
   workflow_dispatch:
     inputs:
       PREFIX:
@@ -737,7 +744,7 @@ jobs:
 
       - name: bump
         run: |
-          if [[ "${GITHUB_EVENT_NAME:-}" == "schedule" ]]; then MSG_PREFIX="Monthly Build: "; fi
+          if [[ "${GITHUB_EVENT_NAME:-}" == "schedule" ]]; then export MSG_PREFIX="Monthly Build: "; fi
           /bin/bash bump ${PREFIX:-mobile} ${SUFFIX:-beta}
         env:
           SECRETS_B64_DEV: ${{ secrets.SECRETS_B64_DEV }}

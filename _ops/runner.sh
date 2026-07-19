@@ -61,28 +61,30 @@ if type docker && [ $USE_DOCKER == true ]; then
 
 	PLATFORM=linux/$(docker version --format '{{.Server.Arch}}')
 
-	# Build flutter_tool
+	# Build the app-namespaced tools image — a shared 'flutter_tools' tag
+	# let a sibling app's build satisfy exit-0-no-effect guards
+	# (2026-07-16 hunt H6, operator-approved local fix; template flow-back pending)
 	pushd _ops
 	BUILDX_CMD="build"
 	if [[ "${RUNNER_WORKSPACE:-}" != "" ]]; then
 		docker buildx inspect builder-main || docker buildx create --name builder-main --use --driver=docker-container
 		BUILDX_CMD="buildx build --load --cache-to type=gha,mode=max --cache-from type=gha --progress=plain"
 	fi
-	docker $BUILDX_CMD --platform "$PLATFORM" --build-arg BUILDPLATFORM="$PLATFORM" -t flutter_tools -f Dockerfile.tools .
+	docker $BUILDX_CMD --platform "$PLATFORM" --build-arg BUILDPLATFORM="$PLATFORM" -t "${APP_SLUG}_flutter_tools" -f Dockerfile.tools .
 	popd
 fi
 
 #Build App with tools
 if [[ "${1:-}" == "test" ]]; then
 	if type docker && [ $USE_DOCKER == true ]; then
-		docker run --platform $PLATFORM $vars $volumes --rm flutter_tools bash _ops/run.tests.sh
+		docker run --platform $PLATFORM $vars $volumes --rm "${APP_SLUG}_flutter_tools" bash _ops/run.tests.sh
 	else
 		bash _ops/run.tests.sh
 	fi
 
 elif [[ "${1:-}" == "web-build" ]]; then
 	if type docker && [ $USE_DOCKER == true ]; then
-		docker run --platform $PLATFORM $vars $volumes --rm flutter_tools bash _ops/build.sh web ${APP_ROOT:-}/ ${2:-}
+		docker run --platform $PLATFORM $vars $volumes --rm "${APP_SLUG}_flutter_tools" bash _ops/build.sh web ${APP_ROOT:-}/ ${2:-}
 
 		#Build web
 		docker build --rm=true --pull=true -t ${APP_SLUG}${3:-} -f _ops/Dockerfile.web .
@@ -93,7 +95,7 @@ elif [[ "${1:-}" == "web-build" ]]; then
 
 elif [[ "${1:-}" == "web-run" ]]; then
 	if type docker && [ $USE_DOCKER == true ]; then
-		docker run --platform $PLATFORM $vars $volumes --rm flutter_tools bash _ops/build.sh web ${APP_ROOT:-}/ ${2:-}
+		docker run --platform $PLATFORM $vars $volumes --rm "${APP_SLUG}_flutter_tools" bash _ops/build.sh web ${APP_ROOT:-}/ ${2:-}
 
 		#Run web
 		docker build --rm=true --pull=true -t ${APP_SLUG} -f _ops/Dockerfile.web .
@@ -101,8 +103,13 @@ elif [[ "${1:-}" == "web-run" ]]; then
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p 8083:8080 -d ${APP_SLUG}
 		echo "Done! - Check in browser - http://<MACHINE_IP>:8083"
+=======
+		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p ${WEB_PORT:-8080}:8080 -d ${APP_SLUG}
+		echo "Done! - Check in browser - http://<MACHINE_IP>:${WEB_PORT:-8080}"
+>>>>>>> Stashed changes
 =======
 		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p ${WEB_PORT:-8080}:8080 -d ${APP_SLUG}
 		echo "Done! - Check in browser - http://<MACHINE_IP>:${WEB_PORT:-8080}"
@@ -122,8 +129,14 @@ elif [[ "${1:-}" == "web-run" ]]; then
 
 elif [[ "${1:-}" == "android-build" ]]; then
 	if type docker && [ $USE_DOCKER == true ]; then
+<<<<<<< Updated upstream
 		#TODO: This currently fails on Apple Silicon
 		docker run --platform $PLATFORM $vars $volumes --rm flutter_tools bash _ops/build.sh android ${2:-}
+=======
+		# Apple Silicon: works via Rosetta — Dockerfile.tools installs amd64
+		# multiarch libs so the x86_64 Android SDK/NDK tools can execute.
+		docker run --platform $PLATFORM $vars $volumes --rm "${APP_SLUG}_flutter_tools" bash _ops/build.sh android ${2:-}
+>>>>>>> Stashed changes
 	else
 		bash _ops/build.sh android ${2:-}
 	fi
@@ -139,7 +152,7 @@ elif [[ "${1:-}" == "ios-run" ]]; then
 
 elif [[ "${1:-}" == "clean" ]]; then
 	if type docker && [ $USE_DOCKER == true ]; then
-		docker run --platform $PLATFORM $vars $volumes --rm flutter_tools bash _ops/clean.sh
+		docker run --platform $PLATFORM $vars $volumes --rm "${APP_SLUG}_flutter_tools" bash _ops/clean.sh
 	else
 		bash _ops/clean.sh
 	fi

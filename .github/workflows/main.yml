@@ -3,7 +3,7 @@ name: Build Flutter App
 on:
   push:
     branches: [main, master, hotfix/*]
-    # Pattern matched against refs/tags
+    # Pattern matched against refs/tags (path filters are not evaluated for tag pushes)
     tags:
       - "**" # Push events to every tag including hierarchical tags like v1.0/beta
   pull_request:

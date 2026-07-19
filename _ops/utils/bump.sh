@@ -17,7 +17,15 @@ SUFFIX=${2:-${SUFFIX:-}}
 [ -n "$SUFFIX" ] && SUFFIX="-${SUFFIX}"
 
 # Count commits
+<<<<<<< Updated upstream
 COMMITS=$(git rev-list --count --all)
+=======
+git fetch --unshallow || true
+# Guarded two-step: a failed rev-list must fail HERE with a git error, not
+# later as an opaque unbound-variable abort inside the perl interpolation.
+_n_commits=$(git rev-list --count HEAD) || { echo "bump: git rev-list --count HEAD failed — cannot derive build number"; exit 1; }
+COMMITS=$(( $(date +%y%m%d)*100 + _n_commits ))
+>>>>>>> Stashed changes
 INCREMENT=1
 
 # For Flutter apps
