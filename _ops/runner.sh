@@ -104,8 +104,13 @@ elif [[ "${1:-}" == "web-run" ]]; then
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p 8083:8080 -d ${APP_SLUG}
 		echo "Done! - Check in browser - http://<MACHINE_IP>:8083"
+=======
+		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p ${WEB_PORT:-8080}:8080 -d ${APP_SLUG}
+		echo "Done! - Check in browser - http://<MACHINE_IP>:${WEB_PORT:-8080}"
+>>>>>>> Stashed changes
 =======
 		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p ${WEB_PORT:-8080}:8080 -d ${APP_SLUG}
 		echo "Done! - Check in browser - http://<MACHINE_IP>:${WEB_PORT:-8080}"
@@ -136,6 +141,9 @@ elif [[ "${1:-}" == "android-build" ]]; then
 		# Apple Silicon: works via Rosetta — Dockerfile.tools installs amd64
 		# multiarch libs so the x86_64 Android SDK/NDK tools can execute.
 		docker run --platform $PLATFORM $vars $volumes --rm "${APP_SLUG}_flutter_tools" bash _ops/build.sh android ${2:-}
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 	else
 		bash _ops/build.sh android ${2:-}

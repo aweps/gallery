@@ -25,6 +25,9 @@ git fetch --unshallow || true
 # later as an opaque unbound-variable abort inside the perl interpolation.
 _n_commits=$(git rev-list --count HEAD) || { echo "bump: git rev-list --count HEAD failed — cannot derive build number"; exit 1; }
 COMMITS=$(( $(date +%y%m%d)*100 + _n_commits ))
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 INCREMENT=1
 
