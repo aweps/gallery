@@ -35,7 +35,14 @@ if type docker && [ $USE_DOCKER == true ]; then
 	vars='-e DEBUG -e NSDEBUG -e WAIT_ON_ERROR -e SECRETS_B64 -e GIT_BRANCH_REF -e GIT_USER'
 
 	if [[ "${RUNNER_WORKSPACE:-}" != "" ]]; then
-		SRC_DIR=${RUNNER_WORKSPACE}/${APP_SLUG}
+		# Host-side path for the daemon-level -v mount. The template's
+		# ${RUNNER_WORKSPACE}/${APP_SLUG} equals the checkout only when the
+		# repo is named after the app (standalone); in a monorepo the
+		# checkout is <workspace>/<repo> with the app one level deeper. Map
+		# the container cwd (/github/workspace[/<app>]) back to the host
+		# path generically (2026-07-19 first live monorepo tag build).
+		REL_DIR=${PWD#"${GITHUB_WORKSPACE:-$PWD}"}
+		SRC_DIR="${RUNNER_WORKSPACE}/$(basename "${GITHUB_REPOSITORY:-$APP_SLUG}")${REL_DIR}"
 		volumes="-v $GRADLE_CACHE:/root/.gradle -v $PUB_CACHE:/root/.pub-cache -v $SRC_DIR:/src -w /src"
 
 	elif [[ "${DRONE_COMMIT_REF:-}" != "" ]]; then
@@ -105,8 +112,13 @@ elif [[ "${1:-}" == "web-run" ]]; then
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p 8083:8080 -d ${APP_SLUG}
 		echo "Done! - Check in browser - http://<MACHINE_IP>:8083"
+=======
+		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p ${WEB_PORT:-8080}:8080 -d ${APP_SLUG}
+		echo "Done! - Check in browser - http://<MACHINE_IP>:${WEB_PORT:-8080}"
+>>>>>>> Stashed changes
 =======
 		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p ${WEB_PORT:-8080}:8080 -d ${APP_SLUG}
 		echo "Done! - Check in browser - http://<MACHINE_IP>:${WEB_PORT:-8080}"
@@ -142,6 +154,9 @@ elif [[ "${1:-}" == "android-build" ]]; then
 		# multiarch libs so the x86_64 Android SDK/NDK tools can execute.
 		docker run --platform $PLATFORM $vars $volumes --rm "${APP_SLUG}_flutter_tools" bash _ops/build.sh android ${2:-}
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

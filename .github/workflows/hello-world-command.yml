@@ -2,6 +2,11 @@ name: hello-world-command
 on:
   repository_dispatch:
     types: [hello-world-command]
+# Least-privilege: privileged ops use PA_TOKEN explicitly; the ambient
+# GITHUB_TOKEN needs read only (repo default is write — 2026-07-16 hunt).
+permissions:
+  contents: read
+
 jobs:
   helloWorld:
     runs-on: ubuntu-latest

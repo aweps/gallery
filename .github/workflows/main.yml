@@ -16,16 +16,43 @@ on:
       WAIT_ON_ERROR:
         required: true
         default: "true"
-      SELF_HOSTED:
-        description: "Use self-hosted runner?"
-        required: true
-        default: "false"
-        type: choice
-        options:
-          - "true"
-          - "false"
 
 jobs:
+  pick-runner:
+    name: Pick runner
+    runs-on: ubuntu-latest
+    outputs:
+      linux: ${{ steps.linux.outputs.use-runner }}
+      macos: ${{ steps.macos.outputs.use-runner }}
+    steps:
+      # Self-hosting is OPTIONAL. fallback-on-error guarantees a GitHub-hosted
+      # runner whenever no self-hosted runner is online or the token cannot
+      # list runners — this job never fails the workflow. PA_TOKEN (org-level
+      # secret) can see org/repo runners; the ambient token is the last resort.
+      # Temporary opt-out (e.g. a job misbehaving on the self-hosted box):
+      # set the repo or org Actions VARIABLE NO_SELFHOSTED=true — or
+      # NO_SELFHOSTED_LINUX / NO_SELFHOSTED_MACOS for one lane — to skip the
+      # probe; a skipped probe's empty output makes the runs-on fallback
+      # default take over (GitHub-hosted). Flipping it needs no commit.
+      - name: Detect linux runner
+        id: linux
+        if: vars.NO_SELFHOSTED != 'true' && vars.NO_SELFHOSTED_LINUX != 'true'
+        uses: mikehardy/runner-fallback-action@dc7732f9e532c451b2527b288ba8d58fd4b0a4ca #v1.1.0
+        with:
+          primary-runner: "debian-selfhosted"
+          fallback-runner: "ubuntu-latest"
+          fallback-on-error: "true"
+          github-token: ${{ secrets.PA_TOKEN || github.token }}
+      - name: Detect macos runner
+        id: macos
+        if: vars.NO_SELFHOSTED != 'true' && vars.NO_SELFHOSTED_MACOS != 'true'
+        uses: mikehardy/runner-fallback-action@dc7732f9e532c451b2527b288ba8d58fd4b0a4ca #v1.1.0
+        with:
+          primary-runner: "macos-selfhosted"
+          fallback-runner: "macos-26"
+          fallback-on-error: "true"
+          github-token: ${{ secrets.PA_TOKEN || github.token }}
+
   filter:
     name: Filter builds
     if: |
@@ -61,6 +88,9 @@ jobs:
           fi
 
   build-web:
+    needs:
+      - pick-runner
+
     name: Build & package builds for Web
     if: |
       always() &&
@@ -68,7 +98,7 @@ jobs:
       !contains(github.event.pull_request.title, 'ci skip') &&
       !github.event.pull_request.head.repo.fork
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(needs.pick-runner.outputs.linux || '["ubuntu-latest"]') }}
     env:
       DEBUG: ${{ github.event.inputs.DEBUG }}
       WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
@@ -80,7 +110,7 @@ jobs:
         uses: crazy-max/ghaction-github-runtime@056b8ec6661ce03a987ab8643a0edc346ae63fe3 #v2.2.0
 
       - name: docker
-        uses: docker://docker
+        uses: docker://docker:29.6.2@sha256:bfec1f5159c63a81ca6fdedbd81404d2c0e16378ed0feec3bb3fbf3998847659
         with:
           args: /bin/sh -c "apk update && apk add bash && /bin/bash _ops/ci.build.sh web"
         env:
@@ -91,6 +121,7 @@ jobs:
   build-android:
     needs:
       - filter
+      - pick-runner
 
     name: Build & package builds for Android
     if: |
@@ -101,7 +132,7 @@ jobs:
       (startsWith(github.ref, 'refs/tags/android') || startsWith(github.ref, 'refs/tags/mobile') || startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/hotfix/')) &&
       needs.filter.outputs.skip-android == 'false'
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(needs.pick-runner.outputs.linux || '["ubuntu-latest"]') }}
     env:
       DEBUG: ${{ github.event.inputs.DEBUG }}
       WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
@@ -113,7 +144,7 @@ jobs:
         uses: crazy-max/ghaction-github-runtime@056b8ec6661ce03a987ab8643a0edc346ae63fe3 #v2.2.0
 
       - name: docker
-        uses: docker://docker
+        uses: docker://docker:29.6.2@sha256:bfec1f5159c63a81ca6fdedbd81404d2c0e16378ed0feec3bb3fbf3998847659
         with:
           args: /bin/sh -c "apk update && apk add bash && /bin/bash _ops/ci.build.sh android"
         env:
@@ -124,6 +155,7 @@ jobs:
   build-ios:
     needs:
       - filter
+      - pick-runner
 
     name: Build ios archive
     if: |
@@ -133,7 +165,11 @@ jobs:
       (startsWith(github.ref, 'refs/tags/ios') || startsWith(github.ref, 'refs/tags/mobile') || startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/hotfix/')) &&
       needs.filter.outputs.skip-ios == 'false'
 
+<<<<<<< Updated upstream
     runs-on: ${{ fromJson(github.event.inputs.SELF_HOSTED == 'true' && '["self-hosted", "macos-15"]' || '"macos-15"') }}
+=======
+    runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
+>>>>>>> Stashed changes
     env:
       DEBUG: ${{ github.event.inputs.DEBUG }}
       WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
@@ -212,6 +248,7 @@ jobs:
   package-ios:
     needs:
       - build-ios
+      - pick-runner
 
     name: Package ios archive
     if: |
@@ -221,7 +258,7 @@ jobs:
       (startsWith(github.ref, 'refs/tags/ios') || startsWith(github.ref, 'refs/tags/mobile') || startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/hotfix/')) &&
       needs.filter.outputs.skip-ios == 'false'
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(needs.pick-runner.outputs.linux || '["ubuntu-latest"]') }}
     env:
       DEBUG: ${{ github.event.inputs.DEBUG }}
       WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
@@ -243,7 +280,7 @@ jobs:
         uses: crazy-max/ghaction-github-runtime@056b8ec6661ce03a987ab8643a0edc346ae63fe3 #v2.2.0
 
       - name: docker
-        uses: docker://docker
+        uses: docker://docker:29.6.2@sha256:bfec1f5159c63a81ca6fdedbd81404d2c0e16378ed0feec3bb3fbf3998847659
         with:
           args: /bin/sh -c "apk update && apk add bash && /bin/bash _ops/ci.build.sh ios"
         env:

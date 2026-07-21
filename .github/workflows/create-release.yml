@@ -7,6 +7,11 @@ on:
 
 name: Create Release
 
+# Release creation writes contents via the ambient GITHUB_TOKEN — scope
+# to exactly that (repo default grants far more — 2026-07-16 hunt).
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Create Release

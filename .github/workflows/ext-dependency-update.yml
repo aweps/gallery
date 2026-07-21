@@ -4,6 +4,18 @@ on:
   repository_dispatch:
     types: dependency_update
 
+# Least-privilege: privileged ops use PA_TOKEN explicitly; the ambient
+# GITHUB_TOKEN needs read only (repo default is write — 2026-07-16 hunt).
+permissions:
+  contents: read
+
+# Serialize dispatches: two concurrent runs raced on the shared app-updates
+# branch (2026-07-16 hunt deferred #1, operator-approved fix); queued, never
+# cancelled — every dispatch's bookkeeping still lands.
+concurrency:
+  group: ext-dependency-update
+  cancel-in-progress: false
+
 jobs:
 
   build:
@@ -72,9 +84,14 @@ jobs:
             fi
 
             git merge -Xtheirs $MASTER_BRANCH
-            while ! git push --force-with-lease origin $REMOTE_BRANCH; do
-              git pull --deepen=100 -Xours origin $REMOTE_BRANCH
-            done
+            # Single-shot, fail-closed: a rejected --force-with-lease means
+            # something else advanced the branch — fail loud and let the next
+            # dispatch rebuild from fresh state. The old retry loop pulled with
+            # -Xours (silently discarding the other writer's content) and
+            # force-pushed until it won (2026-07-16 hunt deferred #1,
+            # operator-approved fix; concurrency group above serializes our own
+            # dispatches so this should never fire for them).
+            git push --force-with-lease origin $REMOTE_BRANCH
 
             curl -fsSL https://github.com/github/hub/raw/$MASTER_BRANCH/script/get | bash -s 2.14.1
             bin/hub pull-request -b $MASTER_BRANCH -h $REMOTE_BRANCH -a genx7up -m "[ci skip] Dependency updated" || :

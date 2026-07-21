@@ -34,7 +34,9 @@ if [[ "${1:-}" == "web" ]]; then
 
 elif [[ "${1:-}" == "android" ]]; then
 
-	pushd ${GITHUB_WORKSPACE:-.}
+	# Monorepo-safe: the invocation cwd is already the app dir; fall back
+	# to GITHUB_WORKSPACE only for standalone checkouts (root == app).
+	if [ -f pubspec.yaml ]; then pushd .; else pushd ${GITHUB_WORKSPACE:-.}; fi
 	flutter pub get
 	flutter doctor -v
 	if [[ "${DEBUG:-}" == "true" ]]; then VERBOSE_FLAG="-v"; fi
@@ -42,7 +44,14 @@ elif [[ "${1:-}" == "android" ]]; then
 	# Add support for unique Application ID
 	export DART_DEFINES="${DART_DEFINES//=gallery/=gallery01}"
 
-	flutter build ${VERBOSE_FLAG:-} appbundle --no-pub --${2:-debug} ${DART_DEFINES:-}
+	# No --no-pub: with it the tool SKIPS regenerating platform tooling
+	# (flutter_command.dart's regenerate...IfApplicable gates on shouldRunPub),
+	# so a release build compiles the pub-get-era GeneratedPluginRegistrant —
+	# still registering dev-dependency plugins (integration_test) that Gradle
+	# rightly EXCLUDES from the release classpath → javac "package ... does
+	# not exist" (first live tag build, 2026-07-19). pub get is cached, so
+	# the cost is nil.
+	flutter build ${VERBOSE_FLAG:-} appbundle --${2:-debug} ${DART_DEFINES:-}
 	popd
 
 elif [[ "${1:-}" == "ios" ]]; then
@@ -52,7 +61,9 @@ elif [[ "${1:-}" == "ios" ]]; then
 		exit 1
 	fi
 
-	pushd ${GITHUB_WORKSPACE:-.}
+	# Monorepo-safe: the invocation cwd is already the app dir; fall back
+	# to GITHUB_WORKSPACE only for standalone checkouts (root == app).
+	if [ -f pubspec.yaml ]; then pushd .; else pushd ${GITHUB_WORKSPACE:-.}; fi
 	flutter pub get
 	flutter doctor -v
 	if [[ "${DEBUG:-}" == "true" ]]; then VERBOSE_FLAG="-v"; fi

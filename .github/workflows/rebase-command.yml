@@ -2,9 +2,17 @@ name: rebase-command
 on:
   repository_dispatch:
     types: [rebase-command]
+# Least-privilege: privileged ops use PA_TOKEN explicitly; the ambient
+# GITHUB_TOKEN needs read only (repo default is write — 2026-07-16 hunt).
+permissions:
+  contents: read
+
 jobs:
   rebase:
-    if: github.event.client_payload.pull_request.rebaseable == true
+    # != false, not == true: GitHub computes rebaseable ASYNC and reports
+    # null while pending — treat pending as rebaseable and let git itself
+    # fail if not (2026-07-16 hunt).
+    if: github.event.client_payload.pull_request.rebaseable != false
     runs-on: ubuntu-latest
     steps:
      - name: Checkout pull request
@@ -35,7 +43,8 @@ jobs:
          reactions: hooray
 
   notRebaseable:
-    if: github.event.client_payload.pull_request.rebaseable != true
+    # only the genuinely-false case — null (pending) routes to the rebase job
+    if: github.event.client_payload.pull_request.rebaseable == false
     runs-on: ubuntu-latest
     steps:
      - name: Update comment
