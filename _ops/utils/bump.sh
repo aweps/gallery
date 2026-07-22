@@ -27,6 +27,9 @@ _n_commits=$(git rev-list --count HEAD) || { echo "bump: git rev-list --count HE
 COMMITS=$(( $(date +%y%m%d)*100 + _n_commits ))
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

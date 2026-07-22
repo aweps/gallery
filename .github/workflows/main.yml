@@ -166,7 +166,11 @@ jobs:
       needs.filter.outputs.skip-ios == 'false'
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     runs-on: ${{ fromJson(github.event.inputs.SELF_HOSTED == 'true' && '["self-hosted", "macos-15"]' || '"macos-15"') }}
+=======
+    runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
+>>>>>>> Stashed changes
 =======
     runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
 >>>>>>> Stashed changes

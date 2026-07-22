@@ -76,11 +76,14 @@ function exportVars()
     set +x
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     source /dev/stdin <<<"$(grep -v '^#' $1 | sed -re "s/^([^=]+)=([^']+).*/\1='\2'/" | grep '=' | sed -re "s/^[^=]+=.*[^'=]$/\0'/" | sed -re "s/^[^=]+='$/\0'/" | sed -E -n 's/[^#]+/export &/ p')"
 =======
     source /dev/stdin <<<"$(grep -v '^#' $1 | grep -E '^[A-Za-z_][A-Za-z0-9_]*=' | sed -re "s/^([^=]+)=([^']+).*/\1='\2'/" | grep '=' | sed -re "s/^[^=]+=.*[^'=]$/\0'/" | sed -re "s/^[^=]+='$/\0'/" | sed -E -n 's/[^#]+/export &/ p')"
 >>>>>>> Stashed changes
 =======
+=======
+>>>>>>> Stashed changes
     # Same quoting transform as before, applied line-by-line so a value that
     # defeats it fails HERE, naming the source file and line -- not later as an
     # opaque '/dev/stdin: line N' abort. Values are never echoed: these files
@@ -103,6 +106,9 @@ function exportVars()
 "
     done < "$_src"
     source /dev/stdin <<<"$_out"
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     if [ "$(echo "${DEBUG:-}" | tr '[:upper:]' '[:lower:]')" = "true" ]; then set -x; fi
 

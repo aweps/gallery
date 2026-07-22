@@ -34,7 +34,13 @@ dart format --set-exit-if-changed --output=none "${FORMAT_PATHS[@]}"
 
 if [[ "${DEBUG:-}" == "true" ]]; then VERBOSE_FLAG="-v"; fi
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 flutter test ${VERBOSE_FLAG:-} --no-pub ${DART_DEFINES:-}
+=======
+# --coverage: writes coverage/lcov.info for the floor ratchet below; golden
+# comparisons (test/goldens/) run inside this same pass.
+flutter test ${VERBOSE_FLAG:-} --coverage --no-pub ${DART_DEFINES:-}
+>>>>>>> Stashed changes
 =======
 # --coverage: writes coverage/lcov.info for the floor ratchet below; golden
 # comparisons (test/goldens/) run inside this same pass.
@@ -51,7 +57,10 @@ if [ -d integration_test ]; then
 flutter test ${VERBOSE_FLAG:-} --no-pub ${DART_DEFINES:-} -d flutter-tester integration_test
 fi
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 
 # Real-browser smoke (test/browser/) — an app enrols by adding the dir
 # (FQ-6). Compiles the suite to JS and runs it in the image's headless
@@ -88,4 +97,7 @@ if [ -f test/.coverage_floor ]; then
         exit 1
     fi
 fi
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
