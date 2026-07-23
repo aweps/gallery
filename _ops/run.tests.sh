@@ -35,7 +35,13 @@ dart format --set-exit-if-changed --output=none "${FORMAT_PATHS[@]}"
 if [[ "${DEBUG:-}" == "true" ]]; then VERBOSE_FLAG="-v"; fi
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 flutter test ${VERBOSE_FLAG:-} --no-pub ${DART_DEFINES:-}
+=======
+# --coverage: writes coverage/lcov.info for the floor ratchet below; golden
+# comparisons (test/goldens/) run inside this same pass.
+flutter test ${VERBOSE_FLAG:-} --coverage --no-pub ${DART_DEFINES:-}
+>>>>>>> Stashed changes
 =======
 # --coverage: writes coverage/lcov.info for the floor ratchet below; golden
 # comparisons (test/goldens/) run inside this same pass.
@@ -58,7 +64,10 @@ flutter test ${VERBOSE_FLAG:-} --no-pub ${DART_DEFINES:-} -d flutter-tester inte
 fi
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 
@@ -98,6 +107,9 @@ if [ -f test/.coverage_floor ]; then
     fi
 fi
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
