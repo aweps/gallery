@@ -78,11 +78,14 @@ function exportVars()
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     source /dev/stdin <<<"$(grep -v '^#' $1 | sed -re "s/^([^=]+)=([^']+).*/\1='\2'/" | grep '=' | sed -re "s/^[^=]+=.*[^'=]$/\0'/" | sed -re "s/^[^=]+='$/\0'/" | sed -E -n 's/[^#]+/export &/ p')"
 =======
     source /dev/stdin <<<"$(grep -v '^#' $1 | grep -E '^[A-Za-z_][A-Za-z0-9_]*=' | sed -re "s/^([^=]+)=([^']+).*/\1='\2'/" | grep '=' | sed -re "s/^[^=]+=.*[^'=]$/\0'/" | sed -re "s/^[^=]+='$/\0'/" | sed -E -n 's/[^#]+/export &/ p')"
 >>>>>>> Stashed changes
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -111,6 +114,9 @@ function exportVars()
     source /dev/stdin <<<"$_out"
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

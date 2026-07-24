@@ -182,6 +182,7 @@ on:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     - cron: "30 5 2 * *"
 =======
     - cron: "30 5 * * 2"
@@ -717,6 +718,8 @@ on:
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     # Monthly, staggered per app: minute/hour/day-of-month derived from the
     # app name at render time so mono siblings don't all bump at once (and
     # off-the-hour minutes dodge GitHub's top-of-hour scheduler congestion).
@@ -725,6 +728,9 @@ on:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
