@@ -1,0 +1,9 @@
+# .voltmap — vault<->file rows for 'volt up/save/status' (safe to commit: paths, never values)
+# form: personal|team <vault-key> <relative-path>    |    seal <glob>
+# migrated 2026-07-23 from mono/initrepos.sh (get1 aweps_gallery) — secrets responsibility now lives with THIS repo
+personal	aweps_gallery/env/temp	_ops/.env.temp
+team	mono-dev/aweps_gallery/secrets/local/_all	_ops/.secrets.local
+team	mono-dev/aweps_gallery/secrets/dev/_all	_ops/.secrets.dev
+team	mono-prod/aweps_gallery/secrets/local/admin	_ops/.secrets.admin
+team	mono-prod/aweps_gallery/secrets/ops/_all	_ops/.secrets.ops
+team	mono-prod/aweps_gallery/secrets/prod/_all	_ops/.secrets.prod
