@@ -22,7 +22,10 @@ jobs:
     name: Pick runner
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
     # Belt-and-braces for a probe-JOB failure (e.g. GitHub cannot resolve
@@ -35,6 +38,9 @@ jobs:
     # having run.
     continue-on-error: true
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -187,7 +193,11 @@ jobs:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     runs-on: ${{ fromJson(github.event.inputs.SELF_HOSTED == 'true' && '["self-hosted", "macos-15"]' || '"macos-15"') }}
+=======
+    runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
+>>>>>>> Stashed changes
 =======
     runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
 >>>>>>> Stashed changes
