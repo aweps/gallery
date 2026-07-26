@@ -2,3 +2,10 @@
 .git*
 .vscode
 Dockerfile*
+
+# -ios carrier only needs the xcarchive; drop the 36k+ Xcode intermediate
+# files under build/ios/ (grpc-fuse sends them one-by-one on Docker Desktop and
+# the self-hosted-mac local packaging step hangs for 20+ min). Keeps build/app
+# (android AAB) and build/web (web) untouched.
+build/ios/*
+!build/ios/archive

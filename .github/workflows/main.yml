@@ -23,6 +23,7 @@ jobs:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
 =======
 >>>>>>> Stashed changes
@@ -44,6 +45,16 @@ jobs:
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+    # Belt-and-braces for a probe-JOB failure (e.g. GitHub cannot resolve the
+    # action itself — the one mode the action's fallback-on-error cannot
+    # catch): continue-on-error keeps this job's conclusion green with empty
+    # outputs, so every consumer still runs on its runs-on fallback default
+    # instead of being SKIPPED. A skipped build-ios still lets `dispatch`
+    # fire (it gates on failure/cancelled, not skipped), which would ship
+    # xops an ops_update for a release with no iOS carrier image.
+    continue-on-error: true
+>>>>>>> Stashed changes
     runs-on: ubuntu-latest
     outputs:
       linux: ${{ steps.linux.outputs.use-runner }}
@@ -64,6 +75,11 @@ jobs:
         uses: mikehardy/runner-fallback-action@dc7732f9e532c451b2527b288ba8d58fd4b0a4ca #v1.1.0
         with:
           primary-runner: "debian-selfhosted"
+<<<<<<< Updated upstream
+=======
+          organization: ${{ github.repository_owner }}
+          primaries-required: "1"   # overflow to hosted when machzero is busy (linux only; iOS stays on bolt-2)
+>>>>>>> Stashed changes
           fallback-runner: "ubuntu-latest"
           fallback-on-error: "true"
           github-token: ${{ secrets.PA_TOKEN || github.token }}
@@ -73,6 +89,10 @@ jobs:
         uses: mikehardy/runner-fallback-action@dc7732f9e532c451b2527b288ba8d58fd4b0a4ca #v1.1.0
         with:
           primary-runner: "macos-selfhosted"
+<<<<<<< Updated upstream
+=======
+          organization: ${{ github.repository_owner }}
+>>>>>>> Stashed changes
           fallback-runner: "macos-26"
           fallback-on-error: "true"
           github-token: ${{ secrets.PA_TOKEN || github.token }}
@@ -89,6 +109,30 @@ jobs:
       skip-ios: "${{ steps.check.outputs.skip-ios }}"
       skip-android: "${{ steps.check.outputs.skip-android }}"
     steps:
+      - name: Reclaim self-hosted workspace (pre-checkout)
+        if: ${{ runner.environment == 'self-hosted' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          ws="${{ github.workspace }}"
+          [ -d "$ws" ] || exit 0
+          uid="$(id -u)"; gid="$(id -g)"
+          # Reused self-hosted workspaces accumulate root-owned files from prior
+          # docker-as-root jobs, so actions/checkout fails to clean them (EACCES).
+          # Reclaim ownership so checkout can proceed. Linux self-hosted has docker
+          # (used for builds); macOS self-hosted has passwordless sudo but no docker.
+          # Hosted runners are ephemeral, so runner.environment guards this out.
+          # Only Linux self-hosted has a docker daemon (it runs the builds); use a
+          # root container there to reclaim. macOS self-hosted (bolt-2) has the
+          # docker CLI but NO daemon, so `docker run` HANGS (and `|| true` can't
+          # guard a hang) -- restrict the container path to Linux and bound it;
+          # macOS reclaims via passwordless sudo. (2026-07-23: this step wedged
+          # every bolt-2 iOS build for >1h before the uname guard.)
+          if [ "$(uname -s)" = "Linux" ] && command -v docker >/dev/null 2>&1; then
+            timeout 120 docker run --rm -v "$ws:/ws" alpine:3.20 chown -R "$uid:$gid" /ws || true
+          fi
+          sudo chown -R "$uid:$gid" "$ws" 2>/dev/null || chown -R "$uid:$gid" "$ws" 2>/dev/null || true
+
       - name: Check out code
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
         with:
@@ -127,6 +171,30 @@ jobs:
       DEBUG: ${{ github.event.inputs.DEBUG }}
       WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
     steps:
+      - name: Reclaim self-hosted workspace (pre-checkout)
+        if: ${{ runner.environment == 'self-hosted' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          ws="${{ github.workspace }}"
+          [ -d "$ws" ] || exit 0
+          uid="$(id -u)"; gid="$(id -g)"
+          # Reused self-hosted workspaces accumulate root-owned files from prior
+          # docker-as-root jobs, so actions/checkout fails to clean them (EACCES).
+          # Reclaim ownership so checkout can proceed. Linux self-hosted has docker
+          # (used for builds); macOS self-hosted has passwordless sudo but no docker.
+          # Hosted runners are ephemeral, so runner.environment guards this out.
+          # Only Linux self-hosted has a docker daemon (it runs the builds); use a
+          # root container there to reclaim. macOS self-hosted (bolt-2) has the
+          # docker CLI but NO daemon, so `docker run` HANGS (and `|| true` can't
+          # guard a hang) -- restrict the container path to Linux and bound it;
+          # macOS reclaims via passwordless sudo. (2026-07-23: this step wedged
+          # every bolt-2 iOS build for >1h before the uname guard.)
+          if [ "$(uname -s)" = "Linux" ] && command -v docker >/dev/null 2>&1; then
+            timeout 120 docker run --rm -v "$ws:/ws" alpine:3.20 chown -R "$uid:$gid" /ws || true
+          fi
+          sudo chown -R "$uid:$gid" "$ws" 2>/dev/null || chown -R "$uid:$gid" "$ws" 2>/dev/null || true
+
       - name: Check out code
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
 
@@ -161,6 +229,30 @@ jobs:
       DEBUG: ${{ github.event.inputs.DEBUG }}
       WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
     steps:
+      - name: Reclaim self-hosted workspace (pre-checkout)
+        if: ${{ runner.environment == 'self-hosted' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          ws="${{ github.workspace }}"
+          [ -d "$ws" ] || exit 0
+          uid="$(id -u)"; gid="$(id -g)"
+          # Reused self-hosted workspaces accumulate root-owned files from prior
+          # docker-as-root jobs, so actions/checkout fails to clean them (EACCES).
+          # Reclaim ownership so checkout can proceed. Linux self-hosted has docker
+          # (used for builds); macOS self-hosted has passwordless sudo but no docker.
+          # Hosted runners are ephemeral, so runner.environment guards this out.
+          # Only Linux self-hosted has a docker daemon (it runs the builds); use a
+          # root container there to reclaim. macOS self-hosted (bolt-2) has the
+          # docker CLI but NO daemon, so `docker run` HANGS (and `|| true` can't
+          # guard a hang) -- restrict the container path to Linux and bound it;
+          # macOS reclaims via passwordless sudo. (2026-07-23: this step wedged
+          # every bolt-2 iOS build for >1h before the uname guard.)
+          if [ "$(uname -s)" = "Linux" ] && command -v docker >/dev/null 2>&1; then
+            timeout 120 docker run --rm -v "$ws:/ws" alpine:3.20 chown -R "$uid:$gid" /ws || true
+          fi
+          sudo chown -R "$uid:$gid" "$ws" 2>/dev/null || chown -R "$uid:$gid" "$ws" 2>/dev/null || true
+
       - name: Check out code
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
 
@@ -194,6 +286,7 @@ jobs:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     runs-on: ${{ fromJson(github.event.inputs.SELF_HOSTED == 'true' && '["self-hosted", "macos-15"]' || '"macos-15"') }}
 =======
     runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
@@ -210,6 +303,11 @@ jobs:
 =======
     runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
 >>>>>>> Stashed changes
+=======
+    runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
+    outputs:
+      self_hosted: ${{ steps.detect_env.outputs.self_hosted }}
+>>>>>>> Stashed changes
     env:
       DEBUG: ${{ github.event.inputs.DEBUG }}
       WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
@@ -217,7 +315,15 @@ jobs:
     steps:
       - name: Print environment
         run: echo "Running on ${{ runner.os }} (${{ runner.arch }})"
+<<<<<<< Updated upstream
         
+=======
+
+      - name: Detect runner environment
+        id: detect_env
+        run: echo "self_hosted=${{ runner.environment == 'self-hosted' }}" >> "$GITHUB_OUTPUT"
+
+>>>>>>> Stashed changes
       - name: Select Xcode version
         run: sudo xcode-select -s /Applications/Xcode_16.3.app
 
@@ -239,12 +345,40 @@ jobs:
           echo "----- installed SDKs -----"
           xcodebuild -showsdks || true
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+      - name: Reclaim self-hosted workspace (pre-checkout)
+        if: ${{ runner.environment == 'self-hosted' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          ws="${{ github.workspace }}"
+          [ -d "$ws" ] || exit 0
+          uid="$(id -u)"; gid="$(id -g)"
+          # Reused self-hosted workspaces accumulate root-owned files from prior
+          # docker-as-root jobs, so actions/checkout fails to clean them (EACCES).
+          # Reclaim ownership so checkout can proceed. Linux self-hosted has docker
+          # (used for builds); macOS self-hosted has passwordless sudo but no docker.
+          # Hosted runners are ephemeral, so runner.environment guards this out.
+          # Only Linux self-hosted has a docker daemon (it runs the builds); use a
+          # root container there to reclaim. macOS self-hosted (bolt-2) has the
+          # docker CLI but NO daemon, so `docker run` HANGS (and `|| true` can't
+          # guard a hang) -- restrict the container path to Linux and bound it;
+          # macOS reclaims via passwordless sudo. (2026-07-23: this step wedged
+          # every bolt-2 iOS build for >1h before the uname guard.)
+          if [ "$(uname -s)" = "Linux" ] && command -v docker >/dev/null 2>&1; then
+            timeout 120 docker run --rm -v "$ws:/ws" alpine:3.20 chown -R "$uid:$gid" /ws || true
+          fi
+          sudo chown -R "$uid:$gid" "$ws" 2>/dev/null || chown -R "$uid:$gid" "$ws" 2>/dev/null || true
+
 >>>>>>> Stashed changes
       - name: Check out code
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
 
       - name: Restore Flutter archive
         id: flutter-cache
+        if: ${{ runner.environment != 'self-hosted' }}
         uses: actions/cache@2f8e54208210a422b2efd51efaa6bd6d7ca8920f #v3.4.3
         with:
           key: flutter-archive-${{ env.FLUTTER_VER }}
@@ -252,6 +386,7 @@ jobs:
             ~/Flutter/flutter_macos_${{ env.FLUTTER_VER }}-stable.zip
 
       - name: Restore Flutter dependencies
+        if: ${{ runner.environment != 'self-hosted' }}
         uses: actions/cache@2f8e54208210a422b2efd51efaa6bd6d7ca8920f #v3.4.3
         with:
           path: ~/Flutter/flutter
@@ -264,8 +399,36 @@ jobs:
           SECRETS_B64_PROD: ${{ secrets.SECRETS_B64_PROD }}
           GITHUB_PR_SHA: ${{ github.event.pull_request.head.sha }}
 
+      - name: Package ios image locally (self-hosted has a docker daemon)
+        # Self-hosted mac has a local docker daemon, so build+push the -ios
+        # carrier image here instead of round-tripping the archive through
+        # GitHub's cache to a linux runner (no-remote-cache-on-self-hosted rule).
+        # DOCKER_DEFAULT_PLATFORM pins linux/amd64 to match the hosted-built
+        # artifact on this arm64 mac; BUILDX_NO_DEFAULT_ATTESTATIONS keeps it a
+        # single-platform image like machzero produces. Hosted macos-26 has NO
+        # docker, so it still hands off to package-ios (gated on self_hosted).
+        if: ${{ runner.environment == 'self-hosted' }}
+        run: |
+          # Homebrew docker CLI + a PATH WITHOUT /usr/local/bin so
+          # docker-credential-osxkeychain is unreachable: the docker CLI defaults
+          # credsStore to osxkeychain on macOS whenever that helper is on PATH, and
+          # that HANGS (credsStore=desktop) or fails (Keychain Error -61) in a
+          # headless runner. With no helper on PATH the CLI stores creds inline
+          # (fine for a dedicated CI runner); a fresh DOCKER_CONFIG also dodges
+          # Docker Desktop's credsStore=desktop in ~/.docker/config.json.
+          export PATH="/opt/homebrew/bin:/usr/bin:/bin"
+          export DOCKER_CONFIG="${RUNNER_TEMP:-/tmp}/docker-ci"
+          mkdir -p "$DOCKER_CONFIG"
+          /bin/bash _ops/ci.build.sh ios
+        env:
+          DOCKER_DEFAULT_PLATFORM: linux/amd64
+          BUILDX_NO_DEFAULT_ATTESTATIONS: "1"
+          SECRETS_B64_DEV: ${{ secrets.SECRETS_B64_DEV }}
+          SECRETS_B64_PROD: ${{ secrets.SECRETS_B64_PROD }}
+          GITHUB_PR_SHA: ${{ github.event.pull_request.head.sha }}
+
       - name: Cache Flutter archive
-        if: steps.flutter-cache.outputs.cache-hit != 'true'
+        if: ${{ steps.flutter-cache.outputs.cache-hit != 'true' && runner.environment != 'self-hosted' }}
         uses: actions/cache@2f8e54208210a422b2efd51efaa6bd6d7ca8920f #v3.4.3
         with:
           key: flutter-archive-${{ env.FLUTTER_VER }}
@@ -273,12 +436,14 @@ jobs:
             ~/Flutter/flutter_macos_${{ env.FLUTTER_VER }}-stable.zip
 
       - name: Cache Flutter dependencies
+        if: ${{ runner.environment != 'self-hosted' }}
         uses: actions/cache@2f8e54208210a422b2efd51efaa6bd6d7ca8920f #v3.4.3
         with:
           path: ~/Flutter/flutter
           key: ${{ runner.OS }}-flutter-install-cache-${{ env.FLUTTER_VER }}
 
       - name: Cache ios archive
+        if: ${{ runner.environment != 'self-hosted' }}
         uses: actions/cache@2f8e54208210a422b2efd51efaa6bd6d7ca8920f #v3.4.3
         with:
           key: ios-archive-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.head_ref || github.ref_name }}-${{ github.run_attempt }}
@@ -296,13 +461,38 @@ jobs:
       !contains(github.event.pull_request.title, 'ci skip') &&
       !github.event.pull_request.head.repo.fork &&
       (startsWith(github.ref, 'refs/tags/ios') || startsWith(github.ref, 'refs/tags/mobile') || startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/hotfix/')) &&
-      needs.filter.outputs.skip-ios == 'false'
+      needs.filter.outputs.skip-ios == 'false' &&
+      needs.build-ios.outputs.self_hosted != 'true'
 
     runs-on: ${{ fromJSON(needs.pick-runner.outputs.linux || '["ubuntu-latest"]') }}
     env:
       DEBUG: ${{ github.event.inputs.DEBUG }}
       WAIT_ON_ERROR: ${{ github.event.inputs.WAIT_ON_ERROR }}
     steps:
+      - name: Reclaim self-hosted workspace (pre-checkout)
+        if: ${{ runner.environment == 'self-hosted' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          ws="${{ github.workspace }}"
+          [ -d "$ws" ] || exit 0
+          uid="$(id -u)"; gid="$(id -g)"
+          # Reused self-hosted workspaces accumulate root-owned files from prior
+          # docker-as-root jobs, so actions/checkout fails to clean them (EACCES).
+          # Reclaim ownership so checkout can proceed. Linux self-hosted has docker
+          # (used for builds); macOS self-hosted has passwordless sudo but no docker.
+          # Hosted runners are ephemeral, so runner.environment guards this out.
+          # Only Linux self-hosted has a docker daemon (it runs the builds); use a
+          # root container there to reclaim. macOS self-hosted (bolt-2) has the
+          # docker CLI but NO daemon, so `docker run` HANGS (and `|| true` can't
+          # guard a hang) -- restrict the container path to Linux and bound it;
+          # macOS reclaims via passwordless sudo. (2026-07-23: this step wedged
+          # every bolt-2 iOS build for >1h before the uname guard.)
+          if [ "$(uname -s)" = "Linux" ] && command -v docker >/dev/null 2>&1; then
+            timeout 120 docker run --rm -v "$ws:/ws" alpine:3.20 chown -R "$uid:$gid" /ws || true
+          fi
+          sudo chown -R "$uid:$gid" "$ws" 2>/dev/null || chown -R "$uid:$gid" "$ws" 2>/dev/null || true
+
       - name: Check out code
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
 

@@ -42,9 +42,9 @@ export GIT_BRANCH_REF
 if [[ `echo $GIT_BRANCH_REF | grep "^refs/" -c` == "1" ]]; then
     if [[ "${SECRETS_B64:-}" == "" ]]; then
         if [[ "$GIT_BRANCH_REF" == "refs/tags/"* ]]; then
-            export SECRETS_B64=$SECRETS_B64_PROD
+            export SECRETS_B64=${SECRETS_B64_PROD:-}
         else
-            export SECRETS_B64=$SECRETS_B64_DEV
+            export SECRETS_B64=${SECRETS_B64_DEV:-}
         fi
     fi
 fi
@@ -80,11 +80,14 @@ function exportVars()
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     source /dev/stdin <<<"$(grep -v '^#' $1 | sed -re "s/^([^=]+)=([^']+).*/\1='\2'/" | grep '=' | sed -re "s/^[^=]+=.*[^'=]$/\0'/" | sed -re "s/^[^=]+='$/\0'/" | sed -E -n 's/[^#]+/export &/ p')"
 =======
     source /dev/stdin <<<"$(grep -v '^#' $1 | grep -E '^[A-Za-z_][A-Za-z0-9_]*=' | sed -re "s/^([^=]+)=([^']+).*/\1='\2'/" | grep '=' | sed -re "s/^[^=]+=.*[^'=]$/\0'/" | sed -re "s/^[^=]+='$/\0'/" | sed -E -n 's/[^#]+/export &/ p')"
 >>>>>>> Stashed changes
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -119,6 +122,9 @@ function exportVars()
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -190,17 +196,26 @@ fi
 if [[ ! -z ${ENABLE_ADMIN:-} && ${ENABLE_ADMIN} == "true" && -f ${SECRETS_SRC}.admin ]]; then
     cat ${SECRETS_SRC}.admin >> $SECRETS_FILE
 fi
-#Remove empty vars
-sed -i -re '/^[^=]+=$/d' $SECRETS_FILE
+#Remove empty vars (portable in-place: BSD sed parses `-i -re` as backup
+#extension "-re", littering a second secret copy; -i.bak works on both)
+sed -i.bak -E -e '/^[^=]+=$/d' $SECRETS_FILE && rm -f ${SECRETS_FILE}.bak
 exportVars $SECRETS_FILE
 
 ######## Updated Env Vars ########
 # Fill secrets
-( printf "cat <<EOF\n" ; cat $ENV_FILE2 ; printf "\nEOF" ) | sh > ${ENV_FILE2}.tmp
+# Strip comment lines before the sh stage: the unquoted heredoc executes
+# backticks/$() anywhere in its body, comments included (a `cmd` in an env
+# comment would RUN cmd here; 2026-07-17 verb-cycle find).
+( printf "cat <<EOF\n" ; grep -v '^[[:space:]]*#' $ENV_FILE2 || : ; printf "\nEOF" ) | sh > ${ENV_FILE2}.tmp
 mv ${ENV_FILE2}.tmp $ENV_FILE2
 
 # Load modified env
 exportVars $ENV_FILE2
+
+# The temp materializations carry REAL secret values whenever a
+# .secrets.<env> exists — remove them now that they are exported
+# (secrets-at-rest under .cicd/ red the A9 gitleaks gate; 2026-07-17 find).
+rm -f $SECRETS_FILE $ENV_FILE2
 
 
 #################### APP SPECIFIC ####################3
@@ -224,13 +239,148 @@ else
     export RELEASE_CHANNEL=dev
 fi
 
-DART_DEFINES=DART_DEFINES_B64_${RELEASE_CHANNEL}
-export DART_DEFINES=`echo ${!DART_DEFINES} | base64 -d`
+# RELEASE_CHANNEL comes from a git tag suffix, so it is operator input, not a
+# known-safe token: `1.0.7-beta.1+N` yields channel "beta.1". Both lookups below
+# build a VARIABLE NAME from it, and an indirect expansion on an invalid name
+# ("beta.1") or an undefined one (an unknown channel like "alpha") is a hard
+# bash error under `set -u`. Sanitize once here, and use `:-` so an unknown
+# channel reaches its intended "Missing DART_DEFINES" message instead of an
+# opaque bash abort (2026-07-22; both pre-date per-channel keystores).
+RELEASE_CHANNEL_VAR=${RELEASE_CHANNEL//[^A-Za-z0-9_]/_}
+export RELEASE_CHANNEL_VAR
+
+DART_DEFINES=DART_DEFINES_B64_${RELEASE_CHANNEL_VAR}
+export DART_DEFINES=`echo ${!DART_DEFINES:-} | base64 -d`
 [[ $DART_DEFINES != "" ]] || (echo "Missing DART_DEFINES"; exit 1)
 export $(echo $DART_DEFINES | sed 's/--dart-define //g' | tr " " "\n" | tr "\n" "\0" | xargs -0 -n1)
 export APP_IDENTIFIER=${APP_IDENTIFIER}.${APP_SUFFIX:-gallery}
 
-# Save keystore file
+# Secrets appended below (PORTER_REGISTER_TOKEN, FIREBASE_*, GLITCHTIP_DSN,
+# POSTHOG_*) must never hit xtrace — same set +x / conditional-restore
+# pattern exportVars() uses above (DEBUG=true must never echo values).
+set +x
+
+# Porter register-gate token: channel-paired from the secrets flow
+# (PORTER_REGISTER_TOKEN_{STG,PROD} schema lines in _ops/.secrets; real
+# values arrive via SECRETS_B64_* / .secrets.<env>). dev+beta channels ->
+# staging token, prod -> production token (docs/porter-consumption-doctrine.md
+# S6/S10; pairing verified live 2026-07-20 - beta rides the PROD secrets
+# bundle, which is why BOTH tokens live in one schema and the channel picks).
+# Appended to the build defines only when non-empty; never committed.
+if [[ "${RELEASE_CHANNEL}" == "prod" ]]; then
+    PORTER_REGISTER_TOKEN=${PORTER_REGISTER_TOKEN_PROD:-}
+else
+    PORTER_REGISTER_TOKEN=${PORTER_REGISTER_TOKEN_STG:-}
+fi
+if [[ "${PORTER_REGISTER_TOKEN:-}" != "" ]]; then
+    export DART_DEFINES="$DART_DEFINES --dart-define PORTER_REGISTER_TOKEN=$PORTER_REGISTER_TOKEN"
+fi
+
+# Firebase (push) + observability defines — channel/app-picked from the
+# secrets flow (schema comments in _ops/.secrets). Firebase app ids are per
+# app+platform+channel; GlitchTip DSNs per app; PostHog key/host shared.
+# Appended as dart-defines only when present; tests strip them (run.tests.sh).
+APP_SLUG_BASE=${APP_SUFFIX%%.*}
+for _plat in ANDROID IOS; do
+    _v="FIREBASE_APP_ID_${_plat}_${APP_SLUG_BASE}_${RELEASE_CHANNEL}"
+    if [[ "${!_v:-}" != "" ]]; then
+        export DART_DEFINES="$DART_DEFINES --dart-define FIREBASE_APP_ID_${_plat}=${!_v}"
+    fi
+done
+if [[ "${FIREBASE_API_KEY:-}" != "" ]]; then
+    export DART_DEFINES="$DART_DEFINES --dart-define FIREBASE_API_KEY=${FIREBASE_API_KEY} --dart-define FIREBASE_SENDER_ID=${FIREBASE_SENDER_ID:-} --dart-define FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-}"
+fi
+_g="GLITCHTIP_DSN_${APP_SLUG_BASE}"
+if [[ "${!_g:-}" != "" ]]; then
+    export DART_DEFINES="$DART_DEFINES --dart-define GLITCHTIP_DSN=${!_g}"
+fi
+if [[ "${POSTHOG_API_KEY:-}" != "" ]]; then
+    export DART_DEFINES="$DART_DEFINES --dart-define POSTHOG_API_KEY=${POSTHOG_API_KEY} --dart-define POSTHOG_HOST=${POSTHOG_HOST:-}"
+fi
+
+# Load DEBUG (restore xtrace exactly like exportVars() does — the secret
+# block above ran with it deliberately suppressed).
+if [ "$(echo "${DEBUG:-}" | tr '[:upper:]' '[:lower:]')" = "true" ]; then set -x; fi
+
+# Save keystore file.
+#
+# PER-CHANNEL upload keys: ANDROID_KEYSTORE_B64_<channel> and its two password
+# vars override the un-suffixed defaults for THIS build's RELEASE_CHANNEL. A
+# package whose Play upload key is already locked (e.g. <app>NN.dev, published
+# to internal testing) can therefore keep that key while .beta/prod use a
+# different one. All three fall back to the single un-suffixed value, so an app
+# that defines no per-channel vars behaves exactly as before.
+#
+# Uses RELEASE_CHANNEL_VAR (the sanitized channel defined above), never the raw
+# RELEASE_CHANNEL, because the raw value can be an invalid variable name.
+_ks_b64_var=ANDROID_KEYSTORE_B64_${RELEASE_CHANNEL_VAR}
+_ks_sp_var=ANDROID_KEYSTORE_PASSWORD_${RELEASE_CHANNEL_VAR}
+_ks_kp_var=ANDROID_KEY_PASSWORD_${RELEASE_CHANNEL_VAR}
+export ANDROID_KEYSTORE_B64="${!_ks_b64_var:-${ANDROID_KEYSTORE_B64:-}}"
+export ANDROID_KEYSTORE_PASSWORD="${!_ks_sp_var:-${ANDROID_KEYSTORE_PASSWORD:-}}"
+export ANDROID_KEY_PASSWORD="${!_ks_kp_var:-${ANDROID_KEY_PASSWORD:-}}"
+unset _ks_b64_var _ks_sp_var _ks_kp_var
 if [[ "${ANDROID_KEYSTORE_B64:-}" != "" ]]; then
     echo $ANDROID_KEYSTORE_B64 | base64 -d > _ops/keystore.jks
 fi
+<<<<<<< Updated upstream
+=======
+
+# Fail loudly if generated files were left behind by a *different* build
+# environment. Docker builds mount the repo at /src with the pub cache at
+# /root/.pub-cache, so files like .flutter-plugins-dependencies end up with
+# absolute paths that don't exist on the native host (and vice versa). Verbs
+# that run `flutter pub get` self-heal this, but `--no-pub` verbs (run.sh) fail
+# cryptically ("Plugin directory does not exist: /root/.pub-cache/..."). Call
+# this before such steps to turn that into a clear, actionable message.
+# `flutter run` installs the APK and the device then unpacks dex/AOT artifacts
+# from it, so a device with room for the APK alone can still fail the install
+# with an opaque "INSTALL_FAILED_INSUFFICIENT_STORAGE / Requested internal only,
+# but not enough space" -- and flutter's retry UNINSTALLS the previous copy
+# first, so the app disappears too. Assert real headroom up front instead.
+# (2026-07-22: a 5.8G emulator data partition at 95% presented as "builds fine,
+# doesn't run"; the AVD was configured for 16G but formatted before that.)
+assert_device_space() {
+    local serial="${1:-}" min_kb=1048576 free_kb
+    [ -n "$serial" ] || return 0
+    free_kb=$(adb -s "$serial" shell df /data 2>/dev/null | awk 'END{print $4}' | tr -d '\r')
+    # Unknown//unparseable df output must never block a run -- only a number we
+    # can compare is allowed to fail the build.
+    case "$free_kb" in ''|*[!0-9]*) return 0 ;; esac
+    if [ "$free_kb" -lt "$min_kb" ]; then
+        echo "==================================================================="
+        echo " ERROR: only $((free_kb / 1024))MB free on $serial's data partition."
+        echo ""
+        echo " A Flutter debug install needs ~1GB of headroom: the APK plus the"
+        echo " dex/AOT artifacts the device unpacks from it. Installing anyway"
+        echo " fails as INSTALL_FAILED_INSUFFICIENT_STORAGE and removes the"
+        echo " previously installed copy."
+        echo ""
+        echo " Fix (emulator): wipe it, which also applies any raised"
+        echo "                 disk.dataPartition.size from the AVD config:"
+        echo "   emulator -avd <name> -wipe-data -no-snapshot"
+        echo " Fix (device):   uninstall unused apps, or adb shell pm trim-caches 999G"
+        echo "==================================================================="
+        exit 1
+    fi
+}
+
+assert_no_stale_env() {
+    local dep_file=".flutter-plugins-dependencies"
+    [ -f "$dep_file" ] || return 0
+    local cur_cache="${PUB_CACHE:-$HOME/.pub-cache}"
+    # Any pub-cache path in the file that isn't under this env's cache is stale.
+    if grep -oE '/[^"]*\.pub-cache[^"]*' "$dep_file" 2>/dev/null | grep -qv "^${cur_cache}"; then
+        echo "==================================================================="
+        echo " ERROR: stale plugin paths from a different build environment."
+        echo ""
+        echo " $dep_file references a pub cache that does not exist here"
+        echo " (this environment uses: ${cur_cache})."
+        echo " You likely switched between Docker and native builds."
+        echo ""
+        echo " Fix:   flutter clean     (or  ./runner clean )    then re-run."
+        echo "==================================================================="
+        exit 1
+    fi
+}
+>>>>>>> Stashed changes

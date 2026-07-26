@@ -22,6 +22,7 @@ fi
 
 if [[ "${1:-}" == "android" ]]; then
 	# Add support for unique Application ID
+<<<<<<< Updated upstream
 	export DART_DEFINES="${DART_DEFINES//=gallery/=gallery01}"
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -58,6 +59,9 @@ if [[ "${1:-}" == "android" ]]; then
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+	export DART_DEFINES="${DART_DEFINES//APP_SUFFIX=gallery/APP_SUFFIX=gallery01}"
+>>>>>>> Stashed changes
 	# Target the first booted Android device/emulator so `flutter run` is not
 	# ambiguous when macOS/Chrome/iOS devices are also connected.
 	# `|| :` so a non-zero pipe exit (e.g. no matches) doesn't trip `set -o pipefail`
@@ -79,6 +83,19 @@ elif [[ "${1:-}" == "ios" ]]; then
 >>>>>>> Stashed changes
 fi
 
+<<<<<<< Updated upstream
+=======
+# `flutter run` uses --no-pub, so it can't self-heal stale plugin paths left by
+# a Docker build. Fail early with a `flutter clean` hint instead of cryptically.
+assert_no_stale_env
+
+# Android only: the iOS simulator installs onto the host disk, whose exhaustion
+# macOS surfaces on its own; the device data partition does not.
+if [[ "${1:-}" == "android" ]]; then
+	assert_device_space "${TARGET_DEVICE:-}"
+fi
+
+>>>>>>> Stashed changes
 # Run app on device
 if [[ "${DEBUG:-}" == "true" ]]; then VERBOSE_FLAG="-v"; fi
 flutter run ${VERBOSE_FLAG:-} --${2:-debug} --no-pub ${DART_DEFINES:-}
