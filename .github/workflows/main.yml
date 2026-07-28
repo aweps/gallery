@@ -25,6 +25,7 @@ jobs:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
 =======
 >>>>>>> Stashed changes
@@ -49,6 +50,8 @@ jobs:
 =======
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     # Belt-and-braces for a probe-JOB failure (e.g. GitHub cannot resolve the
     # action itself — the one mode the action's fallback-on-error cannot
     # catch): continue-on-error keeps this job's conclusion green with empty
@@ -58,6 +61,9 @@ jobs:
     # xops an ops_update for a release with no iOS carrier image.
     continue-on-error: true
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -83,6 +89,11 @@ jobs:
           primary-runner: "debian-selfhosted"
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+          organization: ${{ github.repository_owner }}
+          primaries-required: "1"   # overflow to hosted when machzero is busy (linux only; iOS stays on bolt-2)
+>>>>>>> Stashed changes
 =======
           organization: ${{ github.repository_owner }}
           primaries-required: "1"   # overflow to hosted when machzero is busy (linux only; iOS stays on bolt-2)
@@ -102,6 +113,10 @@ jobs:
           primary-runner: "macos-selfhosted"
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+          organization: ${{ github.repository_owner }}
+>>>>>>> Stashed changes
 =======
           organization: ${{ github.repository_owner }}
 >>>>>>> Stashed changes
@@ -303,6 +318,7 @@ jobs:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     runs-on: ${{ fromJson(github.event.inputs.SELF_HOSTED == 'true' && '["self-hosted", "macos-15"]' || '"macos-15"') }}
 =======
     runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
@@ -318,6 +334,11 @@ jobs:
 >>>>>>> Stashed changes
 =======
     runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
+>>>>>>> Stashed changes
+=======
+    runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
+    outputs:
+      self_hosted: ${{ steps.detect_env.outputs.self_hosted }}
 >>>>>>> Stashed changes
 =======
     runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
@@ -345,6 +366,9 @@ jobs:
         run: echo "self_hosted=${{ runner.environment == 'self-hosted' }}" >> "$GITHUB_OUTPUT"
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -371,8 +395,11 @@ jobs:
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
       - name: Reclaim self-hosted workspace (pre-checkout)
@@ -400,6 +427,9 @@ jobs:
           sudo chown -R "$uid:$gid" "$ws" 2>/dev/null || chown -R "$uid:$gid" "$ws" 2>/dev/null || true
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
