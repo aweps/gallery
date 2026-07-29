@@ -25,6 +25,7 @@ if [[ "${1:-}" == "android" ]]; then
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 	export DART_DEFINES="${DART_DEFINES//=gallery/=gallery01}"
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -70,6 +71,9 @@ if [[ "${1:-}" == "android" ]]; then
 =======
 	export DART_DEFINES="${DART_DEFINES//APP_SUFFIX=gallery/APP_SUFFIX=gallery01}"
 >>>>>>> Stashed changes
+=======
+	export DART_DEFINES="${DART_DEFINES//APP_SUFFIX=gallery/APP_SUFFIX=gallery01}"
+>>>>>>> Stashed changes
 	# Target the first booted Android device/emulator so `flutter run` is not
 	# ambiguous when macOS/Chrome/iOS devices are also connected.
 	# `|| :` so a non-zero pipe exit (e.g. no matches) doesn't trip `set -o pipefail`
@@ -105,6 +109,9 @@ fi
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
