@@ -35,6 +35,7 @@ jobs:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
 =======
 >>>>>>> Stashed changes
@@ -79,6 +80,8 @@ jobs:
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     # Belt-and-braces for a probe-JOB failure (e.g. GitHub cannot resolve the
     # action itself — the one mode the action's fallback-on-error cannot
     # catch): continue-on-error keeps this job's conclusion green with empty
@@ -98,6 +101,9 @@ jobs:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -153,6 +159,11 @@ jobs:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+          organization: ${{ github.repository_owner }}
+          primaries-required: "1"   # overflow to hosted when machzero is busy (linux only; iOS stays on bolt-2)
+>>>>>>> Stashed changes
 =======
           organization: ${{ github.repository_owner }}
           primaries-required: "1"   # overflow to hosted when machzero is busy (linux only; iOS stays on bolt-2)
@@ -222,6 +233,10 @@ jobs:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+          organization: ${{ github.repository_owner }}
+>>>>>>> Stashed changes
 =======
           organization: ${{ github.repository_owner }}
 >>>>>>> Stashed changes
@@ -463,6 +478,7 @@ jobs:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     runs-on: ${{ fromJson(github.event.inputs.SELF_HOSTED == 'true' && '["self-hosted", "macos-15"]' || '"macos-15"') }}
 =======
     runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
@@ -478,6 +494,11 @@ jobs:
 >>>>>>> Stashed changes
 =======
     runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
+>>>>>>> Stashed changes
+=======
+    runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
+    outputs:
+      self_hosted: ${{ steps.detect_env.outputs.self_hosted }}
 >>>>>>> Stashed changes
 =======
     runs-on: ${{ fromJSON(needs.pick-runner.outputs.macos || '["macos-26"]') }}
@@ -565,6 +586,9 @@ jobs:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -621,8 +645,11 @@ jobs:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -680,6 +707,9 @@ jobs:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

@@ -34,6 +34,7 @@ if [[ "${1:-}" == "android" ]]; then
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 	export DART_DEFINES="${DART_DEFINES//=gallery/=gallery01}"
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -69,6 +70,9 @@ if [[ "${1:-}" == "android" ]]; then
 =======
 >>>>>>> Stashed changes
 =======
+>>>>>>> Stashed changes
+=======
+	export DART_DEFINES="${DART_DEFINES//APP_SUFFIX=gallery/APP_SUFFIX=gallery01}"
 >>>>>>> Stashed changes
 =======
 	export DART_DEFINES="${DART_DEFINES//APP_SUFFIX=gallery/APP_SUFFIX=gallery01}"
@@ -150,6 +154,9 @@ fi
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
