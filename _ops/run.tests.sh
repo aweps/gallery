@@ -91,7 +91,13 @@ if [[ "${DEBUG:-}" == "true" ]]; then VERBOSE_FLAG="-v"; fi
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 flutter test ${VERBOSE_FLAG:-} --no-pub ${DART_DEFINES:-}
+=======
+# --coverage: writes coverage/lcov.info for the floor ratchet below; golden
+# comparisons (test/goldens/) run inside this same pass.
+flutter test ${VERBOSE_FLAG:-} --coverage --no-pub ${DART_DEFINES:-}
+>>>>>>> Stashed changes
 =======
 # --coverage: writes coverage/lcov.info for the floor ratchet below; golden
 # comparisons (test/goldens/) run inside this same pass.
@@ -450,7 +456,10 @@ fi
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -658,6 +667,9 @@ fi
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
