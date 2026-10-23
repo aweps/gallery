@@ -199,8 +199,13 @@ elif [[ "${1:-}" == "web-run" ]]; then
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p 8083:8080 -d ${APP_SLUG}
 		echo "Done! - Check in browser - http://<MACHINE_IP>:8083"
+=======
+		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p ${WEB_PORT:-8080}:8080 -d ${APP_SLUG}
+		echo "Done! - Check in browser - http://<MACHINE_IP>:${WEB_PORT:-8080}"
+>>>>>>> Stashed changes
 =======
 		docker run --platform $PLATFORM --rm --name ${APP_SLUG} -p ${WEB_PORT:-8080}:8080 -d ${APP_SLUG}
 		echo "Done! - Check in browser - http://<MACHINE_IP>:${WEB_PORT:-8080}"
@@ -671,6 +676,9 @@ elif [[ "${1:-}" == "android-build" ]]; then
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
